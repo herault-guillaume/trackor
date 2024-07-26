@@ -14,6 +14,11 @@ import bullionvault
 import achatorargent
 import aucoffre
 import joubertchange
+import gold
+import achatoretargent
+import changedelabourse
+import changevivienne
+import bdor
 
 session = Session()
 
@@ -21,24 +26,13 @@ session = Session()
 # achatorargent.get(buy_price,sell_price,0,session)
 # achatorargent.get(buy_price,sell_price,1,session)
 # aucoffre.get(session)
-joubertchange.get(session)
+# joubertchange.get(session)
+# gold.get(session)
+# achatoretargent.get(session)
+# changedelabourse.get(session)
+# changevivienne.get(session)
+# bdor.get(session)
 
-# buy_gp,sell_gp = get_bullionvault_gold_price_euro()
-
-# Exemple d'utilisation
-# url = ''  # Remplacez par l'URL réelle
-# lingots = get_achat_or_argent_gold_price_euro(url,buy_gp,sell_gp,0)
-# monnaies = get_achat_or_argent_gold_price_euro(url,buy_gp,sell_gp,1)
-
-
-# https://www.joubert-change.fr/or-investissement/cours/piece-or-78-20-francs-napoleon.html?gclid=CjwKCAjw74e1BhBnEiwAbqOAjNkbnvzC8-BIcBJuzrwKSVtyAi21wmf6EtddVuSQw0sgRzE0KLATjBoCFMoQAvD_BwE
-# https://www.gold.fr/napoleon-or-20-francs-louis-or/
-# https://www.achat-or-et-argent.fr/or/20-francs-marianne-coq/17
-# https://www.lingor.fr/shop/20-francs-or-napoleon/
-# https://www.changedelabourse.com/or/pieces-d-or-d-investissement
-# https://www.changevivienne.com/or/pieces-d-or-d-investissement
-# https://www.bdor.fr/achat-or-en-ligne/piece-d-or-20-francs-napoleon-laure
-# https://www.bdor.fr/achat-or-en-ligne/piece-d-or-20-francs-coq-marianne
 # https://or-investissement.fr/achat-piece-or-investissement/8-achat-piece-20-francs-marianne-coq.html
 # https://www.oretchange.com/pieces-or/196-achat-20-francs-coq.html
 # https://lcdor.fr/achat-or/pieces-dor/20-francs-or-coq/
