@@ -1,5 +1,5 @@
 from flask import Flask, render_template
-from scraping.scraper_offres import scrape_page
+from scraping.controller import scrape_page
 
 app = Flask(__name__)
 
