@@ -19,6 +19,19 @@ import achatoretargent
 import changedelabourse
 import changevivienne
 import bdor
+import orinvestissement
+import lcdor
+import oretchange
+import goldunion
+import merson
+import goldforex
+import orobel
+import monlingot
+import bullionbypost
+import pieceor
+import changerichelieu
+import lmp
+import goldavenue
 
 session = Session()
 
@@ -32,20 +45,20 @@ session = Session()
 # changedelabourse.get(session)
 # changevivienne.get(session)
 # bdor.get(session)
+# orinvestissement.get(session)
+# lcdor.get(session)
+# oretchange.get(session)
+# goldunion.get(session)
+# merson.get(session)
+# goldforex.get(session)
+# orobel.get(session)
+# monlingot.get(session)
+# bullionbypost.get(session)
+# pieceor.get(session)
+# changerichelieu.get(session)
+# lmp.get(session)
+goldavenue.get(session)
 
-# https://or-investissement.fr/achat-piece-or-investissement/8-achat-piece-20-francs-marianne-coq.html
-# https://www.oretchange.com/pieces-or/196-achat-20-francs-coq.html
-# https://lcdor.fr/achat-or/pieces-dor/20-francs-or-coq/
-# https://goldunion.fr/products/20-francs-coq
-# https://www.merson.fr/fr/achat-or-investissement/91-20-francs-coq.html
-# https://www.goldforex.be/fr/cours-de-lor-prix-pieces-lingot-cotation/napoleon-20-francs-france-229.html
-# https://www.orobel.biz/produit/acheter-piece-or-20-francs-marianne-en-ligne-orobel
-# https://monlingot.fr/or/achat-piece-or-20-francs-napoleon
-# https://www.bullionbypost.fr/francs-francais-piece-or/20-francs-francais/20-francs-notre-choix/
-# https://www.pieces-or.com/achat-or-argent/1-Napoleon-20-Francs.html
-# https://www.changerichelieu.fr/or/pieces-d-or-d-investissement/20-francs-napoleon
-# https://cramp.fr/product/20-francs-napoleon/
-# https://www.lesmetauxprecieux.com/produit/20-francs-marianne-coq/
 # https://www.goldavenue.com/fr/acheter/or/produit/piece-d-or-pur-900-0-20-francs-napoleon-coq-de-chaplain
 # https://www.abacor.fr/product-category/achat-or/pieces-d-or/
 # https://lcdor.fr/achat-or/pieces-dor/20-francs-or-coq/

@@ -1,50 +1,40 @@
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
+import requests
+from bs4 import BeautifulSoup
 from models.model import CoinPrice
-
-mapping_db_names = {
-    'Nom': 'nom',
-    'AchatVous vendez': 'je_vend',
-    'VenteVous achetez': 'j_achete',
-    'Cotation française': 'cotation_francaise',
-    'Prime achat': 'prime_achat_vendeur',
-    'Prime vente': 'prime_vente_vendeur',
-}
 
 def get(session):
     """
-    Scrapes the AuCOFFRE website to get the buy price of 20 Francs coins.
-    It first locates the div containing a specific flag image,
-    then extracts the price text from within that div.
+    Fetches the buy price of the 20 Francs Marianne coin from AuCOFFRE using requests and BeautifulSoup.
     """
-    # options = webdriver.ChromeOptions()
-    # options.add_argument("--headless=new")
-    driver = webdriver.Chrome()
     url = "https://www.aucoffre.com/recherche/metal-1/marketing_list-5/stype-1/produit"
-    driver.get(url)
-    print('test')
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
+    }
 
-    # Locate the div by its data-url attribute (using XPath)
-    xpath = "//div[contains(@data-url, '20f-marianne')]"
-    target_div = WebDriverWait(driver, 2).until(
-        EC.presence_of_element_located((By.XPATH, xpath))
-    )
+    try:
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()  # Raise an exception for HTTP errors
 
-    # Extract the price text from within the div
-    price_element = target_div.find_element(By.CSS_SELECTOR, '.text-xlarge.text-bolder.m-0.text-nowrap')
-    price_text = price_element.text.strip()
+        soup = BeautifulSoup(response.content,'html.parser')
 
-    # Clean the price text and convert to float
-    price = float(price_text.replace('€', '').replace(',','.'))
+        # Use a more specific selector to avoid accidental matches
+        price_element = soup.select_one("div[data-url*='20f-marianne'] .text-xlarge.text-bolder.m-0.text-nowrap")
 
-    coin = CoinPrice(nom="20 francs or coq marianne", j_achete=price,source='aucoffre')
-    session.add(coin)
-    session.commit()
+        if price_element:
+            price_text = price_element.text.strip()
 
-    if price:
-        return price
-    else:
-        raise ValueError("Could not parse the price correctly.")
+            # More robust price cleaning: handle variations in formatting
+            price = float(price_text.replace('€', '').replace(' ', '').replace(',', '.'))
 
+            coin = CoinPrice(nom="20 francs or coq marianne", j_achete=price, source='aucoffre')
+            session.add(coin)
+            session.commit()
+
+            return price
+        else:
+            print("Price element not found on page.")
+            return None
+
+    except (requests.exceptions.RequestException, ValueError) as e:
+        print(f"Error retrieving or parsing price: {e}")
+        return None

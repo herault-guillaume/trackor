@@ -1,30 +1,41 @@
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
+import requests
+from bs4 import BeautifulSoup
 from models.model import CoinPrice
 
-
 def get(session):
-    options = webdriver.ChromeOptions()
-    options.add_argument("--headless")
-    driver = webdriver.Chrome(options=options)
+    """
+    Retrieves the '20 francs or coq marianne' coin purchase price from Change de la Bourse using requests and BeautifulSoup.
+    """
     url = "https://www.changedelabourse.com/or/pieces-d-or-d-investissement/napoleon-or-20-francs"
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
 
-    driver.get(url)
+    }
 
-    # Locate the element
-    price_element = driver.find_element(By.ID, "our_price_display")
+    try:
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
 
-    # Clean the price text and convert to float
-    price = float(price_element.text.replace('€', '').replace(',', '.'))
+        soup = BeautifulSoup(response.content, 'html.parser')
 
-    coin = CoinPrice(nom="20 francs or coq marianne", j_achete=price, source='changedelabourse')
-    session.add(coin)
-    session.commit()
+        # Use a more specific selector to avoid accidental matches
+        price_element = soup.select_one("#our_price_display")
 
-    if price:
-        return price
-    else:
-        raise ValueError("Could not parse the price correctly.")
+        if price_element:
+            price_text = price_element.text.strip()
 
+            # More robust price cleaning: handle variations in formatting
+            price = float(price_text.replace('€', '').replace(' ', '').replace(',', '.'))
+
+            coin = CoinPrice(nom="20 francs or coq marianne", j_achete=price, source='changedelabourse')
+            session.add(coin)
+            session.commit()
+
+            return price
+        else:
+            print("Price element not found on page.")
+            return None
+
+    except (requests.exceptions.RequestException, ValueError) as e:
+        print(f"Error retrieving or parsing price: {e}")
+        return None
