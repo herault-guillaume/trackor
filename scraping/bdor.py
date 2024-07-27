@@ -7,6 +7,7 @@ def get(session):
     Retrieves the '20 francs or coq marianne' coin purchase price from BDOR using requests and BeautifulSoup.
     """
     url = "https://www.bdor.fr/achat-or-en-ligne/piece-d-or-20-francs-coq-marianne"
+
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
 
@@ -34,13 +35,13 @@ def get(session):
 
                     return price
                 except ValueError:
-                    print("Price format could not be parsed.")
+                    print("Price format could not be parsed.",url)
             else:
-                print("Price cell not found in the table.")
+                print("Price cell not found in the table.",url)
         else:
-            print("Target row not found in the table.")
+            print("Target row not found in the table.",url)
 
     except requests.exceptions.RequestException as e:
-        print(f"An error occurred during the request: {e}")
+        print(f"An error occurred during the request: {e}",url)
 
     return None  # Return None to indicate an unsuccessful retrieval

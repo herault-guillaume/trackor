@@ -20,6 +20,7 @@ def get(buy_gp,sell_gp,table_index,session):
         table_index: The index of the table to extract (0 for first, 1 for second).
     """
     url = 'https://www.acheter-or-argent.fr/client/plugins/sebtab/tableau.php'
+
     response = requests.get(url)
     response.raise_for_status()
 
@@ -69,7 +70,7 @@ def get(buy_gp,sell_gp,table_index,session):
             row_data['prime_achat_perso'] = (float(row_data['j_achete']) - (poids_pieces_or[row_data['nom']] * buy_gp)) / float(row_data['j_achete']) * 100
             row_data['prime_vente_perso'] = (float(row_data['je_vend']) - (poids_pieces_or[row_data['nom']] * sell_gp)) / float(row_data['je_vend']) * 100
         except Exception as e:
-            print(e,'not present in weight database')
+            print(e,'not present in weight database',url)
             pass
         data.append(row_data)
 
@@ -80,7 +81,7 @@ def get(buy_gp,sell_gp,table_index,session):
 
         session.commit()  # Save changes to the database
     except Exception as e:
-        print(f"An error occurred: {e}")
+        print(f"An error occurred: {e}",url)
         session.rollback()  # Rollback changes in case of an error
     finally:
         session.close()

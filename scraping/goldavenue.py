@@ -1,33 +1,41 @@
-import requests
-from bs4 import BeautifulSoup
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
 from models.model import CoinPrice
 
 def get(session):
-    url = 'https://www.goldavenue.com/fr/acheter/or/produit/piece-d-or-pur-900-0-20-francs-napoleon-coq-de-chaplain'
-    headers = {'User-Agent': 'Mozilla/5.0'}  # Mimic browser behavior
+    url = "https://www.goldavenue.com/fr/acheter/or/produit/piece-d-or-pur-900-0-20-francs-napoleon-coq-de-chaplain"
 
-    try:
-        response = requests.get(url, headers=headers)
-        response.raise_for_status()  # Check for HTTP errors
+    # Set up headless Chrome
+    options = webdriver.ChromeOptions()
+    # options.add_argument("--headless=new")  # Use headless mode
+    # options.add_argument("--incognito")  # Use incognito mode
 
-        soup = BeautifulSoup(response.content, 'html.parser')
+    with webdriver.Chrome(options=options) as driver:
+        driver.get(url)  # Load the page
 
-        # Find the price element:
-        price_elements = soup.select("div.sc-c09f9e6c-0 hsMOop")
-        print(price_elements)
-        if not price_elements:
-            raise ValueError("Price element not found")
+        try:
+            # Locate the price element by its unique combination of classes
+            price_elements = WebDriverWait(driver, 10).until(
+                EC.presence_of_all_elements_located((By.CSS_SELECTOR, 'span.sc-4c919c2a-0.eGPPLD p.sc-8fad5955-0.iqjCoA'))
+            )
+            price_element = price_elements[1]
 
-        # Extract and clean:
-        price_text = price_elements[2].text
-        price = float(price_text.replace('€', '').replace(',', '.'))
+            price_text_parts = [span.text.strip() for span in price_element.find_elements(By.TAG_NAME, 'span')]
 
-        coin = CoinPrice(nom="20 francs or coq marianne", j_achete=price, source='goldavenue')
-        session.add(coin)
-        session.commit()
+            # Clean and combine the price text
+            price_text = ''.join(price_text_parts).replace('€', '').replace(',', '.')
 
-        return price
+            # Convert to float
+            price = float(price_text)
 
-    except (requests.exceptions.RequestException, ValueError) as e:
-        print(f"Error retrieving price: {e}")
-        return None
+            coin = CoinPrice(nom="20 francs or coq marianne", j_achete=price, source='piecesor')
+            session.add(coin)
+            session.commit()
+
+
+        except ValueError:
+            print(f"Failed to convert price text '{price_text}' to float",url)
+            return None

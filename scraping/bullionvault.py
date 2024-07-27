@@ -15,6 +15,7 @@ def get(session):
 
     try:
         url = "https://or.bullionvault.fr/"
+        print(url)
         driver.get(url)
 
         try:
@@ -63,7 +64,7 @@ def get(session):
         return buy_price_eur,sell_price_eur
 
     except Exception as e:
-        print(f"Error scraping BullionVault: {e}")
+        print(f"Error scraping BullionVault: {e}",url)
         return None
 
     finally:

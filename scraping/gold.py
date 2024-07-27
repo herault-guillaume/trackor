@@ -33,11 +33,11 @@ def get(session):
 
                 return price
             except ValueError:
-                print(f"Failed to convert price text '{price_text}' to float")
+                print(f"Failed to convert price text '{price_text}' to float",url)
         else:
-            print("Price element not found on page.")
+            print("Price element not found on page.",url)
 
     except requests.RequestException as e:
-        print(f"Error making request to {url}: {e}")
+        print(f"Error making request to {url}: {e}",url)
 
     return None  # Return None on failure

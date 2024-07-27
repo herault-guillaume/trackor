@@ -29,5 +29,5 @@ def get(session):
         return price
 
     except (requests.exceptions.RequestException, ValueError) as e:
-        print(f"Error retrieving price: {e}")
+        print(f"Error retrieving price: {e}",url)
         return None

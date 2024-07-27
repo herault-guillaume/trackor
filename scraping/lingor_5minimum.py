@@ -25,5 +25,5 @@ def get(session):
     if price:
         return price
     else:
-        raise ValueError("Could not parse the price correctly.")
+        raise ValueError("Could not parse the price correctly.",url)
 

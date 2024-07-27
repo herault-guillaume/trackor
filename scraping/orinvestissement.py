@@ -31,11 +31,11 @@ def get(session):
                 session.commit()
                 return price
             except ValueError:
-                print(f"Failed to convert price text '{price_text}' to float")
+                print(f"Failed to convert price text '{price_text}' to float,url")
         else:
-            print("Price element not found on page.")
+            print("Price element not found on page.",url)
 
     except requests.RequestException as e:
-        print(f"An error occurred during the request: {e}")
+        print(f"An error occurred during the request: {e}",url)
 
     return None  # Return None on failure

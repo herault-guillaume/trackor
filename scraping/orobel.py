@@ -36,11 +36,11 @@ def get(session):
                 return price
 
             except (ValueError, IndexError) as e:
-                print(f"Failed to parse price: {e}")
+                print(f"Failed to parse price: {e}",url)
         else:
-            print("Price element not found on page.")
+            print("Price element not found on page.",url)
 
     except requests.RequestException as e:
-        print(f"Error making request to {url}: {e}")
+        print(f"Error making request to {url}: {e}",url)
 
     return None  # Return None on failure

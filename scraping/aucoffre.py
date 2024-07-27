@@ -7,6 +7,7 @@ def get(session):
     Fetches the buy price of the 20 Francs Marianne coin from AuCOFFRE using requests and BeautifulSoup.
     """
     url = "https://www.aucoffre.com/recherche/metal-1/marketing_list-5/stype-1/produit"
+
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
     }
@@ -36,5 +37,5 @@ def get(session):
             return None
 
     except (requests.exceptions.RequestException, ValueError) as e:
-        print(f"Error retrieving or parsing price: {e}")
+        print(f"Error retrieving or parsing price: {e}",url)
         return None

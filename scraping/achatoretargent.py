@@ -7,6 +7,7 @@ def get(session):
     Retrieves the '20 francs or coq marianne' coin purchase price from achat-or-et-argent.fr using requests.
     """
     url = "https://www.achat-or-et-argent.fr/or/20-francs-marianne-coq/17"
+
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
     }
@@ -32,11 +33,11 @@ def get(session):
 
                 return price
             except ValueError:
-                print("Price format could not be parsed.")
+                print("Price format could not be parsed.",url)
 
         else:
             print("Price element not found.")
 
     except requests.exceptions.RequestException as e:
-        print(f"An error occurred during the request: {e}")
+        print(f"An error occurred during the request: {e}",url)
     return None  # Return None to indicate an unsuccessful retrieval
