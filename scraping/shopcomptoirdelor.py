@@ -23,7 +23,7 @@ def get(session):
             price_text = price_element.text.strip()
             price = float(price_text.replace('€', '').replace(',', '.').replace('&nbsp;', ''))
 
-            coin = CoinPrice(nom="20 francs or coq marianne", j_achete=price, source='shopcomptoirdelor')
+            coin = CoinPrice(nom="20 francs or coq marianne", j_achete=price, source='shopcomptoirdelor',frais_port=4.95)
             session.add(coin)
             session.commit()
 

@@ -7,7 +7,6 @@ from models.model import CoinPrice
 
 def get(session):
     url = "https://www.bullionbypost.fr/francs-francais-piece-or/20-francs-francais/20-francs-notre-choix/"
-    print(url)
     # Set up headless Chrome
     options = webdriver.ChromeOptions()
     # options.add_argument("--headless=new")  # Use headless mode
@@ -25,7 +24,7 @@ def get(session):
         try:
             price = float(price_text.replace('€', '').replace(',', '.').replace('Prix: à partir de ',''))
 
-            coin = CoinPrice(nom="20 francs or coq marianne", j_achete=price, source='bullionbypost')
+            coin = CoinPrice(nom="20 francs or coq marianne", j_achete=price, source='bullionbypost',frais_port=0.0)
             session.add(coin)
             session.commit()
 

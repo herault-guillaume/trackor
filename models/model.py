@@ -17,6 +17,7 @@ class CoinPrice(Base):
     prime_vente_vendeur = Column(Float,nullable=True)
     prime_achat_perso = Column(Float,nullable=True)
     prime_vente_perso = Column(Float,nullable=True)
+    frais_port = Column(Float,nullable=True)
     source = Column(String,nullable=False)
     timestamp = Column(DateTime, default=datetime.utcnow)
 

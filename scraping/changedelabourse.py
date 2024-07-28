@@ -7,7 +7,7 @@ def get(session):
     Retrieves the '20 francs or coq marianne' coin purchase price from Change de la Bourse using requests and BeautifulSoup.
     """
     url = "https://www.changedelabourse.com/or/pieces-d-or-d-investissement/napoleon-or-20-francs"
-    print(url)
+
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
 
@@ -28,7 +28,7 @@ def get(session):
             # More robust price cleaning: handle variations in formatting
             price = float(price_text.replace('€', '').replace(' ', '').replace(',', '.'))
 
-            coin = CoinPrice(nom="20 francs or coq marianne", j_achete=price, source='changedelabourse')
+            coin = CoinPrice(nom="20 francs or coq marianne", j_achete=price, source='changedelabourse',frais_port=10.0)
             session.add(coin)
             session.commit()
 

@@ -76,7 +76,7 @@ def get(buy_gp,sell_gp,table_index,session):
 
     try:
         for row_data in data:
-            gold_data = CoinPrice(**row_data)
+            gold_data = CoinPrice(**row_data,frais_port=18.0)
             session.add(gold_data)
 
         session.commit()  # Save changes to the database
