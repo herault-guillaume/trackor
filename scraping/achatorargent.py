@@ -49,7 +49,7 @@ def get(buy_gp,sell_gp,table_index,session):
             if i == 0:
                 anchor = cell.find('a')
                 row_data['nom'] = anchor.text.strip() if anchor else value
-                row_data['source'] = 'achat-or-argent'
+                row_data['source'] = 'https://www.acheter-or-argent.fr/client/plugins/sebtab/tableau.php'
 
             else:
                 # Use header_to_model_map for attribute names

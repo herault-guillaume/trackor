@@ -31,7 +31,7 @@ def get(session):
             # Convert to float
             price = float(price_text)
 
-            coin = CoinPrice(nom="20 francs or coq marianne", j_achete=price, source='piecesor',frais_port=26.87)
+            coin = CoinPrice(nom="20 francs or coq marianne", j_achete=price, source='https://www.goldavenue.com/fr/acheter/or/produit/piece-d-or-pur-900-0-20-francs-napoleon-coq-de-chaplain',frais_port=7.0)
             session.add(coin)
             session.commit()
 

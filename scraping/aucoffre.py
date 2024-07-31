@@ -27,7 +27,7 @@ def get(session):
             # More robust price cleaning: handle variations in formatting
             price = float(price_text.replace('€', '').replace(' ', '').replace(',', '.'))
 
-            coin = CoinPrice(nom="20 francs or coq marianne", j_achete=price, source='aucoffre',frais_port=15.0)
+            coin = CoinPrice(nom="20 francs or coq marianne", j_achete=price, source='https://www.aucoffre.com/recherche/metal-1/marketing_list-5/stype-1/produit',frais_port=15.0)
             session.add(coin)
             session.commit()
 

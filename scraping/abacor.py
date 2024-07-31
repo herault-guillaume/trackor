@@ -29,7 +29,7 @@ def get(session):
             # Clean the price text
             try:
                 price = float(price_text.replace('€', '').replace(',', '.'))
-                coin = CoinPrice(nom="20 francs or coq marianne", j_achete=price,frais_port=14.0, source='abacor')
+                coin = CoinPrice(nom="20 francs or coq marianne", j_achete=price,frais_port=14.0, source='https://www.abacor.fr/produit/piece-dor-20-francs-coq-marianne/')
                 session.add(coin)
                 session.commit()
 

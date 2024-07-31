@@ -1,14 +1,8 @@
-import requests
-from bs4 import BeautifulSoup
+
 from models.model import CoinPrice, Session
-from datetime import datetime
-
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-
-from models.model import Session
+from sqlalchemy import func, asc
+import json
+from datetime import datetime, timedelta
 
 import bullionvault
 import achatorargent
@@ -35,6 +29,38 @@ import goldavenue
 import abacor
 import goldreserve
 import shopcomptoirdelor
+
+def calculate_and_store_coin_data(session,coin_name='20 francs or coq marianne',minutes=5,top=7):
+    """
+    Calcule le total (j_achete + frais_port) pour chaque pièce, trie par ordre décroissant,
+    et stocke les résultats dans un fichier JSON.
+
+    Args:
+        session: Objet Session SQLAlchemy pour interagir avec la base de données.
+    """
+
+    # Requête SQLAlchemy pour calculer le total et trier
+    now = datetime.utcnow()
+    five_minutes_ago = now - timedelta(minutes=minutes)
+
+    results = (
+        session.query(
+            CoinPrice.nom,
+            (CoinPrice.j_achete + CoinPrice.frais_port).label("total"),
+            CoinPrice.source
+        )
+        .filter(CoinPrice.nom == coin_name)
+        .filter(CoinPrice.timestamp >= five_minutes_ago)
+        .order_by(asc("total"))
+        .limit(top)
+    )
+
+    # Conversion des résultats en dictionnaire
+    data = [{"position": i, "source": row.source} for i,row in enumerate(results)]
+    print(data)
+    # Stockage dans un fichier JSON
+    with open("coin_data.json", "w") as f:
+        json.dump(data, f)
 
 session = Session()
 
@@ -65,7 +91,7 @@ abacor.get(session)
 goldreserve.get(session)
 shopcomptoirdelor.get(session)
 
-
+calculate_and_store_coin_data(session)
 
 
 

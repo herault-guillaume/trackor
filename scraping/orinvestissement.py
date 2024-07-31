@@ -26,7 +26,7 @@ def get(session):
 
             try:
                 price = float(price_text)
-                coin = CoinPrice(nom="20 francs or coq marianne", j_achete=price, source='orinvestissement',frais_port=0.0)
+                coin = CoinPrice(nom="20 francs or coq marianne", j_achete=price, source='https://or-investissement.fr/achat-piece-or-investissement/8-achat-piece-20-francs-marianne-coq.html',frais_port=25.0)
                 session.add(coin)
                 session.commit()
                 return price
