@@ -3,6 +3,8 @@ from models.model import CoinPrice, Session
 from sqlalchemy import func, asc
 import json
 from datetime import datetime, timedelta
+from google.cloud import storage
+import os
 
 import bullionvault
 import achatorargent
@@ -30,7 +32,32 @@ import abacor
 import goldreserve
 import shopcomptoirdelor
 
-def calculate_and_store_coin_data(session,coin_name='20 francs or coq marianne',minutes=5,top=7):
+
+def update_json_file(new_data,
+                     bucket_name='prixlouisdor',
+                     file_name='site_data.json'):
+    """Updates a JSON file in Google Cloud Storage.
+
+    Args:
+        bucket_name: The name of your Cloud Storage bucket.
+        file_name: The name of the JSON file within the bucket.
+        new_data: The new JSON data (Python dictionary or list) to write to the file.
+    """
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = r"C:\Users\herau\PycharmProjects\trackor\trackor-431010-a4f698825e45.json"
+    storage_client = storage.Client()
+    bucket = storage_client.bucket(bucket_name)
+    blob = bucket.blob(file_name)
+
+    blob.upload_from_string(json.dumps(new_data,indent=0))
+    # Set ACL to make the file publicly accessible
+    blob.acl.all().grant_read()
+    blob.acl.save()
+    # Convert to JSON string with formatting
+
+    print(f"File '{file_name}' updated in bucket '{bucket_name}'")
+
+
+def calculate_and_store_coin_data(session,coin_name='20 francs or coq marianne',minutes=15,top=7):
     """
     Calcule le total (j_achete + frais_port) pour chaque pièce, trie par ordre décroissant,
     et stocke les résultats dans un fichier JSON.
@@ -62,6 +89,8 @@ def calculate_and_store_coin_data(session,coin_name='20 francs or coq marianne',
     with open("coin_data.json", "w") as f:
         json.dump(data, f)
 
+    return data
+
 session = Session()
 
 buy_price,sell_price = bullionvault.get(session)
@@ -91,8 +120,9 @@ abacor.get(session)
 goldreserve.get(session)
 shopcomptoirdelor.get(session)
 
-calculate_and_store_coin_data(session)
+site_data = calculate_and_store_coin_data(session)
 
+update_json_file(site_data)
 
 
 
