@@ -5,6 +5,12 @@ import json
 from datetime import datetime, timedelta
 from google.cloud import storage
 import os
+import time
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.cron import CronTrigger
+from datetime import datetime, timedelta
+import random
+
 
 import bullionvault
 import achatorargent
@@ -57,7 +63,7 @@ def update_json_file(new_data,
     print(f"File '{file_name}' updated in bucket '{bucket_name}'")
 
 
-def calculate_and_store_coin_data(session,coin_name='20 francs or coq marianne',minutes=15,top=7):
+def calculate_and_store_coin_data(session,coin_name='20 francs or coq marianne',minutes=3,top=7):
     """
     Calcule le total (j_achete + frais_port) pour chaque pièce, trie par ordre décroissant,
     et stocke les résultats dans un fichier JSON.
@@ -90,40 +96,74 @@ def calculate_and_store_coin_data(session,coin_name='20 francs or coq marianne',
         json.dump(data, f)
 
     return data
+def fetch_and_update_data():
+    for attempt in range(5):  # Retry up to 3 times
+        try:
+            session = Session()
 
-session = Session()
+            buy_price,sell_price = bullionvault.get(session)
+            achatorargent.get(buy_price,sell_price,0,session)
+            achatorargent.get(buy_price,sell_price,1,session)
+            aucoffre.get(session)
+            # joubertchange.get(session)
+            gold.get(session)
+            achatoretargent.get(session)
+            changedelabourse.get(session)
+            changevivienne.get(session)
+            bdor.get(session)
+            orinvestissement.get(session)
+            lcdor.get(session)
+            oretchange.get(session)
+            # goldunion.get(session) arnaque?
+            merson.get(session)
+            goldforex.get(session)
+            orobel.get(session)
+            monlingot.get(session)
+            bullionbypost.get(session)
+            # pieceor.get(session)
+            changerichelieu.get(session)
+            lmp.get(session)
+            goldavenue.get(session)
+            abacor.get(session)
+            goldreserve.get(session)
+            shopcomptoirdelor.get(session)
 
-buy_price,sell_price = bullionvault.get(session)
-achatorargent.get(buy_price,sell_price,0,session)
-achatorargent.get(buy_price,sell_price,1,session)
-aucoffre.get(session)
-# joubertchange.get(session)
-gold.get(session)
-achatoretargent.get(session)
-changedelabourse.get(session)
-changevivienne.get(session)
-bdor.get(session)
-orinvestissement.get(session)
-lcdor.get(session)
-oretchange.get(session)
-# goldunion.get(session) arnaque?
-merson.get(session)
-goldforex.get(session)
-orobel.get(session)
-monlingot.get(session)
-bullionbypost.get(session)
-# pieceor.get(session)
-changerichelieu.get(session)
-lmp.get(session)
-goldavenue.get(session)
-abacor.get(session)
-goldreserve.get(session)
-shopcomptoirdelor.get(session)
+            site_data = calculate_and_store_coin_data(session)
 
-site_data = calculate_and_store_coin_data(session)
+            update_json_file(site_data)
+            return  # Sortir de la fonction si la mise à jour est réussie
 
-update_json_file(site_data)
+        except Exception as e:
+            print(f"Tentative {attempt + 1} échouée : {e}")
+            time.sleep(5)  # Attendre 5 secondes avant de réessayer
 
+scheduler = BackgroundScheduler()
 
+# Schedule the jobs at 11 AM and 7 PM with randomization
+scheduler.add_job(
+    fetch_and_update_data,
+    CronTrigger(hour=11, minute=random.randint(0,15)),  # Adjust for minutes
+    id='job_at_11am'
+)
+
+scheduler.add_job(
+    fetch_and_update_data,
+    CronTrigger(hour=18, minute=random.randint(0,15)),  # Adjust for minutes
+    id='job_at_7pm'
+)
+
+scheduler.add_job(
+    fetch_and_update_data,
+    CronTrigger(hour=16, minute=57),  # Adjust for minutes
+    id='job_at_8pm'
+)
+
+scheduler.start()
+
+try:
+    while True:
+        time.sleep(2)  # Keep the main thread alive
+except (KeyboardInterrupt, SystemExit):
+    scheduler.shutdown()
 
 
