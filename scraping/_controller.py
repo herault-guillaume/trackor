@@ -56,11 +56,18 @@ def calculate_and_store_coin_data(session,coin_name='20 francs or coq marianne',
     )
 
     # Conversion des résultats en dictionnaire
-    data = [{"position": i, "source": row.source} for i,row in enumerate(results)]
+    # Conversion des résultats en dictionnaire
+    data = [{"position": i,
+             "source": row.source,
+             "%diff": "{:.2f}%".format(str((row.total - results.last().total) * 100 / results.last().total))}
+            for i, row in enumerate(results)]
+
     print(data)
     # Stockage dans un fichier JSON
     with open("coin_data.json", "w") as f:
         json.dump(data, f)
+
+
 
 session = Session()
 
