@@ -90,11 +90,9 @@ def calculate_and_store_coin_data(session,coin_name='20 francs or coq marianne',
     # Conversion des résultats en dictionnaire
     data = [{"position": i,
              "source": row.source,
-             "%diff" : "{:.2f}%".format(str((row.total - results.last().total) * 100 / results.last().total))}
+             "%diff" : "{:.2f}%".format(str((row.total - results[-1].total) * 100 / results[-1].total))}
             for i,row in enumerate(results)]
 
-    # Conversion des résultats en dictionnaire
-    data = [{"position": i, "source": row.source} for i,row in enumerate(results)]
     print(data)
     # Stockage dans un fichier JSON
     with open("coin_data.json", "w") as f:
@@ -142,33 +140,34 @@ def fetch_and_update_data():
             print(f"Tentative {attempt + 1} échouée : {e}")
             time.sleep(5)  # Attendre 5 secondes avant de réessayer
 
-scheduler = BackgroundScheduler()
+# scheduler = BackgroundScheduler()
+#
+# # Schedule the jobs at 11 AM and 7 PM with randomization
+# scheduler.add_job(
+#     fetch_and_update_data,
+#     CronTrigger(hour=11, minute=random.randint(0,15)),  # Adjust for minutes
+#     id='job_at_11am'
+# )
+#
+# scheduler.add_job(
+#     fetch_and_update_data,
+#     CronTrigger(hour=18, minute=random.randint(0,15)),  # Adjust for minutes
+#     id='job_at_7pm'
+# )
+#
+# scheduler.add_job(
+#     fetch_and_update_data,
+#     CronTrigger(hour=19, minute=52),  # Adjust for minutes
+#     id='job_at_8pm'
+# )
+#
+# scheduler.start()
+#
+# try:
+#     while True:
+#         time.sleep(2)  # Keep the main thread alive
+# except (KeyboardInterrupt, SystemExit):
+#     scheduler.shutdown()
 
-# Schedule the jobs at 11 AM and 7 PM with randomization
-scheduler.add_job(
-    fetch_and_update_data,
-    CronTrigger(hour=11, minute=random.randint(0,15)),  # Adjust for minutes
-    id='job_at_11am'
-)
 
-scheduler.add_job(
-    fetch_and_update_data,
-    CronTrigger(hour=18, minute=random.randint(0,15)),  # Adjust for minutes
-    id='job_at_7pm'
-)
-
-scheduler.add_job(
-    fetch_and_update_data,
-    CronTrigger(hour=16, minute=57),  # Adjust for minutes
-    id='job_at_8pm'
-)
-
-scheduler.start()
-
-try:
-    while True:
-        time.sleep(2)  # Keep the main thread alive
-except (KeyboardInterrupt, SystemExit):
-    scheduler.shutdown()
-
-
+fetch_and_update_data()
