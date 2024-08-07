@@ -5,7 +5,7 @@ from selenium.webdriver.support import expected_conditions as EC
 
 from models.model import CoinPrice
 
-def get(session):
+def get_price_for(session):
     url = "https://www.bullionbypost.fr/francs-francais-piece-or/20-francs-francais/20-francs-notre-choix/"
     # Set up headless Chrome
     options = webdriver.ChromeOptions()
@@ -24,7 +24,10 @@ def get(session):
         try:
             price = float(price_text.replace('€', '').replace(',', '.').replace('Prix: à partir de ',''))
 
-            coin = CoinPrice(nom="20 francs or coq marianne", j_achete=price, source='https://www.bullionbypost.fr/francs-francais-piece-or/20-francs-francais/20-francs-notre-choix/',frais_port=0.0)
+            coin = CoinPrice(nom="20 francs or coq marianne",
+                             j_achete=price,
+                             source=url,
+                             frais_port=0.0)
             session.add(coin)
             session.commit()
 

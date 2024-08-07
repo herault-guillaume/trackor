@@ -11,7 +11,29 @@ header_achat_or_argent_map_model = {
     'Prime achat': 'prime_achat_vendeur',
     'Prime vente': 'prime_vente_vendeur',
 }
-def get(buy_gp,sell_gp,table_index,session):
+
+def get_delivery_price(price):
+    if price < 500:
+        return 18.0
+    elif price < 1000:
+        return 15.0
+    elif price < 3000:
+        return 20.0
+    elif price < 10000:
+        return 30.0
+    elif price < 20000:
+        return 45.0
+    elif price < 50000:
+        return 90.0
+    elif price < 75000:
+        return 150.0
+    elif price < 100000:
+        return 180.0
+    elif price < 150000:
+        return 240.0
+    else:
+        return 0.0
+def get_price_for(buy_gp,sell_gp,table_index,session):
     """
     Extracts data from the specified table, maps headers, and stores it in the database.
 
@@ -76,7 +98,7 @@ def get(buy_gp,sell_gp,table_index,session):
 
     try:
         for row_data in data:
-            gold_data = CoinPrice(**row_data,frais_port=18.0)
+            gold_data = CoinPrice(**row_data,frais_port=get_delivery_price(float(row_data['j_achete'])))
             session.add(gold_data)
 
         session.commit()  # Save changes to the database

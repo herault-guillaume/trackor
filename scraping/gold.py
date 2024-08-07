@@ -4,8 +4,11 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from models.model import CoinPrice
 
+def get_delivery_price(price):
+    pass
+#https://www.gold.fr/informations-sur-l-or/nous-connaitre/conditions-generales-dutilisation#frais-et-commissions
 
-def get(session):
+def get_price_for(session):
     options = webdriver.ChromeOptions()
     options.add_argument("--headless")
     driver = webdriver.Chrome(options=options)
@@ -22,7 +25,10 @@ def get(session):
     # Clean the price text and convert to float
     price = float(price_text.replace('€', '').replace(',', '.').replace('\nmin. 5', ''))
 
-    coin = CoinPrice(nom="20 francs or coq marianne", j_achete=price, source='https://www.gold.fr/napoleon-or-20-francs-louis-or/',frais_port=30.0)
+    coin = CoinPrice(nom="20 francs or coq marianne",
+                     j_achete=price,
+                     source=url,
+                     frais_port=30.0)
     session.add(coin)
     session.commit()
 

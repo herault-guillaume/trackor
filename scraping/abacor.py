@@ -2,7 +2,14 @@ import requests
 from bs4 import BeautifulSoup
 from models.model import CoinPrice
 
-def get(session):
+def get_delivery_price(price):
+    if price <= 500.0:
+        return 14.00
+    elif 500 < price <= 1000.0 :
+        return 26.70
+    else:
+        return 56.10
+def get_price_for(session):
     """
     Retrieves the '20 francs or coq marianne' coin purchase price from Goldforex using requests and BeautifulSoup.
     """
@@ -29,7 +36,10 @@ def get(session):
             # Clean the price text
             try:
                 price = float(price_text.replace('€', '').replace(',', '.'))
-                coin = CoinPrice(nom="20 francs or coq marianne", j_achete=price,frais_port=14.0, source='https://www.abacor.fr/produit/piece-dor-20-francs-coq-marianne/')
+                coin = CoinPrice(nom="20 francs or coq marianne",
+                                 j_achete=price,
+                                 frais_port=get_delivery_price(price),
+                                 source=url)
                 session.add(coin)
                 session.commit()
 

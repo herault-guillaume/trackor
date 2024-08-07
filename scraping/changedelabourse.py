@@ -2,7 +2,23 @@ import requests
 from bs4 import BeautifulSoup
 from models.model import CoinPrice
 
-def get(session):
+def get_delivery_price(price):
+    if 0 <= price <= 600:
+        return 10.0
+    elif 600.01 <= price <= 2500:
+        return 20.0
+    elif 2500.01 <= price <= 5000:
+        return 34.0
+    elif 5000.01 <= price <= 7500:
+        return 50.0
+    elif 7500.01 <= price <= 10000:
+        return 56.0
+    elif 10000.01 <= price <= 15000:
+        return 65.0
+    else:  # price > 15000.01
+        return 0.0  # Free delivery
+
+def get_price_for(session):
     """
     Retrieves the '20 francs or coq marianne' coin purchase price from Change de la Bourse using requests and BeautifulSoup.
     """
@@ -28,7 +44,10 @@ def get(session):
             # More robust price cleaning: handle variations in formatting
             price = float(price_text.replace('€', '').replace(' ', '').replace(',', '.'))
 
-            coin = CoinPrice(nom="20 francs or coq marianne", j_achete=price, source='https://www.changedelabourse.com/or/pieces-d-or-d-investissement/napoleon-or-20-francs',frais_port=10.0)
+            coin = CoinPrice(nom="20 francs or coq marianne",
+                             j_achete=price,
+                             source=url,
+                             frais_port=get_delivery_price(price))
             session.add(coin)
             session.commit()
 

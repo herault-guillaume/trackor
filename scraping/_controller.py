@@ -11,9 +11,10 @@ from apscheduler.triggers.cron import CronTrigger
 from datetime import datetime, timedelta
 import random
 
+import traceback
 
 import bullionvault
-import achatorargent
+import achaterorargent
 import aucoffre
 # import joubertchange_5minimum
 import gold
@@ -63,7 +64,7 @@ def update_json_file(new_data,
     print(f"File '{file_name}' updated in bucket '{bucket_name}'")
 
 
-def calculate_and_store_coin_data(session,coin_name='20 francs or coq marianne',minutes=3,top=7):
+def calculate_and_store_coin_data(session,coin_name='20 francs or coq marianne',minutes=3,top=23):
     """
     Calcule le total (j_achete + frais_port) pour chaque pièce, trie par ordre décroissant,
     et stocke les résultats dans un fichier JSON.
@@ -74,7 +75,7 @@ def calculate_and_store_coin_data(session,coin_name='20 francs or coq marianne',
 
     # Requête SQLAlchemy pour calculer le total et trier
     now = datetime.utcnow()
-    five_minutes_ago = now - timedelta(minutes=minutes)
+    n_minutes_ago = now - timedelta(minutes=minutes)
 
     results = (
         session.query(
@@ -83,16 +84,16 @@ def calculate_and_store_coin_data(session,coin_name='20 francs or coq marianne',
             CoinPrice.source
         )
         .filter(CoinPrice.nom == coin_name)
-        .filter(CoinPrice.timestamp >= five_minutes_ago)
+        .filter(CoinPrice.timestamp >= n_minutes_ago)
         .order_by(asc("total"))
         .limit(top)
     )
+
     # Conversion des résultats en dictionnaire
     data = [{"position": i,
              "source": row.source,
-             "%diff" : "{:.2f}%".format(str((row.total - results[-1].total) * 100 / results[-1].total))}
+             "diff" : "{:.1f}%".format((row.total - list(results)[-1].total) * 100 / list(results)[-1].total)}
             for i,row in enumerate(results)]
-
     print(data)
     # Stockage dans un fichier JSON
     with open("coin_data.json", "w") as f:
@@ -103,33 +104,33 @@ def fetch_and_update_data():
     for attempt in range(5):  # Retry up to 3 times
         try:
             session = Session()
-
             buy_price,sell_price = bullionvault.get(session)
-            achatorargent.get(buy_price,sell_price,0,session)
-            achatorargent.get(buy_price,sell_price,1,session)
-            aucoffre.get(session)
+
+            abacor.get_price_for(session)
+            achaterorargent.get_price_for(buy_price, sell_price, 0, session)
+            achaterorargent.get_price_for(buy_price, sell_price, 1, session)
+            achatoretargent.get_price_for(session)
+            aucoffre.get_price_for(session)
+            bdor.get_price_for(session)
+            bullionbypost.get_price_for(session)
+            changedelabourse.get_price_for(session)
+            changerichelieu.get_price_for(session)
+            changevivienne.get_price_for(session)
+            gold.get_price_for(session)
+            goldavenue.get_price_delivery_for(session)
+            goldforex.get_price_for(session)
+            goldreserve.get_price_for(session)
+            lmp.get_price_for(session)
+            lcdor.get_price_for(session)
+            merson.get_price_for(session)
+            monlingot.get_price_for(session)
+            oretchange.get_price_for(session)
+            orinvestissement.get_price_for(session)
+            orobel.get_price_for(session)
+            shopcomptoirdelor.get_price_for(session)
+            # goldunion.get(session)  # arnaque?
             # joubertchange.get(session)
-            gold.get(session)
-            achatoretargent.get(session)
-            changedelabourse.get(session)
-            changevivienne.get(session)
-            bdor.get(session)
-            orinvestissement.get(session)
-            lcdor.get(session)
-            oretchange.get(session)
-            # goldunion.get(session) arnaque?
-            merson.get(session)
-            goldforex.get(session)
-            orobel.get(session)
-            monlingot.get(session)
-            bullionbypost.get(session)
             # pieceor.get(session)
-            changerichelieu.get(session)
-            lmp.get(session)
-            goldavenue.get(session)
-            abacor.get(session)
-            goldreserve.get(session)
-            shopcomptoirdelor.get(session)
 
             site_data = calculate_and_store_coin_data(session)
 
@@ -137,7 +138,8 @@ def fetch_and_update_data():
             return  # Sortir de la fonction si la mise à jour est réussie
 
         except Exception as e:
-            print(f"Tentative {attempt + 1} échouée : {e}")
+            print(f"Tentative {attempt + 1} échouée")
+            print(traceback.format_exc())
             time.sleep(5)  # Attendre 5 secondes avant de réessayer
 
 # scheduler = BackgroundScheduler()

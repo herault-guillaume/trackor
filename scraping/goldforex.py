@@ -1,7 +1,9 @@
 import requests
 from bs4 import BeautifulSoup
 from models.model import CoinPrice
-def get(session):
+
+#https://www.goldforex.be/fr/content/1-livraison
+def get_price_for(session):
     """
     Retrieves the '20 francs or coq marianne' coin purchase price from Oretchange using requests and BeautifulSoup.
     """
@@ -25,7 +27,10 @@ def get(session):
             # Clean the price text
             try:
                 price = float(price_text.replace('€', '').replace(',', '.'))
-                coin = CoinPrice(nom="20 francs or coq marianne", j_achete=price, source='https://www.goldforex.be/fr/cours-de-lor-prix-pieces-lingot-cotation/napoleon-20-francs-france-229.html',frais_port=35.0)
+                coin = CoinPrice(nom="20 francs or coq marianne",
+                                 j_achete=price,
+                                 source='https://www.goldforex.be/fr/cours-de-lor-prix-pieces-lingot-cotation/napoleon-20-francs-france-229.html',
+                                 frais_port=35.0)
                 session.add(coin)
                 session.commit()
 
