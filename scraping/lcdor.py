@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 from models.model import CoinPrice
 
 #via panier
-def get_price_for(session):
+def get_price_for(session,session_id):
     url = 'https://lcdor.fr/achat-or/pieces-dor/20-francs-or-coq/'
     headers = {'User-Agent': 'Mozilla/5.0'}  # Mimic browser behavior
 
@@ -26,7 +26,7 @@ def get_price_for(session):
         coin = CoinPrice(nom="20 francs or coq marianne",
                          j_achete=price,
                          source=url,
-                         frais_port=7.0)
+                         frais_port=7.0,session_id=session_id)
         session.add(coin)
         session.commit()
 

@@ -19,7 +19,7 @@ def get_delivery_price(price):
     else :
         return 0.0
 
-def get_price_for(session):
+def get_price_for(session,session_id):
     """
     Retrieves the '20 francs or coq marianne' coin purchase price from Oretchange using requests and BeautifulSoup.
     """
@@ -46,7 +46,7 @@ def get_price_for(session):
                 coin = CoinPrice(nom="20 francs or coq marianne",
                                  j_achete=price,
                                  source=url,
-                                 frais_port=get_delivery_price(price))
+                                 frais_port=get_delivery_price(price),session_id=session_id)
                 session.add(coin)
                 session.commit()
 

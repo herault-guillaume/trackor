@@ -42,7 +42,7 @@ def get_delivery_price(url="https://www.shop-comptoirdelor.be/info/livraison"):
         print(f"An error occurred while fetching the data: {e}")
         return None
 
-def get_price_for(session):
+def get_price_for(session,session_id):
     url = "https://www.shop-comptoirdelor.be/achat-or/pieces/20-francs-or-diverses-ann%C3%A9espays"
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
@@ -71,7 +71,8 @@ def get_price_for(session):
             coin = CoinPrice(nom="20 francs or coq marianne",
                              j_achete=price,
                              source=url,
-                             frais_port=delivery_price)
+                             frais_port=delivery_price,
+                             session_id=session_id)
             session.add(coin)
             session.commit()
 

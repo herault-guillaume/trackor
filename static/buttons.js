@@ -5,7 +5,9 @@
             container.style.gap = '20px';
             container.style.padding = '20px';
 
-            fetch('https://storage.googleapis.com/prixlouisdor/site_data.json')
+            fetch('https://storage.googleapis.com/prixlouisdor/site_data.json',  {
+            cache: 'no-store',
+            })
                 .then(response => {
                     if (!response.ok) {
                         throw new Error(`HTTP error! status: ${response.status}`);

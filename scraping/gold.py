@@ -8,7 +8,7 @@ def get_delivery_price(price):
     pass
 #https://www.gold.fr/informations-sur-l-or/nous-connaitre/conditions-generales-dutilisation#frais-et-commissions
 
-def get_price_for(session):
+def get_price_for(session,session_id):
     options = webdriver.ChromeOptions()
     options.add_argument("--headless")
     driver = webdriver.Chrome(options=options)
@@ -28,7 +28,7 @@ def get_price_for(session):
     coin = CoinPrice(nom="20 francs or coq marianne",
                      j_achete=price,
                      source=url,
-                     frais_port=30.0)
+                     frais_port=30.0,session_id=session_id)
     session.add(coin)
     session.commit()
 

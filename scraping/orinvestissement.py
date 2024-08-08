@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 from models.model import CoinPrice
 
 # https://or-investissement.fr/information-or-investissement/1-livraison-achat-or-investissement
-def get_price_for(session):
+def get_price_for(session,session_id):
     """
     Retrieves the '20 francs or coq marianne' coin purchase price from Or-Investissement using requests and BeautifulSoup.
     """
@@ -30,7 +30,7 @@ def get_price_for(session):
                 coin = CoinPrice(nom="20 francs or coq marianne",
                                  j_achete=price,
                                  source=url,
-                                 frais_port=25.0)
+                                 frais_port=25.0,session_id=session_id)
                 session.add(coin)
                 session.commit()
                 return price

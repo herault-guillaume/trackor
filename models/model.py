@@ -1,4 +1,5 @@
 from sqlalchemy import create_engine, Column, Integer, String, Float, DateTime
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from datetime import datetime
@@ -20,6 +21,7 @@ class CoinPrice(Base):
     frais_port = Column(Float,nullable=True)
     source = Column(String,nullable=False)
     timestamp = Column(DateTime, default=datetime.utcnow)
+    session_id = Column(UUID(as_uuid=True))
 
 class GoldPrice(Base):
     __tablename__ = 'gold_price'
@@ -56,6 +58,7 @@ poids_pieces_or = {
     '50 pesos or': 37.5,
     '20 dollars or liberté': 30.093,
     '10 dollars or liberté': 15.047,
+    '10 dollars or tête indien': 15.047,
     '5 dollars or liberté': 7.523,
     'souverain or georges V': 7.318,
     'souverain or victoria jubilee': 7.318,
@@ -68,6 +71,7 @@ poids_pieces_or = {
     '1 oz nugget / kangourou': 31.103,
     '10 florins or wilhelmina': 6.056,
     '10 florins or willem III': 6.048,
+    "50 pesos or": 37.5,  # Approximatif
     "20 pesos or": 15.0,  # Approximatif
     "10 pesos or": 7.5,   # Approximatif
     "5 pesos or": 3.75,    # Approximatif

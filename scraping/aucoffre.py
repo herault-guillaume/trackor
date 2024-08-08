@@ -4,7 +4,7 @@ from models.model import CoinPrice
 
 #https://www.aucoffre.com/acheter/tarifs-aucoffre-com
 
-def get_price_for(session):
+def get_price_for(session,session_id):
     """
     Fetches the buy price of the 20 Francs Marianne coin from AuCOFFRE using requests and BeautifulSoup.
     """
@@ -32,7 +32,7 @@ def get_price_for(session):
             coin = CoinPrice(nom="20 francs or coq marianne",
                              j_achete=price,
                              source=url,
-                             frais_port=15.0)
+                             frais_port=15.0,session_id=session_id)
             session.add(coin)
             session.commit()
 

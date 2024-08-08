@@ -4,7 +4,7 @@ from models.model import CoinPrice
 
 #frais de livraison via leur calculette en ligne
 
-def get_price_for(session):
+def get_price_for(session,session_id):
     url = 'https://www.lesmetauxprecieux.com/produit/20-francs-marianne-coq/'
     headers = {'User-Agent': 'Mozilla/5.0'}  # Mimic browser behavior
 
@@ -27,7 +27,7 @@ def get_price_for(session):
         coin = CoinPrice(nom="20 francs or coq marianne",
                          j_achete=price,
                          source=url,
-                         frais_port=15.79)
+                         frais_port=15.79,session_id=session_id)
         session.add(coin)
         session.commit()
 

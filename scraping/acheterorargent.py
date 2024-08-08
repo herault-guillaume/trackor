@@ -33,7 +33,7 @@ def get_delivery_price(price):
         return 240.0
     else:
         return 0.0
-def get_price_for(buy_gp,sell_gp,table_index,session):
+def get_price_for(buy_gp,sell_gp,table_index,session,session_id):
     """
     Extracts data from the specified table, maps headers, and stores it in the database.
 
@@ -98,7 +98,7 @@ def get_price_for(buy_gp,sell_gp,table_index,session):
 
     try:
         for row_data in data:
-            gold_data = CoinPrice(**row_data,frais_port=get_delivery_price(float(row_data['j_achete'])))
+            gold_data = CoinPrice(**row_data,frais_port=get_delivery_price(float(row_data['j_achete'],session_id=session_id)))
             session.add(gold_data)
 
         session.commit()  # Save changes to the database

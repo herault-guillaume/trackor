@@ -10,11 +10,12 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 from datetime import datetime, timedelta
 import random
+import uuid
 
 import traceback
 
 import bullionvault
-import achaterorargent
+import acheterorargent
 import aucoffre
 # import joubertchange_5minimum
 import gold
@@ -64,7 +65,7 @@ def update_json_file(new_data,
     print(f"File '{file_name}' updated in bucket '{bucket_name}'")
 
 
-def calculate_and_store_coin_data(session,coin_name='20 francs or coq marianne',minutes=3,top=23):
+def calculate_and_store_coin_data(session,session_id,coin_name='20 francs or coq marianne'):
     """
     Calcule le total (j_achete + frais_port) pour chaque pièce, trie par ordre décroissant,
     et stocke les résultats dans un fichier JSON.
@@ -73,10 +74,6 @@ def calculate_and_store_coin_data(session,coin_name='20 francs or coq marianne',
         session: Objet Session SQLAlchemy pour interagir avec la base de données.
     """
 
-    # Requête SQLAlchemy pour calculer le total et trier
-    now = datetime.utcnow()
-    n_minutes_ago = now - timedelta(minutes=minutes)
-
     results = (
         session.query(
             CoinPrice.nom,
@@ -84,9 +81,8 @@ def calculate_and_store_coin_data(session,coin_name='20 francs or coq marianne',
             CoinPrice.source
         )
         .filter(CoinPrice.nom == coin_name)
-        .filter(CoinPrice.timestamp >= n_minutes_ago)
+        .filter(CoinPrice.session_id == session_id)
         .order_by(asc("total"))
-        .limit(top)
     )
 
     # Conversion des résultats en dictionnaire
@@ -103,38 +99,42 @@ def calculate_and_store_coin_data(session,coin_name='20 francs or coq marianne',
 def fetch_and_update_data():
     for attempt in range(5):  # Retry up to 3 times
         try:
+            session_id = uuid.uuid4()
             session = Session()
+
             buy_price,sell_price = bullionvault.get(session)
 
-            abacor.get_price_for(session)
-            achaterorargent.get_price_for(buy_price, sell_price, 0, session)
-            achaterorargent.get_price_for(buy_price, sell_price, 1, session)
-            achatoretargent.get_price_for(session)
-            aucoffre.get_price_for(session)
-            bdor.get_price_for(session)
-            bullionbypost.get_price_for(session)
-            changedelabourse.get_price_for(session)
-            changerichelieu.get_price_for(session)
-            changevivienne.get_price_for(session)
-            gold.get_price_for(session)
-            goldavenue.get_price_delivery_for(session)
-            goldforex.get_price_for(session)
-            goldreserve.get_price_for(session)
-            lmp.get_price_for(session)
-            lcdor.get_price_for(session)
-            merson.get_price_for(session)
-            monlingot.get_price_for(session)
-            oretchange.get_price_for(session)
-            orinvestissement.get_price_for(session)
-            orobel.get_price_for(session)
-            shopcomptoirdelor.get_price_for(session)
-            # goldunion.get(session)  # arnaque?
-            # joubertchange.get(session)
-            # pieceor.get(session)
+            abacor.get_price_for(session,session_id)
+            acheterorargent.get_price_for(buy_price, sell_price, 0, session,session_id)
+            acheterorargent.get_price_for(buy_price, sell_price, 1, session,session_id)
+            achatoretargent.get_price_for(session,session_id)
+            aucoffre.get_price_for(session,session_id)
+            bdor.get_price_for(session,session_id)
+            bullionbypost.get_price_for(session,session_id)
+            changedelabourse.get_price_for(session,session_id)
+            changerichelieu.get_price_for(session,session_id)
+            changevivienne.get_price_for(session,session_id)
+            gold.get_price_for(session,session_id)
+            goldavenue.get_price_delivery_for(session,session_id)
+            goldforex.get_price_for(session,session_id)
+            goldreserve.get_price_for(session,session_id)
+            lmp.get_price_for(session,session_id)
+            lcdor.get_price_for(session,session_id)
+            merson.get_price_for(session,session_id)
+            monlingot.get_price_for(session,session_id)
+            oretchange.get_price_for(session,session_id)
+            orinvestissement.get_price_for(session,session_id)
+            orobel.get_price_for(session,session_id)
+            shopcomptoirdelor.get_price_for(session,session_id)
 
-            site_data = calculate_and_store_coin_data(session)
 
-            update_json_file(site_data)
+            # goldunion.get(session,session_id)  # arnaque?
+            # joubertchange.get(session,session_id)
+            # pieceor.get(session,session_id)
+
+            site_data = calculate_and_store_coin_data(session,session_id)
+
+            # update_json_file(site_data)
             return  # Sortir de la fonction si la mise à jour est réussie
 
         except Exception as e:

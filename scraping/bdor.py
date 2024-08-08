@@ -11,7 +11,7 @@ def get_delivery_price(price):
     else :
         return 0.0
 
-def get_price_for(session):
+def get_price_for(session,session_id):
     options = webdriver.ChromeOptions()
     options.add_argument("--headless")
     driver = webdriver.Chrome(options=options)
@@ -32,7 +32,7 @@ def get_price_for(session):
     coin = CoinPrice(nom="20 francs or coq marianne",
                      j_achete=price,
                      source=url,
-                     frais_port=15.0)
+                     frais_port=15.0,session_id=session_id)
     session.add(coin)
     session.commit()
 
