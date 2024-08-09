@@ -61,6 +61,7 @@ poids_pieces_or = {
     '10 dollars or tête indien': 15.047,
     '5 dollars or liberté': 7.523,
     'souverain or georges V': 7.318,
+    '1/2 souverain georges V': 3.661,
     'souverain or victoria jubilee': 7.318,
     'souverain or elizabeth II': 7.318,
     'demi souverain or georges V': 3.66,
@@ -70,7 +71,7 @@ poids_pieces_or = {
     '1 oz american eagle': 31.103,
     '1 oz nugget / kangourou': 31.103,
     '10 florins or wilhelmina': 6.056,
-    '10 florins or willem III': 6.048,
+    '10 florins or willem III': 6.056,
     "50 pesos or": 37.5,  # Approximatif
     "20 pesos or": 15.0,  # Approximatif
     "10 pesos or": 7.5,   # Approximatif

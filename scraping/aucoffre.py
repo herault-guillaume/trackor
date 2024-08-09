@@ -8,8 +8,25 @@ def get_price_for(session,session_id):
     """
     Fetches the buy price of the 20 Francs Marianne coin from AuCOFFRE using requests and BeautifulSoup.
     """
-    url = "https://www.aucoffre.com/recherche/metal-1/marketing_list-5/stype-1/produit"
-
+    urls = {
+        "20 dollars or liberté": "https://www.achat-or-et-argent.fr/or/20-dollars-us/19",
+        "20 francs or coq marianne": "https://www.achat-or-et-argent.fr/or/20-francs-marianne-coq/17",
+        "20 francs or napoléon III": "https://www.achat-or-et-argent.fr/or/louis-d-or-20-francs-or/5231",
+        "20 francs or helvetia suisse": "https://www.achat-or-et-argent.fr/or/20-francs-suisse/15",
+        "20 francs or union latine léopold II": "https://www.achat-or-et-argent.fr/or/union-latine/20",
+        "10 dollars or liberté": "https://www.achat-or-et-argent.fr/or/10-dollars-us/13",
+        "50 pesos or": "https://www.achat-or-et-argent.fr/or/50-pesos/11",
+        "1 oz krugerrand": "https://www.achat-or-et-argent.fr/or/krugerrand/12",
+        "10 francs or napoléon III": "https://www.achat-or-et-argent.fr/or/10-francs-napoleon/32",
+        "souverain or georges V": "https://www.achat-or-et-argent.fr/or/souverain/14",
+        "5 dollars or liberté": "https://www.achat-or-et-argent.fr/or/5-dollars-us/33",
+        "10 florins or willem III" : "https://www.achat-or-et-argent.fr/or/10-florins/18",
+        "20 mark or wilhelm II" : "https://www.achat-or-et-argent.fr/or/20-reichsmarks/34",
+        "1 ducat or" : "https://www.achat-or-et-argent.fr/or/1-ducat-or-francois-joseph-1915/4767",
+        "4 ducat or" : "https://www.achat-or-et-argent.fr/or/4-ducats-or/839",
+        "20 francs or tunisie" : "https://www.achat-or-et-argent.fr/or/20-francs-tunisie/44",
+        "1/2 souverain georges V" : "https://www.achat-or-et-argent.fr/or/demi-souverain/49",
+    }
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
     }
