@@ -4,6 +4,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 from models.model import CoinPrice
+from price_parser import Price
+import traceback
 
 def get_price_for(session,session_id):
     url = "https://www.bullionbypost.fr/francs-francais-piece-or/20-francs-francais/20-francs-notre-choix/"

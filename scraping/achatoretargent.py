@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 from models.model import CoinPrice
 from price_parser import Price
+import traceback
 
 def get_delivery_price(price):
     if 0 <= price <= 1000:
@@ -23,6 +24,8 @@ def get_price_for(session,session_id):
     """
     Retrieves the '20 francs or coq marianne' coin purchase price from achat-or-et-argent.fr using requests.
     """
+    print("https://www.achat-or-et-argent.fr/")
+
     urls = {
         "20 dollars or liberté": "https://www.achat-or-et-argent.fr/or/20-dollars-us/19",
         "20 francs or coq marianne": "https://www.achat-or-et-argent.fr/or/20-francs-marianne-coq/17",
@@ -46,7 +49,7 @@ def get_price_for(session,session_id):
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
     }
-    for url, coin_name in urls.items():
+    for coin_name, url  in urls.items():
         try:
             response = requests.get(url, headers=headers)
             response.raise_for_status()  # Check for HTTP errors
@@ -54,27 +57,23 @@ def get_price_for(session,session_id):
             soup = BeautifulSoup(response.content, 'html.parser')
 
             # Find the specific price span element using its ID
-            price_element = soup.find('span', id="pa9")
+            price_element = soup.find('span', id="tpa")
 
             if price_element:
                 # Extract and clean the price text
                 price_text = price_element.text.strip().replace('€', '').replace(',', '.')
                 price = Price.fromstring(price_text)
-                try:
-                    coin = CoinPrice(nom=coin_name,
-                                     j_achete=price.amount_float,
-                                     source=url,
-                                     frais_port=get_delivery_price(price.amount_float),session_id=session_id)
-                    session.add(coin)
-                    session.commit()
-
-                    return price
-                except ValueError:
-                    print("Price format could not be parsed.",url)
+                print(price, url)
+                coin = CoinPrice(nom=coin_name,
+                                 j_achete=price.amount_float,
+                                 source=url,
+                                 frais_port=get_delivery_price(price.amount_float),session_id=session_id)
+                session.add(coin)
+                session.commit()
 
             else:
-                print("Price element not found.")
+                print("Price element not found.",url)
 
         except requests.exceptions.RequestException as e:
             print(f"An error occurred during the request: {e}",url)
-        return None  # Return None to indicate an unsuccessful retrieval
+            print(traceback.format_exc())

@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 from models.model import CoinPrice, poids_pieces_or
 from datetime import datetime
+import traceback
 
 header_achat_or_argent_map_model = {
     'Nom': 'nom',
@@ -41,6 +42,7 @@ def get_price_for(buy_gp,sell_gp,table_index,session,session_id):
         url: The URL of the web page containing the table.
         table_index: The index of the table to extract (0 for first, 1 for second).
     """
+    print("https://www.acheter-or-argent.fr/")
     url = 'https://www.acheter-or-argent.fr/client/plugins/sebtab/tableau.php'
 
     response = requests.get(url)
@@ -93,19 +95,19 @@ def get_price_for(buy_gp,sell_gp,table_index,session,session_id):
             row_data['prime_vente_perso'] = (float(row_data['je_vend']) - (poids_pieces_or[row_data['nom']] * sell_gp)) / float(row_data['je_vend']) * 100
         except Exception as e:
             print(e,'not present in weight database',url)
+            print(traceback.format_exc())
             pass
         data.append(row_data)
 
     try:
         for row_data in data:
-            gold_data = CoinPrice(**row_data,frais_port=get_delivery_price(float(row_data['j_achete'],session_id=session_id)))
+            gold_data = CoinPrice(**row_data,frais_port=get_delivery_price(float(row_data['j_achete'])),session_id=session_id)
             session.add(gold_data)
 
         session.commit()  # Save changes to the database
     except Exception as e:
         print(f"An error occurred: {e}",url)
+        print(traceback.format_exc())
         session.rollback()  # Rollback changes in case of an error
     finally:
         session.close()
-
-    return True

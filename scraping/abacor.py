@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 from models.model import CoinPrice
 from price_parser import Price
+import traceback
 
 def get_delivery_price(price):
     if price <= 500.0:
@@ -15,6 +16,7 @@ def get_price_for(session,session_id):
     """
     Retrieves the '20 francs or coq marianne' coin purchase price from Goldforex using requests and BeautifulSoup.
     """
+    print("https://www.abacor.fr/")
 
     urls = {
         "20 dollars or liberté": "https://www.abacor.fr/produit/test-20-dollars-us/",
@@ -57,7 +59,7 @@ def get_price_for(session,session_id):
                     else:
                         price_text = price_elements[1].text.strip()
                     price = Price.fromstring(price_text)
-
+                    print(price,url)
                     coin = CoinPrice(nom=coin_name,
                                      j_achete=price.amount_float,
                                      frais_port=get_delivery_price(price.amount_float),
@@ -67,10 +69,12 @@ def get_price_for(session,session_id):
 
                 except (ValueError, IndexError) as e:
                     print(f"Failed to parse price: {e}",url)
+                    print(traceback.format_exc())
             else:
                 print("Price element not found on page.")
 
         except requests.RequestException as e:
             print(f"Error making request to {url}: {e}",url)
+            print(traceback.format_exc())
 
     return None  # Return None on failure
