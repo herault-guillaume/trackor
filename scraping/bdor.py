@@ -51,9 +51,6 @@ table_lookup = {
         #5 Roubles
 }
 
-urls = {
-
-}
 def get_delivery_price(price):
     #https://www.bdor.fr/achat-or-en-ligne/livraison-or
     if price < 1000:

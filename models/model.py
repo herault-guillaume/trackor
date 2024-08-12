@@ -43,7 +43,6 @@ poids_pieces_or = {
     'Lingot or 1 kg LBMA': 1000.0,
     '1 oz philharmonique': 31.103,
     '5 francs or napoléon III': 1.452,
-    '20 francs or fr': 5.805,
     '20 francs or coq marianne': 5.805,
     '20 francs or napoléon III': 5.805,
     '20 francs or génie debout': 5.805,
