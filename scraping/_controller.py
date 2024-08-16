@@ -111,9 +111,9 @@ def fetch_and_update_data():
             #aucoffre.get_price_for(session,session_id)
             #bdor.get_price_for(session,session_id)
             # bullionbypost.get_price_for(session,session_id)
-            #changedelabourse.get_price_for(session,session_id)
-            changerichelieu.get_price_for(session,session_id)
-            #changevivienne.get_price_for(session,session_id)
+            # changedelabourse.get_price_for(session,session_id)
+            # changerichelieu.get_price_for(session,session_id)
+            # changevivienne.get_price_for(session,session_id)
             # gold.get_price_for(session,session_id)
             # goldavenue.get_price_delivery_for(session,session_id)
             # goldforex.get_price_for(session,session_id)
@@ -124,7 +124,7 @@ def fetch_and_update_data():
             # monlingot.get_price_for(session,session_id)
             # oretchange.get_price_for(session,session_id)
             # orinvestissement.get_price_for(session,session_id)
-            # orobel.get_price_for(session,session_id)
+            orobel.get_price_for(session,session_id)
             # shopcomptoirdelor.get_price_for(session,session_id)
 
 

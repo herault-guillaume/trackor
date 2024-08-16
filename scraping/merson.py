@@ -1,6 +1,37 @@
 import requests
 from bs4 import BeautifulSoup
 from models.model import CoinPrice
+from price_parser import Price
+import traceback
+
+coin_name = {
+    "20 Francs Or Napoléon type Coq": '20 francs or coq marianne',
+    "Souverain Or Georges": 'souverain or georges V',
+    "50 Pesos Or Mexique": '50 pesos or',
+    "Krugerrand Or Afrique du Sud": '1 oz krugerrand',
+    "20 Francs Or Suisse": '20 francs or vreneli croix suisse',
+    "20 Dollars Or": '20 dollars or liberté',
+    "10 Dollars Or": '10 dollars or liberté',
+    "10 Francs Or": '10 francs or coq marianne',
+    "20 Francs Union Latine Or": '20 francs or union latine léopold II',
+    "10 Florins Or Hollandais": '10 florins or wilhelmina', # or '10 florins or willem III' depending on the specific coin
+    "20 Francs Or Tunisie": '20 francs or tunisie',
+    "Souverain Elisabeth  II Or": 'souverain or elizabeth II',
+    "1/2 Souverain Or": '1/2 souverain georges V', # or '1/2 souverain victoria' depending on the specific coin
+    "5 Dollars Or": '5 dollars or liberté',
+    "20 Marks Or": '20 mark or wilhelm II',
+    "Lingot Or 1 kg": 'Lingot or 1 kg LBMA',
+    "Lingotin Or 500 grammes": 'Lingot or 500 g LBMA',
+    "Lingotin Or  250 grammes": 'Lingot or 250 g LBMA',
+    "Lingotin Or 100 grammes": 'Lingot or 100 g LBMA',
+    "Lingotin Or 50 grammes": 'Lingot or 50 g LBMA',
+    "Lingotin Or 20 grammes": 'Lingot or 20 g LBMA',
+    "Lingotin Or 10 grammes": 'Lingot or 10 g LBMA',
+    "Lingotin Or 5 grammes": 'Lingot or 5 g LBMA',
+    "Lingotin Once Or": 'Lingot or 1 once LBMA',
+    "Lingotin Or 2 Grammes": "Lingot or 2 g", # Assuming this is the intended match, adjust if needed
+    "Lingotin Or 1 Gramme": "Lingot or 1 g"
+}
 
 def get_delivery_price(price):
     if price <= 2000.0 :
@@ -14,40 +45,35 @@ def get_price_for(session,session_id):
     """
     Retrieves the '20 francs or coq marianne' coin purchase price from Oretchange using requests and BeautifulSoup.
     """
-    url = "https://www.merson.fr/fr/achat-or-investissement/91-20-francs-coq.html"
+    url = "https://www.merson.fr/fr/18-achat-or-investissement"
+    print(url)
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
     }
 
-    try:
-        response = requests.get(url, headers=headers)
-        response.raise_for_status()
+    response = requests.get(url, headers=headers)
+    response.raise_for_status()
 
-        soup = BeautifulSoup(response.content, 'html.parser')
+    soup = BeautifulSoup(response.content, 'html.parser')
 
-        # Find the span element with class "result2"
-        price_element = soup.select_one('span[itemprop="price"].product-price')
+    # Find the span element with class "result2"
+    products_div = soup.find_all("div",'product-container')
 
-        if price_element:
-            price_text = price_element.text.strip()
+    for product in products_div:
+        try:
+            price = Price.fromstring(product.find("span", "price product-price").text)
+            name_title = product.find("h5", "product-name")
+            name = name_title.text.strip()
+            url = name_title.find('a')['href']
+            print(name,price)
 
-            # Clean the price text
-            try:
-                price = float(price_text.replace('€', '').replace(',', '.'))
-                coin = CoinPrice(nom="20 francs or coq marianne",
-                                 j_achete=price,
-                                 source=url,
-                                 frais_port=get_delivery_price(price),session_id=session_id)
-                session.add(coin)
-                session.commit()
+            #price = float(price_text.replace('€', '').replace(',', '.'))
+            coin = CoinPrice(nom=coin_name[name],
+                             j_achete=price.amount_float,
+                             source=url,
+                             frais_port=get_delivery_price(price.amount_float),session_id=session_id)
+            session.add(coin)
+            session.commit()
 
-                return price
-            except ValueError:
-                print(f"Failed to convert price text '{price_text}' to float",url)
-        else:
-            print("Price element not found on page.",url)
-
-    except requests.RequestException as e:
-        print(f"Error making request to {url}: {e}",url)
-
-    return None
+        except Exception as e:
+            print(traceback.format_exc())

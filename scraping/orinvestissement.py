@@ -1,45 +1,63 @@
 import requests
 from bs4 import BeautifulSoup
 from models.model import CoinPrice
+from price_parser import Price
+import traceback
+
+coin_name = {
+    "Pièce Or 20 Francs Marianne Coq": '20 francs or coq marianne',
+    "Pièce Or 20 Francs Napoléon III": '20 francs or napoléon III',
+    "Pièce Or 20 Francs Suisse": '20 francs or vreneli croix suisse',  # Assuming "Suisse" refers to the Vreneli coin
+    "Pièce Or 10 Dollars US": '10 dollars or liberté',  # Assuming "Liberté" is the most common 10 dollar US gold coin
+    "Pièce Or 20 Dollars US": '20 dollars or liberté',  # Similar assumption as above
+    "Pièce Or Union Latine": '20 francs or union latine léopold II',  # Assuming the most common Union Latine coin
+    "Pièce Or 50 Pesos": '50 pesos or',
+    "Pièce Or Souverain": 'souverain or elizabeth II',  # Assuming the most recent monarch
+    "Pièce Or Krugerrand": '1 oz krugerrand',
+    "Pièce Or 100 Francs Napoléon III": '100 francs or napoléon III tête nue',
+    "Pièce Or 50 Francs Napoléon III": '50 francs or napoléon III tête nue',
+    "Pièce Or 5 Dollars US": '5 dollars or liberté',  # Same assumption as for 10 dollars
+    "Pièce Or 20 Francs Génie": '20 francs or génie debout',
+    "Pièce Or 20 Mark Allemande": '20 mark or wilhelm II'
+}
 
 # https://or-investissement.fr/information-or-investissement/1-livraison-achat-or-investissement
 def get_price_for(session,session_id):
     """
     Retrieves the '20 francs or coq marianne' coin purchase price from Or-Investissement using requests and BeautifulSoup.
     """
-    url = 'https://or-investissement.fr/achat-piece-or-investissement/8-achat-piece-20-francs-marianne-coq.html'
+    url = 'https://or-investissement.fr/12-achat-piece-or-investissement'
+    print(url)
     headers = {
         'User-Agent': 'Mozilla/5.0'
     }
+    response = requests.get(url, headers=headers)
+    response.raise_for_status()
 
-    try:
-        response = requests.get(url, headers=headers)
-        response.raise_for_status()  # Raise exception for bad HTTP responses
+    soup = BeautifulSoup(response.content, 'html.parser')
 
-        soup = BeautifulSoup(response.content, 'html.parser')
+    # Find the span element with class "result2"
+    products_div = soup.find_all("article")
 
-        # Locate the price element using the itemprop and class attributes
-        price_element = soup.select_one('span[itemprop="price"].product-price')
+    for product in products_div:
+        try:
+            price_text = product.find('span','product-price').text
 
-        if price_element:
-            # Extract and clean the price text
-            price_text = price_element.text.strip().replace('€', '').replace(',', '.').replace('\xa0', '')
+            price = Price.fromstring(price_text)
+            name_title = product.find("h3", "h3 product-title")
+            url = name_title.find('a')['href']
 
-            try:
-                price = float(price_text)
-                coin = CoinPrice(nom="20 francs or coq marianne",
-                                 j_achete=price,
-                                 source=url,
-                                 frais_port=25.0,session_id=session_id)
-                session.add(coin)
-                session.commit()
-                return price
-            except ValueError:
-                print(f"Failed to convert price text '{price_text}' to float,url")
-        else:
-            print("Price element not found on page.",url)
+            name = name_title.text.strip()
 
-    except requests.RequestException as e:
-        print(f"An error occurred during the request: {e}",url)
+            print(name,price)
 
-    return None  # Return None on failure
+            #price = float(price_text.replace('€', '').replace(',', '.'))
+            coin = CoinPrice(nom=coin_name[name],
+                             j_achete=price.amount_float,
+                             source=url,
+                             frais_port=25.0,session_id=session_id)
+            session.add(coin)
+            session.commit()
+
+        except Exception as e:
+            print(traceback.format_exc())
