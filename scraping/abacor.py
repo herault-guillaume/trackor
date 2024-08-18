@@ -59,7 +59,7 @@ def get_price_for(session,session_id):
                     else:
                         price_text = price_elements[1].text.strip()
                     price = Price.fromstring(price_text)
-                    print(price,url)
+                    print(coin_name,price)
                     coin = CoinPrice(nom=coin_name,
                                      j_achete=price.amount_float,
                                      frais_port=get_delivery_price(price.amount_float),

@@ -1,4 +1,4 @@
-from selenium import webdriver
+from seleniumbase import Driver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -40,43 +40,40 @@ urls = {
 
 def get_price_delivery_for(session,session_id):
     # Set up headless Chrome
-    options = webdriver.ChromeOptions()
-    # options.add_argument("--headless=new")  # Use headless mode
-    # options.add_argument("--incognito")  # Use incognito mode
-    driver = webdriver.Chrome(options=options)
+    driver = Driver(uc=True, headless=True)
 
     for coin_name, url in urls.items():
         try:
             driver.get(url)  # Load the page
             print(url)
             # Locate the price element by its unique combination of classes
-            price_elements = WebDriverWait(driver, 5).until(
-                EC.presence_of_all_elements_located((By.CSS_SELECTOR, 'span.sc-4c919c2a-0.eGPPLD p.sc-8fad5955-0.iqjCoA'))
+            # Wait for the span element to be present (adjust timeout as needed)
+            span_element = WebDriverWait(driver, 7).until(
+                EC.presence_of_all_elements_located((By.XPATH, "//span[@color='primary' and .//p[@display='inline']]"))
             )
-            price_element = price_elements[1]
-
-            price_text_parts = [span.text.strip() for span in price_element.find_elements(By.TAG_NAME, 'span')]
-
+            price = Price.fromstring("".join(span_element[1].text))
+            print(price)
             # Clean and combine the price text
-            price_text = ''.join(price_text_parts).replace('€', '').replace(',', '.')
+            #price_text = ''.join(price_text_parts).replace('€', '').replace(',', '.')
 
             # Extract the delivery fee
-            delivery_element = WebDriverWait(driver, 5).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, 'span.sc-8fad5955-0.klSgsp'))
+            delivery_elements = WebDriverWait(driver, 7).until(
+                EC.presence_of_all_elements_located((By.XPATH, "//p[@text-decoration='underline' and @font-style='italic']"))
             )
-            delivery_text = delivery_element.text.strip().split()[0]
-            delivery_fee = float(delivery_text.replace('€', '').replace(',', '.').replace('--', ''))  # Assuming delivery cost is in €
 
-            # Convert to float
-            price = Price.fromstring(price_text)
+            # Find the span element within the p element
+            span_element = delivery_elements[1].find_element(By.XPATH, ".//span[@font-style='italic']")
+            delivery_fee = Price.fromstring(span_element.text)
+
             print(coin_name,price)
             coin = CoinPrice(nom=coin_name,
                              j_achete=price.amount_float,
                              source=url,
-                             frais_port=delivery_fee,session_id=session_id)
+                             frais_port=delivery_fee.amount_float,session_id=session_id)
             session.add(coin)
             session.commit()
 
 
         except Exception as e :
             print(traceback.format_exc())
+            pass

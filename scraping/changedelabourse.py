@@ -65,6 +65,7 @@ def get_price_for(session,session_id):
             # Extract the product name
             product_name_link = product_item.find('a', class_='product-name')
             product_name = product_name_link.text.strip()
+            url = product_name_link['href']
 
             print(coin_mapping_name[product_name], price)
 
@@ -76,10 +77,11 @@ def get_price_for(session,session_id):
                 coin = CoinPrice(nom=coin_mapping_name[product_name],
                                  j_achete=price.amount_float,
                                  source=url,
-                                 frais_port=get_delivery_price(price),session_id=session_id)
+                                 frais_port=get_delivery_price(price.amount_float),session_id=session_id)
                 session.add(coin)
                 session.commit()
 
         except (requests.exceptions.RequestException, ValueError) as e:
             print(f"Error retrieving or parsing price: {e}",url)
             print(traceback.format_exc())
+            pass

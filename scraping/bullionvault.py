@@ -1,17 +1,14 @@
-from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException
+from seleniumbase import Driver
 
 from models.model import GoldPrice
 
 def get(session):
     """Uses Selenium to click the currency button, then scrapes the 1 kg gold price in Euros."""
 
-    # options = webdriver.ChromeOptions()
-    # options.add_argument('--headless=new')  # Headless mode for efficiency
-    driver = webdriver.Chrome()
+    driver = Driver(uc=True, headless=True)
 
     try:
         url = "https://or.bullionvault.fr/"

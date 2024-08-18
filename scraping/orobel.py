@@ -1,4 +1,4 @@
-from selenium import webdriver
+from seleniumbase import Driver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -61,11 +61,7 @@ def get_price_for(session, session_id):
 
     url = "https://www.orobel.biz/catalogue/pieces-or"
     print(url)
-    options = webdriver.ChromeOptions()
-    options.add_argument('--headless')  # Headless mode for efficiency
-
-    # Initialize Selenium webdriver (replace with your preferred browser driver)
-    driver = webdriver.Chrome(options=options)  # Or use Firefox, Edge, etc.
+    driver = Driver(uc=True, headless=True)
 
 
     try:

@@ -93,8 +93,8 @@ def get_price_for(buy_gp,sell_gp,table_index,session,session_id):
         try :
             row_data['prime_achat_perso'] = (float(row_data['j_achete']) - (poids_pieces_or[row_data['nom']] * buy_gp)) / float(row_data['j_achete']) * 100
             row_data['prime_vente_perso'] = (float(row_data['je_vend']) - (poids_pieces_or[row_data['nom']] * sell_gp)) / float(row_data['je_vend']) * 100
+            print(row_data['nom'],float(row_data['j_achete']))
         except Exception as e:
-            print(e,'not present in weight database',url)
             print(traceback.format_exc())
             pass
         data.append(row_data)

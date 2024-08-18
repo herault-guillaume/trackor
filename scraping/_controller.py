@@ -99,33 +99,34 @@ def calculate_and_store_coin_data(session,session_id,coin_name='20 francs or coq
 def fetch_and_update_data():
     for attempt in range(1):  # Retry up to 3 times
         try:
+            start_time = time.time()
             session_id = uuid.uuid4()
             session = Session()
 
-            #buy_price,sell_price = bullionvault.get(session)
+            buy_price,sell_price = bullionvault.get(session)
 
-            #abacor.get_price_for(session,session_id)
-            #acheterorargent.get_price_for(buy_price, sell_price, 0, session,session_id)
-            #acheterorargent.get_price_for(buy_price, sell_price, 1, session,session_id)
-            #achatoretargent.get_price_for(session,session_id)
-            #aucoffre.get_price_for(session,session_id)
-            #bdor.get_price_for(session,session_id)
-            # bullionbypost.get_price_for(session,session_id)
-            # changedelabourse.get_price_for(session,session_id)
-            # changerichelieu.get_price_for(session,session_id)
-            # changevivienne.get_price_for(session,session_id)
-            # gold.get_price_for(session,session_id)
-            # goldavenue.get_price_delivery_for(session,session_id)
-            # goldforex.get_price_for(session,session_id)
-            # goldreserve.get_price_for(session,session_id)
-            # lmp.get_price_for(session,session_id)
-            # lcdor.get_price_for(session,session_id)
-            # merson.get_price_for(session,session_id)
-            # monlingot.get_price_for(session,session_id)
-            # oretchange.get_price_for(session,session_id)
-            # orinvestissement.get_price_for(session,session_id)
+            abacor.get_price_for(session,session_id)
+            acheterorargent.get_price_for(buy_price, sell_price, 0, session,session_id)
+            acheterorargent.get_price_for(buy_price, sell_price, 1, session,session_id)
+            achatoretargent.get_price_for(session,session_id)
+            aucoffre.get_price_for(session,session_id)
+            bdor.get_price_for(session,session_id)
+            bullionbypost.get_price_for(session,session_id)
+            changedelabourse.get_price_for(session,session_id)
+            changerichelieu.get_price_for(session,session_id)
+            changevivienne.get_price_for(session,session_id)
+            gold.get_price_for(session,session_id)
+            goldavenue.get_price_delivery_for(session,session_id)
+            goldforex.get_price_for(session,session_id)
+            goldreserve.get_price_for(session,session_id)
+            lmp.get_price_for(session,session_id)
+            lcdor.get_price_for(session,session_id)
+            merson.get_price_for(session,session_id)
+            monlingot.get_price_for(session,session_id)
+            oretchange.get_price_for(session,session_id)
+            orinvestissement.get_price_for(session,session_id)
             orobel.get_price_for(session,session_id)
-            # shopcomptoirdelor.get_price_for(session,session_id)
+            shopcomptoirdelor.get_price_for(session,session_id)
 
 
             # goldunion.get(session,session_id)  # arnaque?
@@ -133,7 +134,7 @@ def fetch_and_update_data():
             # pieceor.get(session,session_id)
 
             site_data = calculate_and_store_coin_data(session,session_id)
-
+            print("--- %s seconds ---" % (time.time() - start_time))
             # update_json_file(site_data)
             return  # Sortir de la fonction si la mise à jour est réussie
 

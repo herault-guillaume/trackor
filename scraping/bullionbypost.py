@@ -1,8 +1,11 @@
-from selenium import webdriver
+import random
+import time
+
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from models.model import CoinPrice
+from seleniumbase import Driver
 
 from price_parser import Price
 import traceback
@@ -57,33 +60,31 @@ urls = {
     "5 pesos or": "https://www.bullionbypost.fr/pieces-du-monde/pieces-mexicaines/5-pesos-mexicains-en-or/",
 }
 def get_price_for(session,session_id):
-    # Set up headless Chrome
-    options = webdriver.ChromeOptions()
-    # options.add_argument("--headless=new")  # Use headless mode
-    # options.add_argument("--incognito")  # Use incognito mode
+    print("https://www.bullionbypost.fr/")
+    driver = Driver(uc=True, headless=True)
 
-    with webdriver.Chrome(options=options) as driver:
-        for coin_name, url in urls.items():
-            try:
-                driver.get(url)  # Load the page
+    #driver = webdriver.Chrome(options=options)
+    for coin_name, url in urls.items():
+        try:
+            driver.get(url)  # Load the page
+            time.sleep(random.randint(10,18))
+            # Locate the price element by its text content
+            price_element = WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.XPATH, "//p[strong[text()='Prix: ']]"))  # Use XPath for text-based search
+            )
+            price_text = price_element.text.strip()
+            price = Price.fromstring(price_text)
 
-                # Locate the price element by its text content
-                price_element = WebDriverWait(driver, 10).until(
-                    EC.presence_of_element_located((By.XPATH, "//p[strong[text()='Prix: ']]"))  # Use XPath for text-based search
-                )
-                price_text = price_element.text.strip()
-                price = Price.fromstring(price_text)
+            print(coin_name,price)
 
+            coin = CoinPrice(nom=coin_name,
+                             j_achete=price.amount_float,
+                             source=url,
+                             frais_port=0.0,session_id=session_id)
+            session.add(coin)
+            session.commit()
 
-                #price = float(price_text.replace('€', '').replace(',', '.').replace('Prix: à partir de ',''))
-
-                coin = CoinPrice(nom=coin_name,
-                                 j_achete=price.amount_float,
-                                 source=url,
-                                 frais_port=0.0,session_id=session_id)
-                session.add(coin)
-                session.commit()
-
-            except ValueError:
-                print(f"Failed to convert price text '{price_text}' to float",url)
-                print(traceback.format_exc())
+        except ValueError:
+            print(f"Failed to convert price text '{price_text}' to float",url)
+            print(traceback.format_exc())
+            pass

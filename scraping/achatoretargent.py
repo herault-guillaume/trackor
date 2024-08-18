@@ -63,7 +63,7 @@ def get_price_for(session,session_id):
                 # Extract and clean the price text
                 price_text = price_element.text.strip().replace('€', '').replace(',', '.')
                 price = Price.fromstring(price_text)
-                print(price, url)
+                print(coin_name, price)
                 coin = CoinPrice(nom=coin_name,
                                  j_achete=price.amount_float,
                                  source=url,

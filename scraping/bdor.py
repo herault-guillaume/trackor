@@ -1,4 +1,6 @@
-from selenium import webdriver
+import time
+
+from seleniumbase import Driver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -53,17 +55,15 @@ table_lookup = {
 
 def get_delivery_price(price):
     #https://www.bdor.fr/achat-or-en-ligne/livraison-or
-    if price < 1000:
+    if price < 1000.0:
         return 15.0
     else :
         return 0.0
 
 def get_price_for(session,session_id):
-    options = webdriver.ChromeOptions()
-    options.add_argument("--headless")
-    driver = webdriver.Chrome(options=options)
+    driver = Driver(uc=True, headless=True)
     url = "https://www.bdor.fr/achat-or-en-ligne"
-
+    print(url)
     try :
         driver.get(url)
         following_element = None
@@ -75,7 +75,13 @@ def get_price_for(session,session_id):
             div_element = wait.until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, "div[data-idr='{id}']".format(id=id)))
             )
-
+            trs_elements = wait.until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, "tr.prixPalier[data-ordre='1']"))
+            )
+            divs_produit = wait.until(
+                EC.presence_of_element_located((By.CLASS_NAME, "produitOrNom"))
+            )
+            #time.sleep(5)
             # Find all ligneTab divs within the div_element
             ligne_tab_divs = div_element.find_elements(By.CLASS_NAME, "ligneTab")
 
@@ -102,16 +108,7 @@ def get_price_for(session,session_id):
 
                 # Extract the href attribute
                 source = first_a_tag.get_attribute("href")
-
-
-                # Find the td element containing the '€' symbol
-                price_td = tr_element[1].find_element(
-                    By.XPATH, ".//td[contains(text(), '€')]"
-                )
-
-                # Clean the price text and convert to float
-                # price = float(following_element.text.replace('€', '').replace(',', '.').replace('  net',''))
-                price = Price.fromstring(price_td.text)
+                price = Price.fromstring(tr_element[1].find_elements(By.TAG_NAME, 'td')[1].get_attribute('innerHTML'))
                 print(product_name, price)
                 coin = CoinPrice(nom=product_name,
                                  j_achete=price.amount_float,
