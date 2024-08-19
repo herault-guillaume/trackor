@@ -1,5 +1,5 @@
 
-from models.model import CoinPrice, Session
+from models.model import CoinPrice, Session, poids_pieces_or
 from sqlalchemy import func, asc
 import json
 from datetime import datetime, timedelta
@@ -40,7 +40,6 @@ import abacor
 import goldreserve
 import shopcomptoirdelor
 
-
 def update_json_file(new_data,
                      bucket_name='prixlouisdor',
                      file_name='site_data.json'):
@@ -64,6 +63,66 @@ def update_json_file(new_data,
 
     print(f"File '{file_name}' updated in bucket '{bucket_name}'")
 
+def find_best_deals(session: Session, session_id: UUID, num_deals: int = 7) -> list[dict]:
+    """
+    Calculates the `num_deals` best deals (gold weight / price ratio)
+    among the available coins and returns information about the corresponding coins.
+
+    Args:
+        session: SQLAlchemy Session object to interact with the database.
+        session_id: Session ID to filter the results.
+        num_deals: Number of best deals to return (default 7).
+
+    Returns:
+        A list of dictionaries containing information about the coins with the best ratios,
+        sorted in descending order of ratio.
+    """
+
+    results = (
+        session.query(
+            CoinPrice.nom,
+            CoinPrice.j_achete,
+            CoinPrice.frais_port
+        )
+        .filter(CoinPrice.session_id == session_id)
+        .all()
+    )
+
+    deals = []
+
+    for row in results:
+        if row.nom in poids_pieces_or:
+            weight = poids_pieces_or[row.nom]
+            total_price = row.j_achete + row.frais_port
+            ratio = weight / total_price
+
+            deals.append({
+                "name": row.nom,
+                "weight": weight,
+                "total_price": total_price,
+                "ratio": ratio
+            })
+
+    # Sort deals by ratio in descending order and take the first `num_deals`
+    sorted_deals = sorted(deals, key=lambda x: x["ratio"], reverse=True)[:num_deals]
+
+    return sorted_deals
+
+def save_deals_to_json(deals: list[dict], filename: str = "best_deals.json") -> None:
+    """
+    Saves information about the best deals to a JSON file.
+
+    Args:
+        deals: List of dictionaries containing information about the best deals.
+        filename: Name of the JSON file to save the data to (default "best_deals.json").
+    """
+
+    try:
+        with open(filename, "w") as f:
+            json.dump(deals, f, indent=4)  # indent for better readability
+        print(f"The best deals have been saved to {filename}")
+    except IOError as e:
+        print(f"Error writing to JSON file: {e}")
 
 def calculate_and_store_coin_data(session,session_id,coin_name='20 francs or coq marianne'):
     """
@@ -96,6 +155,100 @@ def calculate_and_store_coin_data(session,session_id,coin_name='20 francs or coq
         json.dump(data, f)
 
     return data
+
+import json
+from sqlalchemy.orm import sessionmaker
+from uuid import UUID
+
+# ... (code définissant les modèles de données et le moteur de base de données) ...
+
+Session = sessionmaker(bind=engine)
+
+def meilleures_affaires(session: Session, session_id: UUID, nombre_affaires: int = 7) -> list[dict]:
+    """
+    Calcule les `nombre_affaires` meilleures affaires (rapport poids en or / prix)
+    parmi les pièces disponibles et retourne les informations des pièces correspondantes.
+
+    Args:
+        session: Objet Session SQLAlchemy pour interagir avec la base de données.
+        session_id: ID de la session pour filtrer les résultats.
+        nombre_affaires: Nombre de meilleures affaires à retourner (par défaut 7).
+
+    Returns:
+        Une liste de dictionnaires contenant les informations des pièces avec les meilleurs rapports,
+        triée par rapport décroissant.
+    """
+
+    results = (
+        session.query(
+            CoinPrice.nom,
+            CoinPrice.j_achete,
+            CoinPrice.frais_port
+        )
+        .filter(CoinPrice.session_id == session_id)
+        .all()
+    )
+
+    affaires = []
+
+    for row in results:
+        if row.nom in poids_pieces_or:
+            poids = poids_pieces_or[row.nom]
+            prix_total = row.j_achete + row.frais_port
+            rapport = poids / prix_total
+
+            affaires.append({
+                "nom": row.nom,
+                "poids": poids,
+                "prix_total": prix_total,
+                "rapport": rapport
+            })
+
+    # Trier les affaires par rapport décroissant et prendre les `nombre_affaires` premières
+    affaires_triees = sorted(affaires, key=lambda x: x["rapport"], reverse=True)[:nombre_affaires]
+
+    return affaires_triees
+
+def sauvegarder_affaires_json(affaires: list[dict], nom_fichier: str = "meilleures_affaires.json") -> None:
+    try:
+        with open(nom_fichier, "w") as f:
+            json.dump(affaires, f, indent=4)  # indent pour une meilleure lisibilité
+        print(f"Les meilleures affaires ont été sauvegardées dans {nom_fichier}")
+    except IOError as e:
+        print(f"Erreur lors de l'écriture du fichier JSON : {e}")
+
+def calculate_and_store_coin_data(session,session_id,coin_name='20 francs or coq marianne'):
+    """
+    Calcule le total (j_achete + frais_port) pour chaque pièce, trie par ordre décroissant,
+    et stocke les résultats dans un fichier JSON.
+
+    Args:
+        session: Objet Session SQLAlchemy pour interagir avec la base de données.
+    """
+
+    results = (
+        session.query(
+            CoinPrice.nom,
+            (CoinPrice.j_achete + CoinPrice.frais_port).label("total"),
+            CoinPrice.source
+        )
+        .filter(CoinPrice.nom == coin_name)
+        .filter(CoinPrice.session_id == session_id)
+        .order_by(asc("total"))
+    )
+
+    # Conversion des résultats en dictionnaire
+    data = [{"position": i,
+             "source": row.source,
+             "diff" : "{:.1f}%".format((row.total - list(results)[-1].total) * 100 / list(results)[-1].total)}
+            for i,row in enumerate(results)]
+    print(data)
+    # Stockage dans un fichier JSON
+    with open("coin_data.json", "w") as f:
+        json.dump(data, f)
+
+    return data
+
 def fetch_and_update_data():
     for attempt in range(1):  # Retry up to 3 times
         try:
