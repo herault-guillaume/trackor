@@ -24,7 +24,7 @@ coin_name = {
     "Aigle américain 1/10 OZ or diverses années": '1/10 oz american eagle',
     "5 dollars USA or diverses années": '5 dollars or liberté',
     "10 dollars USA or diverses années": '10 dollars or liberté',
-    "1 rand sud-africains or diverses années": '1 oz krugerrand',
+    "1 rand sud-africains or diverses années": '1 rand sud-africains or',
     #"2 rands sud-africains or diverses années": '20 rands',
     "Nugget en or 1 once troy années diverses": '1 oz nugget / kangourou',
     "Ducat simple d'or néerlandais diverses années": '1 ducat or',

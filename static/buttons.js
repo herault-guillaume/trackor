@@ -5,7 +5,7 @@
             container.style.gap = '20px';
             container.style.padding = '20px';
 
-            fetch('https://storage.googleapis.com/prixlouisdor/site_data.json',  {
+            fetch('https://storage.googleapis.com/prixlouisdor/20_fr_france.json',  {
             cache: 'no-store',
             })
                 .then(response => {
@@ -20,6 +20,8 @@
                         return;
                     }
                     const numButtons = data.length;
+                    const midIndex = Math.floor(numButtons / 2);
+
                     data.slice(0, numButtons).forEach((item,index) => {
                         // Button
                         const button = document.createElement('a');
@@ -95,13 +97,27 @@
                         changeSpan.style.padding = '5px 10px';
                         changeSpan.style.borderRadius = '20px';
                         changeSpan.style.fontSize = '1.0rem';
-                        // Calculate gradient color
-                        const startColor = [63, 255, 20]; // Fluorescent green [R, G, B]
-                        const endColor = [255, 255, 255];   // White [R, G, B]
 
-                        const r = Math.round(startColor[0] + (endColor[0] - startColor[0]) * index / (numButtons - 1));
-                        const g = Math.round(startColor[1] + (endColor[1] - startColor[1]) * index / (numButtons - 1));
-                        const b = Math.round(startColor[2] + (endColor[2] - startColor[2]) * index / (numButtons - 1));
+                       // Calculate gradient color based on button index relative to the median
+                        let r, g, b;
+                        if (index === midIndex) {
+                            // White for the median button
+                            r = 255;
+                            g = 255;
+                            b = 255;
+                        } else if (index < midIndex) {
+                            // Green gradient for buttons before the median
+                            const greenIntensity = Math.round(255 * (midIndex - index) / midIndex);
+                            r = 255 - greenIntensity;;
+                            g = 255;
+                            b = 255 - greenIntensity;;
+                        } else {
+                            // Red gradient for buttons after the median
+                            const redIntensity = Math.round(255 * (index - midIndex) / (numButtons - midIndex - 1));
+                            r = 255;
+                            g = 255 - redIntensity;
+                            b = 255 - redIntensity;
+                        }
 
                         const color = `rgb(${r}, ${g}, ${b})`;
                         changeSpan.style.color = color;

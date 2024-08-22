@@ -15,7 +15,7 @@ table_lookup = {
         "20 Fr Or Napoléon Tête Nue" : '20 francs or napoléon III',
         #20 Fr Or Napoléon Lauré
         "10 Fr Or Coq" : "10 francs or coq marianne",
-        "10 Fr Or Napoléon Tête Nue" : "20 francs or napoléon III",
+        "10 Fr Or Napoléon Tête Nue" : "10 francs or napoléon III",
         #10 Fr Or Napoléon Lauré
         "10 Fr Or Vreneli" : "10 francs or vreneli croix suisse",
         #20 Dollars Or St Gaudens

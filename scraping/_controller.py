@@ -1,6 +1,7 @@
 
 from models.model import CoinPrice, Session, poids_pieces_or
 from sqlalchemy import func, asc
+from sqlalchemy.sql.expression import and_
 import json
 from datetime import datetime, timedelta
 from google.cloud import storage
@@ -11,7 +12,8 @@ from apscheduler.triggers.cron import CronTrigger
 from datetime import datetime, timedelta
 import random
 import uuid
-
+import statistics
+from urllib.parse import urlparse
 import traceback
 
 import bullionvault
@@ -41,8 +43,8 @@ import goldreserve
 import shopcomptoirdelor
 
 def update_json_file(new_data,
-                     bucket_name='prixlouisdor',
-                     file_name='site_data.json'):
+                     filename,
+                     bucket_name='prixlouisdor'):
     """Updates a JSON file in Google Cloud Storage.
 
     Args:
@@ -53,7 +55,7 @@ def update_json_file(new_data,
     os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = r"C:\Users\herau\PycharmProjects\trackor\trackor-431010-a4f698825e45.json"
     storage_client = storage.Client()
     bucket = storage_client.bucket(bucket_name)
-    blob = bucket.blob(file_name)
+    blob = bucket.blob(filename)
 
     blob.upload_from_string(json.dumps(new_data,indent=0))
     # Set ACL to make the file publicly accessible
@@ -61,9 +63,9 @@ def update_json_file(new_data,
     blob.acl.save()
     # Convert to JSON string with formatting
 
-    print(f"File '{file_name}' updated in bucket '{bucket_name}'")
+    print(f"File '{filename}' updated in bucket '{bucket_name}'")
 
-def find_best_deals(session: Session, session_id: UUID, num_deals: int = 7) -> list[dict]:
+def find_best_deals(session, session_id, num_deals=15,filename='best_deals.json'):
     """
     Calculates the `num_deals` best deals (gold weight / price ratio)
     among the available coins and returns information about the corresponding coins.
@@ -82,7 +84,8 @@ def find_best_deals(session: Session, session_id: UUID, num_deals: int = 7) -> l
         session.query(
             CoinPrice.nom,
             CoinPrice.j_achete,
-            CoinPrice.frais_port
+            CoinPrice.frais_port,
+            CoinPrice.source
         )
         .filter(CoinPrice.session_id == session_id)
         .all()
@@ -91,161 +94,102 @@ def find_best_deals(session: Session, session_id: UUID, num_deals: int = 7) -> l
     deals = []
 
     for row in results:
-        if row.nom in poids_pieces_or:
+        if row.nom in poids_pieces_or and not 'lingot' in str(row.nom).lower():
             weight = poids_pieces_or[row.nom]
             total_price = row.j_achete + row.frais_port
-            ratio = weight / total_price
+            ratio = total_price / weight
 
             deals.append({
                 "name": row.nom,
                 "weight": weight,
                 "total_price": total_price,
-                "ratio": ratio
+                "ratio": ratio,
+                "source": row.source
             })
 
     # Sort deals by ratio in descending order and take the first `num_deals`
-    sorted_deals = sorted(deals, key=lambda x: x["ratio"], reverse=True)[:num_deals]
-
-    return sorted_deals
-
-def save_deals_to_json(deals: list[dict], filename: str = "best_deals.json") -> None:
-    """
-    Saves information about the best deals to a JSON file.
-
-    Args:
-        deals: List of dictionaries containing information about the best deals.
-        filename: Name of the JSON file to save the data to (default "best_deals.json").
-    """
+    sorted_deals = sorted(deals, key=lambda x: x["ratio"], reverse=False)[:num_deals]
 
     try:
         with open(filename, "w") as f:
-            json.dump(deals, f, indent=4)  # indent for better readability
+            json.dump(sorted_deals, f, indent=4)  # indent for better readability
         print(f"The best deals have been saved to {filename}")
     except IOError as e:
         print(f"Error writing to JSON file: {e}")
 
-def calculate_and_store_coin_data(session,session_id,coin_name='20 francs or coq marianne'):
+    return sorted_deals
+
+
+def calculate_and_store_coin_data(session, session_id, coin_names, filename):
     """
-    Calcule le total (j_achete + frais_port) pour chaque pièce, trie par ordre décroissant,
-    et stocke les résultats dans un fichier JSON.
+    Calcule le total (j_achete + frais_port) pour chaque pièce,
+    garde une seule pièce par source avec le prix le plus bas,
+    trie par ordre croissant, et stocke les résultats dans un fichier JSON.
+    Le diff est calculé par rapport à la médiane de toutes les pièces sélectionnées.
 
     Args:
         session: Objet Session SQLAlchemy pour interagir avec la base de données.
+        session_id: ID de la session de recherche.
+        coin_names: Liste des noms de pièces à considérer.
+        filename: Nom du fichier JSON pour stocker les résultats.
     """
 
-    results = (
+    # Première requête pour obtenir tous les résultats avec les noms de pièces spécifiés
+    all_results = (
         session.query(
             CoinPrice.nom,
             (CoinPrice.j_achete + CoinPrice.frais_port).label("total"),
             CoinPrice.source
         )
-        .filter(CoinPrice.nom == coin_name)
-        .filter(CoinPrice.session_id == session_id)
-        .order_by(asc("total"))
-    )
-
-    # Conversion des résultats en dictionnaire
-    data = [{"position": i,
-             "source": row.source,
-             "diff" : "{:.1f}%".format((row.total - list(results)[-1].total) * 100 / list(results)[-1].total)}
-            for i,row in enumerate(results)]
-    print(data)
-    # Stockage dans un fichier JSON
-    with open("coin_data.json", "w") as f:
-        json.dump(data, f)
-
-    return data
-
-import json
-from sqlalchemy.orm import sessionmaker
-from uuid import UUID
-
-# ... (code définissant les modèles de données et le moteur de base de données) ...
-
-Session = sessionmaker(bind=engine)
-
-def meilleures_affaires(session: Session, session_id: UUID, nombre_affaires: int = 7) -> list[dict]:
-    """
-    Calcule les `nombre_affaires` meilleures affaires (rapport poids en or / prix)
-    parmi les pièces disponibles et retourne les informations des pièces correspondantes.
-
-    Args:
-        session: Objet Session SQLAlchemy pour interagir avec la base de données.
-        session_id: ID de la session pour filtrer les résultats.
-        nombre_affaires: Nombre de meilleures affaires à retourner (par défaut 7).
-
-    Returns:
-        Une liste de dictionnaires contenant les informations des pièces avec les meilleurs rapports,
-        triée par rapport décroissant.
-    """
-
-    results = (
-        session.query(
-            CoinPrice.nom,
-            CoinPrice.j_achete,
-            CoinPrice.frais_port
-        )
+        .filter(CoinPrice.nom.in_(coin_names))
         .filter(CoinPrice.session_id == session_id)
         .all()
     )
 
-    affaires = []
+    # Extraire le domaine de chaque URL source et le stocker dans un dictionnaire
+    source_domains = {result: urlparse(result.source).netloc for result in all_results}
 
-    for row in results:
-        if row.nom in poids_pieces_or:
-            poids = poids_pieces_or[row.nom]
-            prix_total = row.j_achete + row.frais_port
-            rapport = poids / prix_total
+    # Filtrer et sélectionner la pièce la moins chère par domaine en Python
+    unique_results = []
+    seen_domains = set()
+    for result in all_results:
+        domain = source_domains[result]
+        if domain not in seen_domains:
+            cheapest_coin = min(
+                (r for r in all_results if source_domains[r] == domain),
+                key=lambda x: x.total
+            )
+            unique_results.append(cheapest_coin)
+            seen_domains.add(domain)
 
-            affaires.append({
-                "nom": row.nom,
-                "poids": poids,
-                "prix_total": prix_total,
-                "rapport": rapport
-            })
+    # Trier les résultats par prix total croissant
+    unique_results.sort(key=lambda x: x.total)
 
-    # Trier les affaires par rapport décroissant et prendre les `nombre_affaires` premières
-    affaires_triees = sorted(affaires, key=lambda x: x["rapport"], reverse=True)[:nombre_affaires]
 
-    return affaires_triees
+    # Calcul de la médiane de tous les prix
+    all_totals = [row.total for row in unique_results]
+    if all_totals:
+        median_total = statistics.median(all_totals)
+    else:
+        median_total = 0
 
-def sauvegarder_affaires_json(affaires: list[dict], nom_fichier: str = "meilleures_affaires.json") -> None:
-    try:
-        with open(nom_fichier, "w") as f:
-            json.dump(affaires, f, indent=4)  # indent pour une meilleure lisibilité
-        print(f"Les meilleures affaires ont été sauvegardées dans {nom_fichier}")
-    except IOError as e:
-        print(f"Erreur lors de l'écriture du fichier JSON : {e}")
+    # Conversion des résultats en dictionnaire, en calculant la différence par rapport à la moyenne
+    data = []
+    for i, row in enumerate(unique_results):
+        row_data = {
+            "position": i,
+            "nom": row.nom,
+            "source": row.source,
+            "total": row.total,
+            "diff": "{:.1f}%".format((row.total - median_total) * 100 / median_total)
+        }
+        data.append(row_data)
 
-def calculate_and_store_coin_data(session,session_id,coin_name='20 francs or coq marianne'):
-    """
-    Calcule le total (j_achete + frais_port) pour chaque pièce, trie par ordre décroissant,
-    et stocke les résultats dans un fichier JSON.
-
-    Args:
-        session: Objet Session SQLAlchemy pour interagir avec la base de données.
-    """
-
-    results = (
-        session.query(
-            CoinPrice.nom,
-            (CoinPrice.j_achete + CoinPrice.frais_port).label("total"),
-            CoinPrice.source
-        )
-        .filter(CoinPrice.nom == coin_name)
-        .filter(CoinPrice.session_id == session_id)
-        .order_by(asc("total"))
-    )
-
-    # Conversion des résultats en dictionnaire
-    data = [{"position": i,
-             "source": row.source,
-             "diff" : "{:.1f}%".format((row.total - list(results)[-1].total) * 100 / list(results)[-1].total)}
-            for i,row in enumerate(results)]
-    print(data)
     # Stockage dans un fichier JSON
-    with open("coin_data.json", "w") as f:
-        json.dump(data, f)
+    with open(filename, "w", encoding='utf8') as f:
+        json.dump(data, f, indent=4)
+
+    update_json_file(data, filename=filename)
 
     return data
 
@@ -285,10 +229,30 @@ def fetch_and_update_data():
             # goldunion.get(session,session_id)  # arnaque?
             # joubertchange.get(session,session_id)
             # pieceor.get(session,session_id)
-
-            site_data = calculate_and_store_coin_data(session,session_id)
+            print(find_best_deals(session,uuid.UUID('c662005ab5ad4cae86326ff919bbc90a'),num_deals=50))
+            # calculate_and_store_coin_data(session,uuid.UUID('c662005ab5ad4cae86326ff919bbc90a'),['1 oz krugerrand'],'1_oz_krugerrand.json')
+            calculate_and_store_coin_data(session,uuid.UUID('c662005ab5ad4cae86326ff919bbc90a'),['20 francs or coq marianne',
+                                                                        '20 francs or cérès',
+                                                                        '20 francs or génie debout',
+                                                                        '20 francs or napoléon III'],'20_fr_france.json')
+            calculate_and_store_coin_data(session,uuid.UUID('c662005ab5ad4cae86326ff919bbc90a'),['20 francs or union latine léopold II'],'20_fr_union_latine.json')
+            calculate_and_store_coin_data(session,uuid.UUID('c662005ab5ad4cae86326ff919bbc90a'),['20 francs or vreneli croix suisse',
+                                                                        '20 francs or helvetia suisse'],'20_fr_suisse.json')
+            calculate_and_store_coin_data(session,uuid.UUID('c662005ab5ad4cae86326ff919bbc90a'),['souverain or edouart VII',
+                                                                        'souverain or georges V',
+                                                                        'souverain or victoria jubilee'],'1_souv_ru.json')
+            calculate_and_store_coin_data(session,uuid.UUID('c662005ab5ad4cae86326ff919bbc90a'),['souverain or elizabeth II'],'1_souv_eliz_ru.json')
+            calculate_and_store_coin_data(session,uuid.UUID('c662005ab5ad4cae86326ff919bbc90a'),['1/2 souverain georges V',
+                                                                        '1/2 souverain victoria'],'1_2_souv_ru.json')
+            calculate_and_store_coin_data(session,uuid.UUID('c662005ab5ad4cae86326ff919bbc90a'),['50 pesos or'],'50_pesos_mex.json')
+            calculate_and_store_coin_data(session,uuid.UUID('c662005ab5ad4cae86326ff919bbc90a'),['20 mark or wilhelm II'],'20_mark_all.json')
+            calculate_and_store_coin_data(session,uuid.UUID('c662005ab5ad4cae86326ff919bbc90a'),['5 dollars or liberté','5 dollars or tête indien'],'5_dol_usa.json')
+            calculate_and_store_coin_data(session,uuid.UUID('c662005ab5ad4cae86326ff919bbc90a'),['20 dollars or liberté'],'20_dol_usa.json')
+            calculate_and_store_coin_data(session,uuid.UUID('c662005ab5ad4cae86326ff919bbc90a'),['10 dollars or liberté','10 dollars or tête indien'],'10_dol_usa.json')
+            calculate_and_store_coin_data(session,uuid.UUID('c662005ab5ad4cae86326ff919bbc90a'),['10 francs or coq marianne',
+                                                                        '10 francs or cérès 1850-1851',
+                                                                        '10 francs or napoléon III'],'10_fr_france.json')
             print("--- %s seconds ---" % (time.time() - start_time))
-            # update_json_file(site_data)
             return  # Sortir de la fonction si la mise à jour est réussie
 
         except Exception as e:

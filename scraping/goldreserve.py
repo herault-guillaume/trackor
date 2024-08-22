@@ -18,7 +18,7 @@ coin_name = {
     #"40 Francs – Louis Philippe | Or": None,  # This key doesn't exist, handle later
     "4 Ducats – Autriche | Or": "4 ducats or",
     "1/2 souverain – Edouard VII | Or": "1/2 souverain georges V",  # Assuming typo, should be George V
-    "10 Lire – Vittorio Emanuele | Or": "20 lire or vittorio emanuele II",  # Assuming it's a 20 Lire coin, clarify if needed
+    "10 Lire – Vittorio Emanuele | Or": "1 or vittorio emanuele II",  # Assuming it's a 20 Lire coin, clarify if needed
     #"5 Roubles – Alexandre III | Or": None,  # This key doesn't exist, handle later
     "20 Francs – Génie | Or": "20 francs or génie debout",
     "50 Francs – Napoléon tête nue | Or": "50 francs or napoléon III tête nue",
@@ -27,7 +27,7 @@ coin_name = {
     "20 Lire – Umberto I | Or": "20 lire or umberto I",
     #"40 Francs – Louis XVIII | Or": None,  # This key doesn't exist, handle later
     "100 Francs – Napoléon tête nue | Or": "100 francs or napoléon III tête nue",
-    "1/2 Souverain – Victoria (jubilé) | Or": "souverain or victoria jubilee",
+    "1/2 Souverain – Victoria (jubilé) | Or": '1/2 souverain victoria',
     "40 Francs – Napoléon tête laurée | Or": "40 francs or napoléon empereur lauré",
     "10 Francs France – Cérès | Or": "10 francs or cérès 1850-1851",
     #"40 Francs – Napoléon Empereur An 13 | Or": None,  # This key doesn't exist, handle later
