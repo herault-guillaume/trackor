@@ -235,13 +235,17 @@ def fetch_and_update_data():
                                                                         '20 francs or cérès',
                                                                         '20 francs or génie debout',
                                                                         '20 francs or napoléon III'],'20_fr_france.json')
-            calculate_and_store_coin_data(session,uuid.UUID('c662005ab5ad4cae86326ff919bbc90a'),['20 francs or union latine léopold II'],'20_fr_union_latine.json')
+            calculate_and_store_coin_data(session,uuid.UUID('c662005ab5ad4cae86326ff919bbc90a'),['20 francs or leopold I','20 francs or union latine léopold II'],'20_fr_belgique.json')
+            calculate_and_store_coin_data(session,uuid.UUID('c662005ab5ad4cae86326ff919bbc90a'),['20 lire or umberto I','20 lire or vittorio emanuele II'],'20_lires_italie.json')
             calculate_and_store_coin_data(session,uuid.UUID('c662005ab5ad4cae86326ff919bbc90a'),['20 francs or vreneli croix suisse',
                                                                         '20 francs or helvetia suisse'],'20_fr_suisse.json')
             calculate_and_store_coin_data(session,uuid.UUID('c662005ab5ad4cae86326ff919bbc90a'),['souverain or edouart VII',
                                                                         'souverain or georges V',
                                                                         'souverain or victoria jubilee'],'1_souv_ru.json')
-            calculate_and_store_coin_data(session,uuid.UUID('c662005ab5ad4cae86326ff919bbc90a'),['souverain or elizabeth II'],'1_souv_eliz_ru.json')
+            calculate_and_store_coin_data(session,uuid.UUID('c662005ab5ad4cae86326ff919bbc90a'),['souverain or edouart VII',
+                                                                                                            'souverain or elizabeth II',
+                                                                                                            'souverain or georges V',
+                                                                                                            'souverain or victoria jubilee'],'1_souv_eliz_ru.json')
             calculate_and_store_coin_data(session,uuid.UUID('c662005ab5ad4cae86326ff919bbc90a'),['1/2 souverain georges V',
                                                                         '1/2 souverain victoria'],'1_2_souv_ru.json')
             calculate_and_store_coin_data(session,uuid.UUID('c662005ab5ad4cae86326ff919bbc90a'),['50 pesos or'],'50_pesos_mex.json')
