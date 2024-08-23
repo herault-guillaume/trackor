@@ -52,7 +52,7 @@ def update_json_file(new_data,
         file_name: The name of the JSON file within the bucket.
         new_data: The new JSON data (Python dictionary or list) to write to the file.
     """
-    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = r"C:\Users\herau\PycharmProjects\trackor\trackor-431010-a4f698825e45.json"
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = r"C:\Users\guillaume.herault\PycharmProjects\trackor\trackor-431010-d8c08fe2f6b3.json"
     storage_client = storage.Client()
     bucket = storage_client.bucket(bucket_name)
     blob = bucket.blob(filename)
@@ -65,14 +65,14 @@ def update_json_file(new_data,
 
     print(f"File '{filename}' updated in bucket '{bucket_name}'")
 
-def find_best_deals(session, session_id, num_deals=15,filename='best_deals.json'):
+def find_best_deals(session, session_id, num_deals=50,filename='best_deals.json'):
     """
     Calculates the `num_deals` best deals (gold weight / price ratio)
     among the available coins and returns information about the corresponding coins.
 
     Args:
         session: SQLAlchemy Session object to interact with the database.
-        session_id: Session ID to filter the results.
+        : Session ID to filter the results.
         num_deals: Number of best deals to return (default 7).
 
     Returns:
@@ -87,7 +87,7 @@ def find_best_deals(session, session_id, num_deals=15,filename='best_deals.json'
             CoinPrice.frais_port,
             CoinPrice.source
         )
-        .filter(CoinPrice.session_id == session_id)
+        .filter(CoinPrice.session_id == session_id )
         .all()
     )
 
@@ -101,19 +101,18 @@ def find_best_deals(session, session_id, num_deals=15,filename='best_deals.json'
 
             deals.append({
                 "name": row.nom,
-                "weight": weight,
-                "total_price": total_price,
-                "ratio": ratio,
+                "ratio": "{:.2f}".format(ratio),
                 "source": row.source
             })
 
     # Sort deals by ratio in descending order and take the first `num_deals`
-    sorted_deals = sorted(deals, key=lambda x: x["ratio"], reverse=False)[:num_deals]
-
+    sorted_deals = sorted(deals, key=lambda x: float(x["ratio"]), reverse=False)[:num_deals]
+    print(sorted_deals)
     try:
         with open(filename, "w") as f:
             json.dump(sorted_deals, f, indent=4)  # indent for better readability
         print(f"The best deals have been saved to {filename}")
+        update_json_file(sorted_deals,filename)
     except IOError as e:
         print(f"Error writing to JSON file: {e}")
 
@@ -129,7 +128,7 @@ def calculate_and_store_coin_data(session, session_id, coin_names, filename):
 
     Args:
         session: Objet Session SQLAlchemy pour interagir avec la base de données.
-        session_id: ID de la session de recherche.
+        : ID de la session de recherche.
         coin_names: Liste des noms de pièces à considérer.
         filename: Nom du fichier JSON pour stocker les résultats.
     """
@@ -165,7 +164,6 @@ def calculate_and_store_coin_data(session, session_id, coin_names, filename):
     # Trier les résultats par prix total croissant
     unique_results.sort(key=lambda x: x.total)
 
-
     # Calcul de la médiane de tous les prix
     all_totals = [row.total for row in unique_results]
     if all_totals:
@@ -177,8 +175,6 @@ def calculate_and_store_coin_data(session, session_id, coin_names, filename):
     data = []
     for i, row in enumerate(unique_results):
         row_data = {
-            "position": i,
-            "nom": row.nom,
             "source": row.source,
             "total": row.total,
             "diff": "{:.1f}%".format((row.total - median_total) * 100 / median_total)
@@ -194,7 +190,7 @@ def calculate_and_store_coin_data(session, session_id, coin_names, filename):
     return data
 
 def fetch_and_update_data():
-    for attempt in range(1):  # Retry up to 3 times
+    for attempt in range(3):  # Retry up to 3 times
         try:
             start_time = time.time()
             session_id = uuid.uuid4()
@@ -229,27 +225,31 @@ def fetch_and_update_data():
             # goldunion.get(session,session_id)  # arnaque?
             # joubertchange.get(session,session_id)
             # pieceor.get(session,session_id)
-            print(find_best_deals(session,uuid.UUID('c662005ab5ad4cae86326ff919bbc90a'),num_deals=50))
-            # calculate_and_store_coin_data(session,uuid.UUID('c662005ab5ad4cae86326ff919bbc90a'),['1 oz krugerrand'],'1_oz_krugerrand.json')
-            calculate_and_store_coin_data(session,uuid.UUID('c662005ab5ad4cae86326ff919bbc90a'),['20 francs or coq marianne',
+            print(find_best_deals(session,session_id,num_deals=15))
+            # calculate_and_store_coin_data(session,session_id,['1 oz krugerrand'],'1_oz_krugerrand.json')
+            calculate_and_store_coin_data(session,session_id,['20 francs or coq marianne',
                                                                         '20 francs or cérès',
                                                                         '20 francs or génie debout',
                                                                         '20 francs or napoléon III'],'20_fr_france.json')
-            calculate_and_store_coin_data(session,uuid.UUID('c662005ab5ad4cae86326ff919bbc90a'),['20 francs or union latine léopold II'],'20_fr_union_latine.json')
-            calculate_and_store_coin_data(session,uuid.UUID('c662005ab5ad4cae86326ff919bbc90a'),['20 francs or vreneli croix suisse',
+            calculate_and_store_coin_data(session,session_id,['20 francs or leopold I','20 francs or union latine léopold II'],'20_fr_belgique.json')
+            calculate_and_store_coin_data(session,session_id,['20 lire or umberto I','20 lire or vittorio emanuele II'],'20_lires_italie.json')
+            calculate_and_store_coin_data(session,session_id,['20 francs or vreneli croix suisse',
                                                                         '20 francs or helvetia suisse'],'20_fr_suisse.json')
-            calculate_and_store_coin_data(session,uuid.UUID('c662005ab5ad4cae86326ff919bbc90a'),['souverain or edouart VII',
+            calculate_and_store_coin_data(session,session_id,['souverain or edouart VII',
                                                                         'souverain or georges V',
                                                                         'souverain or victoria jubilee'],'1_souv_ru.json')
-            calculate_and_store_coin_data(session,uuid.UUID('c662005ab5ad4cae86326ff919bbc90a'),['souverain or elizabeth II'],'1_souv_eliz_ru.json')
-            calculate_and_store_coin_data(session,uuid.UUID('c662005ab5ad4cae86326ff919bbc90a'),['1/2 souverain georges V',
+            calculate_and_store_coin_data(session,session_id,['souverain or edouart VII',
+                                                                                                            'souverain or elizabeth II',
+                                                                                                            'souverain or georges V',
+                                                                                                            'souverain or victoria jubilee'],'1_souv_eliz_ru.json')
+            calculate_and_store_coin_data(session,session_id,['1/2 souverain georges V',
                                                                         '1/2 souverain victoria'],'1_2_souv_ru.json')
-            calculate_and_store_coin_data(session,uuid.UUID('c662005ab5ad4cae86326ff919bbc90a'),['50 pesos or'],'50_pesos_mex.json')
-            calculate_and_store_coin_data(session,uuid.UUID('c662005ab5ad4cae86326ff919bbc90a'),['20 mark or wilhelm II'],'20_mark_all.json')
-            calculate_and_store_coin_data(session,uuid.UUID('c662005ab5ad4cae86326ff919bbc90a'),['5 dollars or liberté','5 dollars or tête indien'],'5_dol_usa.json')
-            calculate_and_store_coin_data(session,uuid.UUID('c662005ab5ad4cae86326ff919bbc90a'),['20 dollars or liberté'],'20_dol_usa.json')
-            calculate_and_store_coin_data(session,uuid.UUID('c662005ab5ad4cae86326ff919bbc90a'),['10 dollars or liberté','10 dollars or tête indien'],'10_dol_usa.json')
-            calculate_and_store_coin_data(session,uuid.UUID('c662005ab5ad4cae86326ff919bbc90a'),['10 francs or coq marianne',
+            calculate_and_store_coin_data(session,session_id,['50 pesos or'],'50_pesos_mex.json')
+            calculate_and_store_coin_data(session,session_id,['20 mark or wilhelm II'],'20_mark_all.json')
+            calculate_and_store_coin_data(session,session_id,['5 dollars or liberté','5 dollars or tête indien'],'5_dol_usa.json')
+            calculate_and_store_coin_data(session,session_id,['20 dollars or liberté'],'20_dol_usa.json')
+            calculate_and_store_coin_data(session,session_id,['10 dollars or liberté','10 dollars or tête indien'],'10_dol_usa.json')
+            calculate_and_store_coin_data(session,session_id,['10 francs or coq marianne',
                                                                         '10 francs or cérès 1850-1851',
                                                                         '10 francs or napoléon III'],'10_fr_france.json')
             print("--- %s seconds ---" % (time.time() - start_time))

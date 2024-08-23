@@ -1,107 +1,72 @@
 [
     {
-        "position": 0,
-        "nom": "10 francs or napol\u00e9on III",
         "source": "https://www.bullionbypost.fr/pieces-or/francs-francais-piece-or/10-francs-notre-choix/",
-        "total": 244.4,
-        "diff": "-7.0%"
+        "total": 243.3,
+        "diff": "-7.3%"
     },
     {
-        "position": 1,
-        "nom": "10 francs or napol\u00e9on III",
+        "source": "https://monlingot.fr/or/achat-piece-or-10-francs-napoleon",
+        "total": 243.70000000000002,
+        "diff": "-7.1%"
+    },
+    {
         "source": "https://www.oretchange.com/pieces-or/172-682132-achat-10-francs-napoleon-iii.html#/28-achat_or-achat_au_gre_a_gre",
-        "total": 251.12,
-        "diff": "-4.5%"
+        "total": 250.16,
+        "diff": "-4.7%"
     },
     {
-        "position": 2,
-        "nom": "10 francs or coq marianne",
-        "source": "https://www.merson.fr/fr/achat-or-investissement/109-10-francs-coq.html",
-        "total": 255.9,
-        "diff": "-2.7%"
+        "source": "https://www.acheter-or-argent.fr/client/plugins/sebtab/tableau.php",
+        "total": 255.45,
+        "diff": "-2.6%"
     },
     {
-        "position": 3,
-        "nom": "10 francs or napol\u00e9on III",
         "source": "https://www.changedelabourse.com/or/pieces-d-or-d-investissement/10-francs-napoleon",
         "total": 257.0,
-        "diff": "-2.2%"
+        "diff": "-2.1%"
     },
     {
-        "position": 4,
-        "nom": "10 francs or napol\u00e9on III",
         "source": "https://www.changerichelieu.fr/or",
         "total": 257.0,
-        "diff": "-2.2%"
+        "diff": "-2.1%"
     },
     {
-        "position": 5,
-        "nom": "10 francs or napol\u00e9on III",
-        "source": "https://www.acheter-or-argent.fr/client/plugins/sebtab/tableau.php",
-        "total": 260.27,
-        "diff": "-1.0%"
-    },
-    {
-        "position": 6,
-        "nom": "10 francs or napol\u00e9on III",
         "source": "https://www.achat-or-et-argent.fr/or/10-francs-napoleon/32",
         "total": 262.0,
-        "diff": "-0.3%"
+        "diff": "-0.1%"
     },
     {
-        "position": 7,
-        "nom": "10 francs or napol\u00e9on III",
-        "source": "https://monlingot.fr/or/achat-piece-or-10-francs-napoleon",
-        "total": 262.90999999999997,
-        "diff": "0.0%"
+        "source": "https://www.merson.fr/fr/achat-or-investissement/109-10-francs-coq.html",
+        "total": 262.78,
+        "diff": "0.1%"
     },
     {
-        "position": 8,
-        "nom": "10 francs or napol\u00e9on III",
         "source": "https://www.abacor.fr/produit/piece-d-or-10-francs-napoleon/",
         "total": 269.0,
-        "diff": "2.3%"
+        "diff": "2.5%"
     },
     {
-        "position": 9,
-        "nom": "10 francs or napol\u00e9on III",
         "source": "https://www.changevivienne.com/or",
         "total": 277.0,
-        "diff": "5.4%"
+        "diff": "5.6%"
     },
     {
-        "position": 10,
-        "nom": "10 francs or coq marianne",
         "source": "https://www.shop-comptoirdelor.be/achat-or/pieces/10-francs-fran%C3%A7ais-or-diverses-ann%C3%A9es",
-        "total": 289.95,
-        "diff": "10.3%"
+        "total": 288.45,
+        "diff": "9.9%"
     },
     {
-        "position": 11,
-        "nom": "10 francs or napol\u00e9on III",
         "source": "https://www.goldreserve.fr/produit/demi-napoleon-or/",
-        "total": 292.05,
-        "diff": "11.1%"
+        "total": 306.76,
+        "diff": "16.9%"
     },
     {
-        "position": 12,
-        "nom": "10 francs or coq marianne",
         "source": "https://www.orobel.biz/produit/10-francs-marianne-coq-or",
-        "total": 310.62,
-        "diff": "18.1%"
+        "total": 308.82,
+        "diff": "17.7%"
     },
     {
-        "position": 13,
-        "nom": "10 francs or coq marianne",
         "source": "https://www.bdor.fr/achat-or-en-ligne/piece-d-or-10-francs-coq-marianne",
-        "total": 342.0,
-        "diff": "30.1%"
-    },
-    {
-        "position": 14,
-        "nom": "10 francs or coq marianne",
-        "source": "https://www.goldavenue.com/fr/acheter/or/produit/piece-d-or-pur-900-0-20-francs-napoleon-coq-de-chaplain",
-        "total": 450.73,
-        "diff": "71.4%"
+        "total": 340.5,
+        "diff": "29.8%"
     }
 ]

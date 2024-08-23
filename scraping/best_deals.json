@@ -1,352 +1,77 @@
 [
     {
-        "name": "1 oz krugerrand",
-        "weight": 31.103,
-        "total_price": 2321.9,
-        "ratio": 74.65196283316722,
-        "source": "https://www.merson.fr/fr/achat-or-investissement/107-krugafrique-du-sud.html"
-    },
-    {
         "name": "50 pesos or",
-        "weight": 37.5,
-        "total_price": 2800.9,
-        "ratio": 74.69066666666667,
-        "source": "https://www.merson.fr/fr/achat-or-investissement/103-50-pesos-mexique.html"
-    },
-    {
-        "name": "50 pesos or",
-        "weight": 37.5,
-        "total_price": 2816.02,
-        "ratio": 75.09386666666667,
+        "ratio": "74.84",
         "source": "https://www.acheter-or-argent.fr/client/plugins/sebtab/tableau.php"
     },
     {
         "name": "1 oz krugerrand",
-        "weight": 31.103,
-        "total_price": 2344.45,
-        "ratio": 75.37697328232002,
+        "ratio": "74.91",
         "source": "https://www.goldavenue.com/fr/acheter/or/produit/1-once-piece-d-or-pur-916-7-krugerrand-annees-mixtes"
     },
     {
-        "name": "20 mark or wilhelm II",
-        "weight": 7.168,
-        "total_price": 541.9,
-        "ratio": 75.59988839285714,
-        "source": "https://www.merson.fr/fr/achat-or-investissement/119-20-marks.html"
-    },
-    {
         "name": "50 pesos or",
-        "weight": 37.5,
-        "total_price": 2835.0,
-        "ratio": 75.6,
-        "source": "https://www.bdor.fr/achat-or-en-ligne/piece-d-or-50-pesos"
-    },
-    {
-        "name": "50 pesos or",
-        "weight": 37.5,
-        "total_price": 2839.0,
-        "ratio": 75.70666666666666,
+        "ratio": "75.03",
         "source": "https://www.goldforex.be/fr/cours-de-lor-prix-pieces-lingot-cotation/50-pesos-mexique-230.html"
     },
     {
-        "name": "1 oz philharmonique",
-        "weight": 31.103,
-        "total_price": 2355.92,
-        "ratio": 75.74574799858534,
-        "source": "https://www.goldavenue.com/fr/acheter/or/produit/1-once-piece-d-or-pur-999-9-philharmonique-annees-mixtes"
-    },
-    {
-        "name": "10 florins or wilhelmina",
-        "weight": 6.056,
-        "total_price": 458.9,
-        "ratio": 75.77608982826948,
-        "source": "https://www.merson.fr/fr/achat-or-investissement/105-10-florins.html"
-    },
-    {
-        "name": "100 couronnes or fran\u00e7ois joseph I",
-        "weight": 30.483,
-        "total_price": 2311.17,
-        "ratio": 75.81832496801496,
-        "source": "https://www.acheter-or-argent.fr/client/plugins/sebtab/tableau.php"
-    },
-    {
         "name": "50 pesos or",
-        "weight": 37.5,
-        "total_price": 2843.28,
-        "ratio": 75.8208,
-        "source": "https://www.oretchange.com/pieces-or/182-achat-50-pesos-mexique.html"
+        "ratio": "75.21",
+        "source": "https://www.bdor.fr/achat-or-en-ligne/piece-d-or-50-pesos"
     },
     {
         "name": "1 oz krugerrand",
-        "weight": 31.103,
-        "total_price": 2364.06,
-        "ratio": 76.00745908754782,
-        "source": "https://www.acheter-or-argent.fr/client/plugins/sebtab/tableau.php"
-    },
-    {
-        "name": "1 oz krugerrand",
-        "weight": 31.103,
-        "total_price": 2366.5,
-        "ratio": 76.0859081117577,
+        "ratio": "75.22",
         "source": "https://www.goldforex.be/fr/cours-de-lor-prix-pieces-lingot-cotation/krugerrand-1-once-afrique-du-sud-219.html"
     },
     {
-        "name": "20 francs or union latine l\u00e9opold II",
-        "weight": 5.805,
-        "total_price": 441.9,
-        "ratio": 76.12403100775194,
-        "source": "https://www.merson.fr/fr/achat-or-investissement/93-union-latine.html"
+        "name": "1 oz philharmonique",
+        "ratio": "75.25",
+        "source": "https://www.goldavenue.com/fr/acheter/or/produit/1-once-piece-d-or-pur-999-9-philharmonique-annees-mixtes"
     },
     {
         "name": "50 pesos or",
-        "weight": 37.5,
-        "total_price": 2856.1,
-        "ratio": 76.16266666666667,
-        "source": "https://www.abacor.fr/produit/piece-d-or-50-pesos/"
+        "ratio": "75.53",
+        "source": "https://www.oretchange.com/pieces-or/182-achat-50-pesos-mexique.html"
     },
     {
-        "name": "souverain or georges V",
-        "weight": 7.318,
-        "total_price": 557.6,
-        "ratio": 76.19568188029517,
-        "source": "https://www.oretchange.com/pieces-or/200-achat-souverain-victoria.html"
+        "name": "100 couronnes or fran\u00e7ois joseph I",
+        "ratio": "75.57",
+        "source": "https://www.acheter-or-argent.fr/client/plugins/sebtab/tableau.php"
     },
     {
         "name": "1 oz krugerrand",
-        "weight": 31.103,
-        "total_price": 2371.08,
-        "ratio": 76.23316078834839,
-        "source": "https://www.oretchange.com/pieces-or/186-achat-krugerrand-afrique-du-sud.html"
-    },
-    {
-        "name": "50 \u00e9cus or charles quint",
-        "weight": 15.552,
-        "total_price": 1186.23,
-        "ratio": 76.27507716049384,
+        "ratio": "75.75",
         "source": "https://www.acheter-or-argent.fr/client/plugins/sebtab/tableau.php"
     },
     {
-        "name": "10 florins or wilhelmina",
-        "weight": 6.056,
-        "total_price": 462.0,
-        "ratio": 76.28797886393659,
-        "source": "https://www.changedelabourse.com/or/pieces-d-or-d-investissement/10-florins"
-    },
-    {
-        "name": "10 florins or wilhelmina",
-        "weight": 6.056,
-        "total_price": 462.0,
-        "ratio": 76.28797886393659,
-        "source": "https://www.changerichelieu.fr/or"
-    },
-    {
-        "name": "10 florins or wilhelmina",
-        "weight": 6.056,
-        "total_price": 462.0,
-        "ratio": 76.28797886393659,
-        "source": "https://www.changevivienne.com/or"
-    },
-    {
-        "name": "1 oz philharmonique",
-        "weight": 31.103,
-        "total_price": 2375.42,
-        "ratio": 76.3726971674758,
-        "source": "https://www.acheter-or-argent.fr/client/plugins/sebtab/tableau.php"
+        "name": "50 pesos or",
+        "ratio": "75.78",
+        "source": "https://www.abacor.fr/produit/piece-d-or-50-pesos/"
     },
     {
         "name": "1 oz maple leaf",
-        "weight": 31.103,
-        "total_price": 2375.42,
-        "ratio": 76.3726971674758,
-        "source": "https://www.acheter-or-argent.fr/client/plugins/sebtab/tableau.php"
-    },
-    {
-        "name": "1 oz maple leaf",
-        "weight": 31.103,
-        "total_price": 2376.11,
-        "ratio": 76.3948815226827,
+        "ratio": "75.93",
         "source": "https://www.goldavenue.com/fr/acheter/or/produit/1-once-piece-d-or-pur-999-9-maple-leaf-annee-aleatoire"
     },
     {
         "name": "1 oz maple leaf",
-        "weight": 31.103,
-        "total_price": 2378.0,
-        "ratio": 76.45564736520592,
+        "ratio": "75.94",
         "source": "https://www.goldforex.be/fr/cours-de-lor-prix-pieces-lingot-cotation/maple-leaf-1-once-canada-220.html"
     },
     {
-        "name": "20 dollars or libert\u00e9",
-        "weight": 30.093,
-        "total_price": 2302.9,
-        "ratio": 76.52610241584422,
-        "source": "https://www.merson.fr/fr/achat-or-investissement/99-20-dollars.html"
+        "name": "50 \u00e9cus or charles quint",
+        "ratio": "76.02",
+        "source": "https://www.acheter-or-argent.fr/client/plugins/sebtab/tableau.php"
     },
     {
         "name": "50 pesos or",
-        "weight": 37.5,
-        "total_price": 2869.86,
-        "ratio": 76.5296,
-        "source": "https://www.goldreserve.fr/produit/50-pesos-or/"
-    },
-    {
-        "name": "50 pesos or",
-        "weight": 37.5,
-        "total_price": 2871.51,
-        "ratio": 76.5736,
+        "ratio": "76.05",
         "source": "https://monlingot.fr/or/achat-piece-or-50-pesos"
     },
     {
-        "name": "1 oz krugerrand",
-        "weight": 31.103,
-        "total_price": 2382.0,
-        "ratio": 76.58425232292704,
-        "source": "https://www.bdor.fr/achat-or-en-ligne/piece-d-or-krugerrand"
-    },
-    {
         "name": "50 pesos or",
-        "weight": 37.5,
-        "total_price": 2872.58,
-        "ratio": 76.60213333333333,
+        "ratio": "76.11",
         "source": "https://www.orobel.biz/produit/acheter-piece-or-50-pesos-mexique-en-ligne-orobel"
-    },
-    {
-        "name": "20 francs or napol\u00e9on III",
-        "weight": 5.805,
-        "total_price": 444.75,
-        "ratio": 76.61498708010336,
-        "source": "https://www.oretchange.com/pieces-or/176-achat-20-francs-napoleon-iii.html"
-    },
-    {
-        "name": "20 francs or coq marianne",
-        "weight": 5.805,
-        "total_price": 444.9,
-        "ratio": 76.64082687338501,
-        "source": "https://www.merson.fr/fr/achat-or-investissement/91-20-francs-coq.html"
-    },
-    {
-        "name": "20 francs or vreneli croix suisse",
-        "weight": 5.805,
-        "total_price": 444.9,
-        "ratio": 76.64082687338501,
-        "source": "https://www.merson.fr/fr/achat-or-investissement/95-20-francs-suisse.html"
-    },
-    {
-        "name": "20 francs or coq marianne",
-        "weight": 5.805,
-        "total_price": 445.08,
-        "ratio": 76.671834625323,
-        "source": "https://www.oretchange.com/pieces-or/196-achat-20-francs-coq.html"
-    },
-    {
-        "name": "1 oz nugget / kangourou",
-        "weight": 31.103,
-        "total_price": 2385.0,
-        "ratio": 76.68070604121789,
-        "source": "https://www.goldforex.be/fr/cours-de-lor-prix-pieces-lingot-cotation/nugget-1-once-australie-223.html"
-    },
-    {
-        "name": "1 oz krugerrand",
-        "weight": 31.103,
-        "total_price": 2385.5,
-        "ratio": 76.69678166093303,
-        "source": "https://www.achat-or-et-argent.fr/or/krugerrand/12"
-    },
-    {
-        "name": "1 oz krugerrand",
-        "weight": 31.103,
-        "total_price": 2385.5,
-        "ratio": 76.69678166093303,
-        "source": "https://www.changedelabourse.com/or/pieces-d-or-d-investissement/krugerrand"
-    },
-    {
-        "name": "1 oz krugerrand",
-        "weight": 31.103,
-        "total_price": 2385.5,
-        "ratio": 76.69678166093303,
-        "source": "https://www.changerichelieu.fr/or"
-    },
-    {
-        "name": "1 oz krugerrand",
-        "weight": 31.103,
-        "total_price": 2385.5,
-        "ratio": 76.69678166093303,
-        "source": "https://www.changevivienne.com/or"
-    },
-    {
-        "name": "50 \u00e9cus or charles quint",
-        "weight": 15.552,
-        "total_price": 1194.0,
-        "ratio": 76.7746913580247,
-        "source": "https://www.goldforex.be/fr/cours-de-lor-prix-pieces-lingot-cotation/50-ecu-belgique-234.html"
-    },
-    {
-        "name": "souverain or georges V",
-        "weight": 7.318,
-        "total_price": 561.9,
-        "ratio": 76.78327411861164,
-        "source": "https://www.merson.fr/fr/achat-or-investissement/97-souverains-georges.html"
-    },
-    {
-        "name": "souverain or elizabeth II",
-        "weight": 7.318,
-        "total_price": 561.9,
-        "ratio": 76.78327411861164,
-        "source": "https://www.merson.fr/fr/achat-or-investissement/113-souverain-elisabeth-ii.html"
-    },
-    {
-        "name": "20 dollars or libert\u00e9",
-        "weight": 30.093,
-        "total_price": 2310.8,
-        "ratio": 76.78862193865683,
-        "source": "https://www.oretchange.com/pieces-or/175-achat-20-dollars-liberte.html"
-    },
-    {
-        "name": "50 pesos or",
-        "weight": 37.5,
-        "total_price": 2880.0,
-        "ratio": 76.8,
-        "source": "https://www.bullionbypost.fr/pieces-du-monde/pieces-mexicaines/50-pesos-mexicains-or/"
-    },
-    {
-        "name": "20 francs or tunisie",
-        "weight": 5.805,
-        "total_price": 445.9,
-        "ratio": 76.81309216192938,
-        "source": "https://www.merson.fr/fr/achat-or-investissement/111-20-francstunisie.html"
-    },
-    {
-        "name": "1 oz american eagle",
-        "weight": 31.103,
-        "total_price": 2389.5,
-        "ratio": 76.82538661865415,
-        "source": "https://www.goldforex.be/fr/cours-de-lor-prix-pieces-lingot-cotation/eagle-50-1-once-etats-unis-222.html"
-    },
-    {
-        "name": "20 francs or union latine l\u00e9opold II",
-        "weight": 5.805,
-        "total_price": 446.0,
-        "ratio": 76.83031869078381,
-        "source": "https://www.changedelabourse.com/or/pieces-d-or-d-investissement/union-latine"
-    },
-    {
-        "name": "20 francs or union latine l\u00e9opold II",
-        "weight": 5.805,
-        "total_price": 446.0,
-        "ratio": 76.83031869078381,
-        "source": "https://www.changerichelieu.fr/or"
-    },
-    {
-        "name": "20 francs or union latine l\u00e9opold II",
-        "weight": 5.805,
-        "total_price": 446.0,
-        "ratio": 76.83031869078381,
-        "source": "https://www.changevivienne.com/or"
-    },
-    {
-        "name": "20 francs or tunisie",
-        "weight": 5.805,
-        "total_price": 446.03,
-        "ratio": 76.83548664944014,
-        "source": "https://www.abacor.fr/produit/piece-d-or-20-francs-tunisie/"
     }
 ]

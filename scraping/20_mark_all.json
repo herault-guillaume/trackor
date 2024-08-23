@@ -1,93 +1,67 @@
 [
     {
-        "position": 0,
-        "nom": "20 mark or wilhelm II",
-        "source": "https://www.merson.fr/fr/achat-or-investissement/119-20-marks.html",
-        "total": 541.9,
-        "diff": "-5.2%"
+        "source": "https://www.acheter-or-argent.fr/client/plugins/sebtab/tableau.php",
+        "total": 556.44,
+        "diff": "-2.0%"
     },
     {
-        "position": 1,
-        "nom": "20 mark or wilhelm II",
+        "source": "https://www.merson.fr/fr/achat-or-investissement/119-20-marks.html",
+        "total": 556.76,
+        "diff": "-1.9%"
+    },
+    {
         "source": "https://www.changedelabourse.com/or/pieces-d-or-d-investissement/20-reichsmarks",
         "total": 558.0,
-        "diff": "-2.4%"
+        "diff": "-1.7%"
     },
     {
-        "position": 2,
-        "nom": "20 mark or wilhelm II",
         "source": "https://www.changerichelieu.fr/or",
         "total": 558.0,
-        "diff": "-2.4%"
+        "diff": "-1.7%"
     },
     {
-        "position": 3,
-        "nom": "20 mark or wilhelm II",
         "source": "https://www.changevivienne.com/or",
         "total": 558.0,
-        "diff": "-2.4%"
+        "diff": "-1.7%"
     },
     {
-        "position": 4,
-        "nom": "20 mark or wilhelm II",
         "source": "https://www.achat-or-et-argent.fr/or/20-reichsmarks/34",
         "total": 563.0,
-        "diff": "-1.5%"
+        "diff": "-0.8%"
     },
     {
-        "position": 5,
-        "nom": "20 mark or wilhelm II",
-        "source": "https://www.acheter-or-argent.fr/client/plugins/sebtab/tableau.php",
-        "total": 563.49,
-        "diff": "-1.4%"
-    },
-    {
-        "position": 6,
-        "nom": "20 mark or wilhelm II",
         "source": "https://monlingot.fr/pieces-or/Piece-investissement-Or-20-Reichsmark",
-        "total": 571.47,
+        "total": 567.63,
         "diff": "0.0%"
     },
     {
-        "position": 7,
-        "nom": "20 mark or wilhelm II",
         "source": "https://www.bullionbypost.fr/pieces-du-monde/pieces-allemandes/20-mark-allemand-meilleur-rapport-qualite-prix/",
-        "total": 579.2,
+        "total": 575.7,
         "diff": "1.4%"
     },
     {
-        "position": 8,
-        "nom": "20 mark or wilhelm II",
         "source": "https://lcdor.fr/achat-or/pieces-dor/20-mark-or/",
-        "total": 585.05,
-        "diff": "2.4%"
+        "total": 585.55,
+        "diff": "3.2%"
     },
     {
-        "position": 9,
-        "nom": "20 mark or wilhelm II",
         "source": "https://www.goldreserve.fr/produit/reichmark-or/",
-        "total": 605.53,
-        "diff": "6.0%"
+        "total": 609.17,
+        "diff": "7.3%"
     },
     {
-        "position": 10,
-        "nom": "20 mark or wilhelm II",
-        "source": "https://www.lesmetauxprecieux.com/produit/reichmark/",
-        "total": 613.74,
-        "diff": "7.4%"
-    },
-    {
-        "position": 11,
-        "nom": "20 mark or wilhelm II",
         "source": "https://www.bdor.fr/achat-or-en-ligne/piece-d-or-20-mark",
-        "total": 619.5,
-        "diff": "8.4%"
+        "total": 616.0,
+        "diff": "8.5%"
     },
     {
-        "position": 12,
-        "nom": "20 mark or wilhelm II",
+        "source": "https://www.lesmetauxprecieux.com/produit/reichmark/",
+        "total": 619.56,
+        "diff": "9.1%"
+    },
+    {
         "source": "https://or-investissement.fr/achat-piece-or-investissement/441-achat-piece-or-20-mark-allemande.html",
-        "total": 640.0,
-        "diff": "12.0%"
+        "total": 639.0,
+        "diff": "12.6%"
     }
 ]
