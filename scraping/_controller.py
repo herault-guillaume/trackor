@@ -52,7 +52,7 @@ def update_json_file(new_data,
         file_name: The name of the JSON file within the bucket.
         new_data: The new JSON data (Python dictionary or list) to write to the file.
     """
-    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = r"C:\Users\guillaume.herault\PycharmProjects\trackor\trackor-431010-d8c08fe2f6b3.json"
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = r"C:\Users\Guillaume Hérault\PycharmProjects\trackor\trackor-431010-2f200e734df0.json"
     storage_client = storage.Client()
     bucket = storage_client.bucket(bucket_name)
     blob = bucket.blob(filename)
@@ -199,9 +199,7 @@ def fetch_and_update_data():
             buy_price,sell_price = bullionvault.get(session)
 
             abacor.get_price_for(session,session_id)
-            acheterorargent.get_price_for(buy_price, sell_price, 0, session,session_id)
-            acheterorargent.get_price_for(buy_price, sell_price, 1, session,session_id)
-            achatoretargent.get_price_for(session,session_id)
+            acheterorargent.get_price_for(session,session_id)
             aucoffre.get_price_for(session,session_id)
             bdor.get_price_for(session,session_id)
             bullionbypost.get_price_for(session,session_id)
@@ -220,7 +218,6 @@ def fetch_and_update_data():
             orinvestissement.get_price_for(session,session_id)
             orobel.get_price_for(session,session_id)
             shopcomptoirdelor.get_price_for(session,session_id)
-
 
             # goldunion.get(session,session_id)  # arnaque?
             # joubertchange.get(session,session_id)
