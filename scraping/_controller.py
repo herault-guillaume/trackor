@@ -42,6 +42,43 @@ import abacor
 import goldreserve
 import shopcomptoirdelor
 
+def format_date_to_french_quarterly_hour(date):
+    """
+    Formats a datetime object to a French-formatted string with the quarter of the hour.
+
+    Args:
+      date: A datetime object.
+
+    Returns:
+      A string representing the date in French format and the quarter of the hour
+      (e.g., "04/09/2024 à 11:00").
+    """
+    # French day and month names
+    day_names = ["lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi", "dimanche"]
+    month_names = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"]
+
+    day_name = day_names[date.weekday()]
+    day = date.day
+    month_name = month_names[date.month - 1]
+    year = date.year
+    hour = date.hour
+    minute = date.minute
+    quarter = int(minute / 12)  # Calculate the quarter (0, 1, 2, or 3)
+
+    # Format the hour and minute strings with leading zeros
+    hour_str = f"{hour:02d}"
+    minute_str = f"{quarter * 5:02d}"
+
+    return f" Dernière mise à jour le {day_name} {day} {month_name} {year} à {hour_str}h{minute_str}."
+
+    # Get the current datetime
+    current_time = datetime.now()
+
+    # Format the current time to a French formatted string with quarterly hour
+    formatted_time = format_date_to_french_quarterly_hour(current_time)
+
+    print(formatted_time)
+
 def update_json_file(new_data,
                      filename,
                      bucket_name='prixlouisdor'):
@@ -85,7 +122,8 @@ def find_best_deals(session, session_id, num_deals=50,filename='best_deals.json'
             CoinPrice.nom,
             CoinPrice.j_achete,
             CoinPrice.frais_port,
-            CoinPrice.source
+            CoinPrice.source,
+            CoinPrice.timestamp
         )
         .filter(CoinPrice.session_id == session_id )
         .all()
@@ -102,7 +140,8 @@ def find_best_deals(session, session_id, num_deals=50,filename='best_deals.json'
             deals.append({
                 "name": row.nom,
                 "ratio": "{:.2f}".format(ratio),
-                "source": row.source
+                "source": row.source,
+                "last_updated": format_date_to_french_quarterly_hour(row.timestamp)
             })
 
     # Sort deals by ratio in descending order and take the first `num_deals`
@@ -138,7 +177,8 @@ def calculate_and_store_coin_data(session, session_id, coin_names, filename):
         session.query(
             CoinPrice.nom,
             (CoinPrice.j_achete + CoinPrice.frais_port).label("total"),
-            CoinPrice.source
+            CoinPrice.source,
+            CoinPrice.timestamp
         )
         .filter(CoinPrice.nom.in_(coin_names))
         .filter(CoinPrice.session_id == session_id)
@@ -177,7 +217,8 @@ def calculate_and_store_coin_data(session, session_id, coin_names, filename):
         row_data = {
             "source": row.source,
             "total": row.total,
-            "diff": "{:.1f}%".format((row.total - median_total) * 100 / median_total)
+            "diff": "{:.1f}%".format((row.total - median_total) * 100 / median_total),
+            "last_updated": format_date_to_french_quarterly_hour(row.timestamp)
         }
         data.append(row_data)
 
@@ -223,7 +264,7 @@ def fetch_and_update_data():
             # joubertchange.get(session,session_id)
             # pieceor.get(session,session_id)
             print(find_best_deals(session,session_id,num_deals=15))
-            # calculate_and_store_coin_data(session,session_id,['1 oz krugerrand'],'1_oz_krugerrand.json')
+            calculate_and_store_coin_data(session,session_id,['1 oz krugerrand'],'1_oz_krugerrand.json')
             calculate_and_store_coin_data(session,session_id,['20 francs or coq marianne',
                                                                         '20 francs or cérès',
                                                                         '20 francs or génie debout',

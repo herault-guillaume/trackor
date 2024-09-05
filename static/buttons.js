@@ -19,6 +19,10 @@
                         console.error('No data received from site_data.json');
                         return;
                     }
+
+                    // Extract last update time from data (assuming it's in a field called 'last_update')
+                    const lastUpdateTime = data[0].last_updated; // Adjust if the field name is different
+
                     const numButtons = data.length;
                     const midIndex = Math.floor(numButtons / 2);
 
@@ -130,6 +134,20 @@
                         // Append button to container
                         container.appendChild(button);
                     });
+
+                    // Create a text element to display the last update time
+                    const lastUpdateText = document.createElement('p');
+                    lastUpdateText.textContent = `${lastUpdateTime}`;
+                    lastUpdateText.style.textAlign = 'center';
+                    lastUpdateText.style.marginBottom = '0px';
+                    lastUpdateText.style.color = 'white';
+                    lastUpdateText.style.fontFamily = 'Lora';
+                    lastUpdateText.style.fontSize = '0.8rem';
+
+                    // Insert the text element at the beginning of the container
+                    container.insertBefore(lastUpdateText, container.firstChild);
+
+                    document.body.appendChild(container);
                 })
                 .catch(error => {
                     console.error('Error fetching or processing data:', error);

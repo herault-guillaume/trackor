@@ -19,6 +19,10 @@
                         console.error('No data received from site_data.json');
                         return;
                     }
+
+                    // Extract last update time from data (assuming it's in a field called 'last_update')
+                    const lastUpdateTime = data[0].last_updated; // Adjust if the field name is different
+
                     const numButtons = data.length;
                     const midIndex = Math.floor(numButtons / 2);
 
@@ -31,7 +35,7 @@
                         button.rel = "noopener noreferrer";
 
                         const textSpan = document.createElement('span');
-                        textSpan.textContent = url.hostname.replace(/(?:www\.|\.fr|\.be|\.com)/gi, '');
+                        textSpan.textContent = item.name;
                         textSpan.style.color = '#fff';
                         button.appendChild(textSpan);
 
@@ -82,7 +86,6 @@
                         overlappingContainer.style.position = 'absolute';
                         overlappingContainer.style.bottom = '50%';
                         overlappingContainer.style.right = '10%';
-                        overlappingContainer.style.right = '10%';
                         overlappingContainer.style.transform = 'translate(50%, 50%)';
                         overlappingContainer.style.display = 'flex';
                         overlappingContainer.style.alignItems = 'center';
@@ -90,7 +93,7 @@
                         overlappingContainer.style.zIndex = '1';
 
                         const changeSpan = document.createElement('span');
-                        changeSpan.textContent = item.diff;
+                        changeSpan.textContent = item.ratio + " €/g";
                         changeSpan.style.fontSize = '1.0rem';
                                        // Add class to changeSpan
                                 // Apply oval styles directly to changeSpan
@@ -131,6 +134,19 @@
                         // Append button to container
                         container.appendChild(button);
                     });
+                    // Create a text element to display the last update time
+                    const lastUpdateText = document.createElement('p');
+                    lastUpdateText.textContent = `${lastUpdateTime}`;
+                    lastUpdateText.style.textAlign = 'center';
+                    lastUpdateText.style.marginBottom = '0px';
+                    lastUpdateText.style.color = 'white';
+                    lastUpdateText.style.fontFamily = 'Lora';
+                    lastUpdateText.style.fontSize = '0.8rem';
+
+                    // Insert the text element at the beginning of the container
+                    container.insertBefore(lastUpdateText, container.firstChild);
+
+                    document.body.appendChild(container);
                 })
                 .catch(error => {
                     console.error('Error fetching or processing data:', error);

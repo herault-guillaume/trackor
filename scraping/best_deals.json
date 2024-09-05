@@ -1,77 +1,92 @@
 [
     {
         "name": "1 oz krugerrand",
-        "ratio": "75.16",
-        "source": "https://www.goldavenue.com/fr/acheter/or/produit/1-once-piece-d-or-pur-916-7-krugerrand-annees-mixtes"
+        "ratio": "75.05",
+        "source": "https://www.goldavenue.com/fr/acheter/or/produit/1-once-piece-d-or-pur-916-7-krugerrand-annees-mixtes",
+        "last_updated": " Derni\u00e8re mise \u00e0 jour le jeudi 5 septembre 2024 \u00e0 11h10."
     },
     {
         "name": "1 oz nugget / kangourou",
-        "ratio": "75.16",
-        "source": "https://www.goldavenue.com/fr/acheter/or/produit/1-once-piece-d-or-pure-999-9-perth-mint-kangourou-bu-mixed-years"
+        "ratio": "75.05",
+        "source": "https://www.goldavenue.com/fr/acheter/or/produit/1-once-piece-d-or-pure-999-9-perth-mint-kangourou-bu-mixed-years",
+        "last_updated": " Derni\u00e8re mise \u00e0 jour le jeudi 5 septembre 2024 \u00e0 11h10."
     },
     {
         "name": "50 pesos or",
-        "ratio": "75.25",
-        "source": "https://www.goldforex.be/fr/cours-de-lor-prix-pieces-lingot-cotation/50-pesos-mexique-230.html"
-    },
-    {
-        "name": "50 pesos or",
-        "ratio": "75.37",
-        "source": "https://www.bdor.fr/achat-or-en-ligne/piece-d-or-50-pesos"
+        "ratio": "75.31",
+        "source": "https://www.goldforex.be/fr/cours-de-lor-prix-pieces-lingot-cotation/50-pesos-mexique-230.html",
+        "last_updated": " Derni\u00e8re mise \u00e0 jour le jeudi 5 septembre 2024 \u00e0 11h10."
     },
     {
         "name": "1 oz krugerrand",
-        "ratio": "75.44",
-        "source": "https://www.goldforex.be/fr/cours-de-lor-prix-pieces-lingot-cotation/krugerrand-1-once-afrique-du-sud-219.html"
+        "ratio": "75.39",
+        "source": "https://www.goldforex.be/fr/cours-de-lor-prix-pieces-lingot-cotation/krugerrand-1-once-afrique-du-sud-219.html",
+        "last_updated": " Derni\u00e8re mise \u00e0 jour le jeudi 5 septembre 2024 \u00e0 11h10."
     },
     {
         "name": "1 oz philharmonique",
-        "ratio": "75.50",
-        "source": "https://www.goldavenue.com/fr/acheter/or/produit/1-once-piece-d-or-pur-999-9-philharmonique-annees-mixtes"
+        "ratio": "75.40",
+        "source": "https://www.goldavenue.com/fr/acheter/or/produit/1-once-piece-d-or-pur-999-9-philharmonique-annees-mixtes",
+        "last_updated": " Derni\u00e8re mise \u00e0 jour le jeudi 5 septembre 2024 \u00e0 11h10."
     },
     {
         "name": "50 pesos or",
-        "ratio": "75.73",
-        "source": "https://www.oretchange.com/pieces-or/182-achat-50-pesos-mexique.html"
+        "ratio": "75.41",
+        "source": "https://www.bdor.fr/achat-or-en-ligne/piece-d-or-50-pesos",
+        "last_updated": " Derni\u00e8re mise \u00e0 jour le jeudi 5 septembre 2024 \u00e0 11h00."
     },
     {
         "name": "50 pesos or",
-        "ratio": "75.82",
-        "source": "https://www.abacor.fr/produit/piece-d-or-50-pesos/"
-    },
-    {
-        "name": "1 oz maple leaf",
-        "ratio": "76.18",
-        "source": "https://www.goldforex.be/fr/cours-de-lor-prix-pieces-lingot-cotation/maple-leaf-1-once-canada-220.html"
-    },
-    {
-        "name": "1 oz maple leaf",
-        "ratio": "76.19",
-        "source": "https://www.goldavenue.com/fr/acheter/or/produit/1-once-piece-d-or-pur-999-9-maple-leaf-annee-aleatoire"
-    },
-    {
-        "name": "50 pesos or",
-        "ratio": "76.26",
-        "source": "https://monlingot.fr/or/achat-piece-or-50-pesos"
-    },
-    {
-        "name": "50 pesos or",
-        "ratio": "76.34",
-        "source": "https://www.orobel.biz/produit/acheter-piece-or-50-pesos-mexique-en-ligne-orobel"
-    },
-    {
-        "name": "1 oz krugerrand",
-        "ratio": "76.36",
-        "source": "https://www.bdor.fr/achat-or-en-ligne/piece-d-or-krugerrand"
-    },
-    {
-        "name": "1 oz nugget / kangourou",
-        "ratio": "76.39",
-        "source": "https://www.goldforex.be/fr/cours-de-lor-prix-pieces-lingot-cotation/nugget-1-once-australie-223.html"
+        "ratio": "75.75",
+        "source": "https://www.oretchange.com/pieces-or/182-achat-50-pesos-mexique.html",
+        "last_updated": " Derni\u00e8re mise \u00e0 jour le jeudi 5 septembre 2024 \u00e0 11h10."
     },
     {
         "name": "50 \u00e9cus or charles quint",
+        "ratio": "75.91",
+        "source": "https://www.goldforex.be/fr/cours-de-lor-prix-pieces-lingot-cotation/50-ecu-belgique-234.html",
+        "last_updated": " Derni\u00e8re mise \u00e0 jour le jeudi 5 septembre 2024 \u00e0 11h10."
+    },
+    {
+        "name": "1 oz maple leaf",
+        "ratio": "76.23",
+        "source": "https://www.goldforex.be/fr/cours-de-lor-prix-pieces-lingot-cotation/maple-leaf-1-once-canada-220.html",
+        "last_updated": " Derni\u00e8re mise \u00e0 jour le jeudi 5 septembre 2024 \u00e0 11h10."
+    },
+    {
+        "name": "50 pesos or",
+        "ratio": "76.24",
+        "source": "https://www.merson.fr/fr/achat-or-investissement/103-50-pesos-mexique.html",
+        "last_updated": " Derni\u00e8re mise \u00e0 jour le jeudi 5 septembre 2024 \u00e0 11h10."
+    },
+    {
+        "name": "50 pesos or",
+        "ratio": "76.32",
+        "source": "https://monlingot.fr/or/achat-piece-or-50-pesos",
+        "last_updated": " Derni\u00e8re mise \u00e0 jour le jeudi 5 septembre 2024 \u00e0 11h10."
+    },
+    {
+        "name": "50 pesos or",
+        "ratio": "76.37",
+        "source": "https://www.orobel.biz/produit/acheter-piece-or-50-pesos-mexique-en-ligne-orobel",
+        "last_updated": " Derni\u00e8re mise \u00e0 jour le jeudi 5 septembre 2024 \u00e0 11h10."
+    },
+    {
+        "name": "1 oz krugerrand",
         "ratio": "76.39",
-        "source": "https://www.shop-comptoirdelor.be/achat-or/pieces/50-ecu-belgique-diverses-ann%C3%A9es"
+        "source": "https://www.bdor.fr/achat-or-en-ligne/piece-d-or-krugerrand",
+        "last_updated": " Derni\u00e8re mise \u00e0 jour le jeudi 5 septembre 2024 \u00e0 11h00."
+    },
+    {
+        "name": "50 pesos or",
+        "ratio": "76.43",
+        "source": "https://www.abacor.fr/produit/piece-d-or-50-pesos/",
+        "last_updated": " Derni\u00e8re mise \u00e0 jour le jeudi 5 septembre 2024 \u00e0 11h00."
+    },
+    {
+        "name": "1 oz nugget / kangourou",
+        "ratio": "76.44",
+        "source": "https://www.goldforex.be/fr/cours-de-lor-prix-pieces-lingot-cotation/nugget-1-once-australie-223.html",
+        "last_updated": " Derni\u00e8re mise \u00e0 jour le jeudi 5 septembre 2024 \u00e0 11h10."
     }
 ]

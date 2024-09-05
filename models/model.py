@@ -3,6 +3,7 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from datetime import datetime
+import pytz
 
 Base = declarative_base()
 
@@ -20,7 +21,7 @@ class CoinPrice(Base):
     prime_vente_perso = Column(Float,nullable=True)
     frais_port = Column(Float,nullable=True)
     source = Column(String,nullable=False)
-    timestamp = Column(DateTime, default=datetime.utcnow)
+    timestamp = Column(DateTime, default=lambda: datetime.now(pytz.timezone('CET')))
     session_id = Column(UUID(as_uuid=True))
 
 class GoldPrice(Base):
