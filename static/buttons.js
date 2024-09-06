@@ -1,11 +1,33 @@
 <script>
-        function createButtons() {
-            const container = document.createElement('container');
-            container.style.display = 'grid';
-            container.style.gap = '20px';
-            container.style.padding = '20px';
+        const urls = [
+            { url: "https://storage.googleapis.com/prixlouisdor/10_dol_usa.json", name: '10 Dollars USA' },
+            { url: "https://storage.googleapis.com/prixlouisdor/10_fr_france.json", name: '10 Francs FR' },
+            { url: "https://storage.googleapis.com/prixlouisdor/1_2_souv_ru.json", name: '1/2 Souv. UK' },
+            { url: "https://storage.googleapis.com/prixlouisdor/1_oz_krugerrand.json", name: '1 Oz Kruggerand' },
+            { url:"https://storage.googleapis.com/prixlouisdor/1_souv_ru.json", name: '1 Souv. UK' },
+            { url:"https://storage.googleapis.com/prixlouisdor/20_dol_usa.json", name: '20 Dollars USA' },
+            { url:"https://storage.googleapis.com/prixlouisdor/20_fr_belgique.json", name: '20 Francs BEL' },
+            { url: "https://storage.googleapis.com/prixlouisdor/20_fr_france.json", name: '10 Francs FR' },
+            { url: "https://storage.googleapis.com/prixlouisdor/20_fr_suisse.json", name: '20 Francs SUI' },
+            { url: "https://storage.googleapis.com/prixlouisdor/20_lires_italie.json", name: '20 Lires ITA' },
+            { url: "https://storage.googleapis.com/prixlouisdor/20_mark_all.json", name: '20 Mark DE' },
+            { url: "https://storage.googleapis.com/prixlouisdor/50_pesos_mex.json", name: '50 Pesos MEX' },
+            { url: "https://storage.googleapis.com/prixlouisdor/5_dol_usa.json", name: '5 Dollars USA' },
+            //{ url: "https://storage.googleapis.com/prixlouisdor/best_deals.json", name: 'Bests deals' },
+        ];
 
-            fetch('https://storage.googleapis.com/prixlouisdor/20_fr_france.json',  {
+        const container = document.createElement('container-coins-name');
+        container.style.display = 'grid';
+        container.style.gap = '20px';
+        container.style.padding = '20px';
+
+        function createButtons(url) {
+               // Supprime l'ancien conteneur s'il existe
+              while (container.firstChild) {
+                container.removeChild(container.firstChild);
+              }
+
+            fetch(url,  {
             cache: 'no-store',
             })
                 .then(response => {
@@ -147,7 +169,6 @@
                     // Insert the text element at the beginning of the container
                     container.insertBefore(lastUpdateText, container.firstChild);
 
-                    document.body.appendChild(container);
                 })
                 .catch(error => {
                     console.error('Error fetching or processing data:', error);
@@ -155,6 +176,41 @@
 
             document.body.appendChild(container);
         }
+        function createButtonForUrl(url, name) {
+            const button = document.createElement('button');
+            button.textContent = name; // Utilise le nom pour le texte du bouton
+            button.addEventListener('click', () => {
+            // Désactive tous les boutons
+            const allButtons = document.querySelectorAll('#container-country-name button');
+            allButtons.forEach(btn => {
+              btn.classList.remove('active');
+              btn.style.backgroundColor = ''; // Réinitialise la couleur de fond
+            });
+            console.log(url)
+            // Active le bouton cliqué et applique le style
+            button.classList.add('active');
+            button.style.backgroundColor = 'lightblue';
 
-        createButtons();
+            createButtons(url);
+        });
+
+        return button;
+        }
+
+        function generateButtons() {
+            const container = document.createElement('container-country-name'); // Crée un div
+            container.id = 'container-country-name'; // Ajoute l'ID
+            container.style.display = 'grid-row';
+
+            urls.forEach(item => {
+                const button = createButtonForUrl(item.url, item.name); // Passe le nom à createButtonForUrl
+                console.log('created')
+                container.appendChild(button);
+            });
+            document.body.appendChild(container)
+        }
+
+        // Appelle cette fonction pour générer les boutons au chargement de la page
+        generateButtons();
+        //createButtons();
     </script>
