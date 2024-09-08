@@ -1,6 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
-from models.model import CoinPrice
+from models.model import CoinPrice, poids_pieces_or
 from price_parser import Price
 import traceback
 
@@ -12,7 +12,7 @@ def get_delivery_price(price):
     else:
         return 56.10
 
-def get_price_for(session,session_id):
+def get_price_for(session,session_id,buy_price):
     """
     Retrieves the '20 francs or coq marianne' coin purchase price from Goldforex using requests and BeautifulSoup.
     """
@@ -63,6 +63,7 @@ def get_price_for(session,session_id):
                     coin = CoinPrice(nom=coin_name,
                                      j_achete=price.amount_float,
                                      frais_port=get_delivery_price(price.amount_float),
+                                     prime_achat_perso=((price.amount_float+get_delivery_price(price.amount_float))-(buy_price*poids_pieces_or[coin_name]))*100.0/buy_price*poids_pieces_or[coin_name],
                                      source=url,session_id=session_id)
                     session.add(coin)
                     session.commit()

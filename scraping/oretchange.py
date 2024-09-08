@@ -1,6 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
-from models.model import CoinPrice
+from models.model import CoinPrice, poids_pieces_or
 from price_parser import Price
 import traceback
 
@@ -20,7 +20,7 @@ coin_name = {
     "Demi-souverain Or Victoria, Edouard VII ou George V": '1/2 souverain georges V'
 }
 
-def get_price_for(session,session_id):
+def get_price_for(session,session_id,buy_price):
     """
     Retrieves the '20 francs or coq marianne' coin purchase price from Oretchange using requests and BeautifulSoup.
     """
@@ -61,6 +61,7 @@ def get_price_for(session,session_id):
             coin = CoinPrice(nom=coin_name[name],
                              j_achete=price.amount_float,
                              source=url,
+                             prime_achat_perso=((price.amount_float + 0.0) - (buy_price * poids_pieces_or[coin_name[name]])) * 100.0 / buy_price *poids_pieces_or[coin_name[name]],
                              frais_port=0.0,session_id=session_id)
             session.add(coin)
             session.commit()

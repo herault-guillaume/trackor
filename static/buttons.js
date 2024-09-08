@@ -13,8 +13,7 @@
             { url: "https://storage.googleapis.com/prixlouisdor/20_lires_italie.json", name: '20 Lires 🇮🇹', id: '20-lires-italie' },
             { url: "https://storage.googleapis.com/prixlouisdor/20_mark_all.json", name: '20 Marks 🇩🇪', id: '20-mark-all' },
             { url: "https://storage.googleapis.com/prixlouisdor/50_pesos_mex.json", name: '50 Pesos 🇲🇽', id: '50-pesos-mex' },
-
-            //{ url: "https://storage.googleapis.com/prixlouisdor/best_deals.json", name: 'Bests deals' },
+            { url: "https://storage.googleapis.com/prixlouisdor/best_deals.json", name: '↘️ €/g', id:'best_deals' },
         ];
 
 
@@ -39,7 +38,7 @@
         containerCoins.style.gridColumn = '1 / 2';
         containerCoins.style.justifySelf = 'center';
 
-        function createButtons(url) {
+        function createButtons(url,button_id) {
                // Supprime l'ancien conteneur s'il existe
               while (containerCoins.firstChild) {
                 containerCoins.removeChild(containerCoins.firstChild);
@@ -75,7 +74,11 @@
                         button.rel = "noopener noreferrer";
 
                         const textSpan = document.createElement('span');
-                        textSpan.textContent = url.hostname.replace(/(?:www\.|\.fr|\.be|\.com)/gi, '');
+                         if (button_id === 'best_deals') {
+                          button.textContent = item.name;
+                        } else {
+                          button.textContent = url.hostname.replace(/(?:www\.|\.fr|\.be|\.com)/gi, '');
+                        }
                         textSpan.style.color = '#fff';
                         button.appendChild(textSpan);
 
@@ -104,7 +107,7 @@
                         rainbowSquare.style.position = 'absolute';
                         rainbowSquare.style.top = '-100px';
                         rainbowSquare.style.left = '-200px';
-                        rainbowSquare.style.backgroundImage = 'linear-gradient(225deg, #debc71ff 0%, #b69543ff 50%, #9c6e2aff 100%)';
+                        rainbowSquare.style.backgroundImage = 'linear-gradient(225deg, #9c6e2aff 0%, #fccc7c 50%, #fcc069 100%)';
                         rainbowSquare.style.zIndex = '-1';
                         rainbowSquare.style.transition = 'all .5s';
 
@@ -133,7 +136,11 @@
                         overlappingContainer.style.zIndex = '1';
 
                         const changeSpan = document.createElement('span');
-                        changeSpan.textContent = item.diff;
+                         if (button_id === 'best_deals') {
+                          changeSpan.textContent = item.ratio + " €/g";
+                        } else {
+                          changeSpan.textContent = item.diff;
+                        }
                         changeSpan.style.fontSize = '1.0rem';
                                        // Add class to changeSpan
                                 // Apply oval styles directly to changeSpan
@@ -226,7 +233,7 @@
             rainbowSquare.style.position = 'absolute';
             rainbowSquare.style.top = '-100px';
             rainbowSquare.style.left = '0px';
-            rainbowSquare.style.backgroundImage = 'linear-gradient(225deg, #debc71ff 0%, #b69543ff 50%, #9c6e2aff 100%)';
+            rainbowSquare.style.backgroundImage = 'linear-gradient(225deg, #fcc069 0%, #fccc7c 50%, #9c6e2aff 100%)';
             rainbowSquare.style.zIndex = '-1';
             rainbowSquare.style.transition = 'all .5s';
 
@@ -258,7 +265,7 @@
             button.style.borderColor = '#5dda39';
             button.style.borderWidth = 'medium';
 
-            createButtons(url);
+            createButtons(url,button.id);
         });
 
         return button;

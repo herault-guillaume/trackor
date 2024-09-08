@@ -36,7 +36,7 @@ def get_delivery_price(price):
     else:
         return 0.0
 
-def get_price_for(session,session_id):
+def get_price_for(session,session_id,buy_price):
 
     urls = ['https://www.acheter-or-argent.fr/?fond=rubrique&id_rubrique=2&page={i}&nouveaute=&promo='.format(i=i) for i in range(1,9)]
     for url in urls :
@@ -53,9 +53,13 @@ def get_price_for(session,session_id):
 
                 product_price = Price.fromstring(product.find('span','prixProduit').text)
                 print(product_price,product_name_url.text)
-                coin = CoinPrice(nom=product_name_url.text,
+                coin = CoinPrice(nom=product_name_url.text[1:],
                                  j_achete=product_price.amount_float,
                                  source=product_name_url['href'],
+                                 prime_achat_perso=((product_price.amount_float + get_delivery_price(product_price.amount_float)) - (
+                                             buy_price * poids_pieces_or[product_name_url.text[1:]])) * 100.0 / buy_price *
+                                                   poids_pieces_or[product_name_url.text[1:]],
+
                                  frais_port=get_delivery_price(product_price.amount_float), session_id=session_id)
                 session.add(coin)
                 session.commit()

@@ -1,7 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
-from models.model import CoinPrice
-
+from models.model import CoinPrice, poids_pieces_or
 from seleniumbase import Driver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -99,7 +98,7 @@ coin_name = {
 #         print(f"An error occurred while fetching the data: {e}")
 #         return None
 
-def get_price_for(session, session_id):
+def get_price_for(session, session_id,buy_price):
     """
     Retrieves coin purchase prices from Orobel using Selenium.
     """
@@ -142,6 +141,9 @@ def get_price_for(session, session_id):
                             nom=coin_name[name],
                             j_achete=price.amount_float,
                             source=url,
+                            prime_achat_perso=((price.amount_float +24.95) - (
+                                    buy_price * poids_pieces_or[coin_name[name]])) * 100.0 / buy_price *
+                                              poids_pieces_or[coin_name[name]],
                             frais_port=24.95,
                             session_id=session_id
                         )

@@ -1,10 +1,10 @@
 import requests
 from bs4 import BeautifulSoup
-from models.model import CoinPrice
+from models.model import CoinPrice, poids_pieces_or
 
 #gold union faq combien coute une expédition
 
-def get_price_for(session,session_id):
+def get_price_for(session,session_id,buy_price):
     """
     Retrieves the '20 francs or coq marianne' coin purchase price from Oretchange using requests and BeautifulSoup.
     """
@@ -33,6 +33,10 @@ def get_price_for(session,session_id):
                     coin = CoinPrice(nom="20 francs or coq marianne",
                                      j_achete=price,
                                      source='https://goldunion.fr/products/20-francs-coq',
+                                     prime_achat_perso=((price.amount_float + get_delivery_price(
+                                         price.amount_float)) - (buy_price * poids_pieces_or[
+                                         coin_name])) * 100.0 / buy_price * poids_pieces_or[coin_name],
+
                                      frais_port=20.0,session_id=session_id)
                     session.add(coin)
                     session.commit()

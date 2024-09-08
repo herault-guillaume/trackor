@@ -4,7 +4,7 @@ import time
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from models.model import CoinPrice
+from models.model import CoinPrice, poids_pieces_or
 from seleniumbase import Driver
 
 from price_parser import Price
@@ -59,7 +59,7 @@ urls = {
     "10 pesos or": "https://www.bullionbypost.fr/pieces-du-monde/pieces-mexicaines/10-pesos-mexicains-en-or/",
     "5 pesos or": "https://www.bullionbypost.fr/pieces-du-monde/pieces-mexicaines/5-pesos-mexicains-en-or/",
 }
-def get_price_for(session,session_id):
+def get_price_for(session,session_id,buy_price):
     print("https://www.bullionbypost.fr/")
     driver = Driver(uc=True, headless=True)
 
@@ -76,13 +76,21 @@ def get_price_for(session,session_id):
             price = Price.fromstring(price_text)
 
             print(coin_name,price)
+            try :
+                coin = CoinPrice(nom=coin_name,
+                                 j_achete=price.amount_float,
+                                 source=url,
+                                 prime_achat_perso=((price.amount_float + 0.0) - (
+                                             buy_price * poids_pieces_or[coin_name])) * 100.0 / buy_price * poids_pieces_or[
+                                                       coin_name],
 
-            coin = CoinPrice(nom=coin_name,
-                             j_achete=price.amount_float,
-                             source=url,
-                             frais_port=0.0,session_id=session_id)
-            session.add(coin)
-            session.commit()
+                                 frais_port=0.0,session_id=session_id)
+                session.add(coin)
+                session.commit()
+            except Exception as e:
+                print(f"Failed to convert price text '{price_text}' to float", url)
+                print(traceback.format_exc())
+                pass
 
         except ValueError:
             print(f"Failed to convert price text '{price_text}' to float",url)

@@ -1,6 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
-from models.model import CoinPrice
+from models.model import CoinPrice, poids_pieces_or
 from price_parser import Price
 import traceback
 
@@ -26,7 +26,7 @@ coin_to_name = {
 }
 
 #via panier
-def get_price_for(session,session_id):
+def get_price_for(session,session_id,buy_price):
     url = 'https://lcdor.fr/achat-or/pieces-dor/'
     print(url)
 
@@ -52,6 +52,10 @@ def get_price_for(session,session_id):
             coin = CoinPrice(nom=coin_to_name[name],
                              j_achete=price.amount_float,
                              source=url,
+                             prime_achat_perso=((price.amount_float + 7.0) - (
+                                         buy_price * poids_pieces_or[coin_to_name[name]])) * 100.0 / buy_price * poids_pieces_or[
+                                                   coin_to_name[name]],
+
                              frais_port=7.0,session_id=session_id)
             session.add(coin)
             session.commit()

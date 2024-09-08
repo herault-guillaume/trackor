@@ -3,7 +3,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-from models.model import CoinPrice
+from models.model import CoinPrice, poids_pieces_or
 from price_parser import Price
 import traceback
 
@@ -38,7 +38,7 @@ urls = {
 
 
 
-def get_price_delivery_for(session,session_id):
+def get_price_delivery_for(session,session_id,buy_price):
     # Set up headless Chrome
     driver = Driver(uc=True, headless=True)
 
@@ -69,6 +69,10 @@ def get_price_delivery_for(session,session_id):
             coin = CoinPrice(nom=coin_name,
                              j_achete=price.amount_float,
                              source=url,
+                             prime_achat_perso=((price.amount_float + delivery_fee.amount_float) - (
+                                         buy_price * poids_pieces_or[coin_name])) * 100.0 / buy_price * poids_pieces_or[
+                                                   coin_name],
+
                              frais_port=delivery_fee.amount_float,session_id=session_id)
             session.add(coin)
             session.commit()

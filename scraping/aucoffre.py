@@ -1,12 +1,12 @@
 import requests
 from bs4 import BeautifulSoup
-from models.model import CoinPrice
+from models.model import CoinPrice, poids_pieces_or
 from price_parser import Price
 import traceback
 
 #https://www.aucoffre.com/acheter/tarifs-aucoffre-com
 
-def get_price_for(session,session_id):
+def get_price_for(session,session_id,buy_price):
     """
     Fetches the buy price of the 20 Francs Marianne coin from AuCOFFRE using requests and BeautifulSoup.
     """
@@ -89,9 +89,12 @@ def get_price_for(session,session_id):
                     # More robust price cleaning: handle variations in formatting
                     #price = float(price_text.replace('€', '').replace(' ', '').replace(',', '.'))
 
-                    coin = CoinPrice(nom=url[1],
+                    coin = CoinPrice(nom=coin_name,
                                      j_achete=price.amount_float,
                                      source=url[0],
+                                     prime_achat_perso=((price.amount_float + 15.0) - (buy_price * poids_pieces_or[
+                                         coin_name])) * 100.0 / buy_price * poids_pieces_or[coin_name],
+
                                      frais_port=15.0,session_id=session_id)
                     session.add(coin)
                     session.commit()
