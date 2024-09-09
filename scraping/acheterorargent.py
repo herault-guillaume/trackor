@@ -57,8 +57,8 @@ def get_price_for(session,session_id,buy_price):
                                  j_achete=product_price.amount_float,
                                  source=product_name_url['href'],
                                  prime_achat_perso=((product_price.amount_float + get_delivery_price(product_price.amount_float)) - (
-                                             buy_price * poids_pieces_or[product_name_url.text[1:]])) * 100.0 / buy_price *
-                                                   poids_pieces_or[product_name_url.text[1:]],
+                                             buy_price * poids_pieces_or[product_name_url.text[1:]])) * 100.0 / (buy_price *
+                                                   poids_pieces_or[product_name_url.text[1:]]),
 
                                  frais_port=get_delivery_price(product_price.amount_float), session_id=session_id)
                 session.add(coin)

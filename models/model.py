@@ -138,7 +138,7 @@ poids_pieces_or  = {
                         '100 francs or napoléon III tête nue': 29.02,
                         '2 1/2 pesos or': 1.872,
                         '20 couronnes or françois joseph I': 6.093,
-                        '20 dollars or fr': 30.096, # -> CPor
+                        '20 dollars or tete indien': 30.096, # -> CPor
                         '20 dollars or liberté': 30.096, # -> CPor
                         '20 francs or fr': 5.805, # -> CPor
                         '20 francs or': 5.805, # -> CPor
@@ -151,6 +151,7 @@ poids_pieces_or  = {
                         '20 francs or louis XVIII buste habillé': 5.805, # -> CPor
                         '20 francs or louis philippe lauré': 5.805, # -> CPor
                         '20 francs or napoléon empereur': 5.805, # -> CPor
+                        '20 francs or napoléon empereur lauré': 5.805, # -> CPor
                         '20 francs or louis-napoléon bonaparte': 5.805, # -> CPor
                         '20 francs or napoléon III': 5.805, # -> CPor
                         '20 francs or tunisie': 5.805, # -> CPor
@@ -166,6 +167,8 @@ poids_pieces_or  = {
                         '40 francs or napoléon empereur lauré': 11.61,
                         '5 dollars or liberté': 7.523, # -> CPor
                         '5 dollars or tête indien': 7.523, # -> CPor
+                        '2.5 dollars or tête liberté': 3.762, # -> CPor
+                        '2.5 dollars or tête indien': 3.762, # -> CPor
                         'demi-eagle americain or 5 dollars tete liberte': 7.523, # -> CPor
                         '5 francs or napoléon III': 1.452,
                         '5 pesos or': 3.75,
@@ -201,12 +204,12 @@ poids_pieces_or  = {
                         'souverain or 2024 charles III': 7.318, # -> CPor
                         'souverain or 2023 charles III': 7.318, # -> CPor
                         'souverain or 2022 charles III': 7.318, # -> CPor
-                        'demi souverain or 2024 charles III': 7.318, # -> CPor
-                        'demi souverain or 2023 charles III': 7.318, # -> CPor
-                        'demi souverain or 2022 charles III': 7.318, # -> CPor
-                        '1/4 souverain or 2024 charles III': 7.318, # -> CPor
-                        'double souverain or 2024 charles III': 7.318, # -> CPor
-                        'double souverain or 2022 charles III': 7.318, # -> CPor
+                        'demi souverain or 2024 charles III': 3.6612, # -> CPor
+                        'demi souverain or 2023 charles III': 3.6612, # -> CPor
+                        'demi souverain or 2022 charles III': 3.6612, # -> CPor
+                        '1/4 souverain or 2024 charles III': 1.83, # -> CPor
+                        'double souverain or 2024 charles III': 14.64, # -> CPor
+                        'double souverain or 2022 charles III': 14.64, # -> CPor
                     }
 
 

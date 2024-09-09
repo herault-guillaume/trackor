@@ -38,6 +38,8 @@ coin_name = {
     "Pièce d'or 10 dollars Liberty": "10 dollars or liberté",
     "Pièce d'or 5 dollars indien": "5 dollars or tête indien",
     "Pièce d'or 5 dollars Liberty": "5 dollars or liberté",
+    "Pièce d'or 2.5 dollars Indien": "2.5 dollars or tête indien",
+    "Pièce d'or 2.5 dollars Liberty": "2.5 dollars or liberté",
 }
 
 #https://www.goldforex.be/fr/content/1-livraison
@@ -80,8 +82,8 @@ def get_price_for(session,session_id,buy_price):
                              j_achete=price.amount_float,
                              source=url,
                              prime_achat_perso=((price.amount_float + 35.0) - (
-                                         buy_price * poids_pieces_or[coin_name[coin_label]])) * 100.0 / buy_price * poids_pieces_or[
-                                                   coin_name[coin_label]],
+                                         buy_price * poids_pieces_or[coin_name[coin_label]])) * 100.0 / (buy_price * poids_pieces_or[
+                                                   coin_name[coin_label]]),
 
                              frais_port=35.0,session_id=session_id)
             session.add(coin)

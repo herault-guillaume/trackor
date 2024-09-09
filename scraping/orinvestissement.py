@@ -55,8 +55,8 @@ def get_price_for(session,session_id,buy_price):
             coin = CoinPrice(nom=coin_name[name],
                              j_achete=price.amount_float,
                              prime_achat_perso=((price.amount_float + 25.0) - (
-                                     buy_price * poids_pieces_or[coin_name[name]])) * 100.0 / buy_price *
-                                               poids_pieces_or[coin_name[name]],
+                                     buy_price * poids_pieces_or[coin_name[name]])) * 100.0 / (buy_price *
+                                               poids_pieces_or[coin_name[name]]),
                              source=url,
                              frais_port=25.0,session_id=session_id)
             session.add(coin)

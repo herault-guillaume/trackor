@@ -34,8 +34,7 @@ def get_price_for(session,session_id,buy_price):
                                      j_achete=price,
                                      source='https://goldunion.fr/products/20-francs-coq',
                                      prime_achat_perso=((price.amount_float + get_delivery_price(
-                                         price.amount_float)) - (buy_price * poids_pieces_or[
-                                         coin_name])) * 100.0 / buy_price * poids_pieces_or[coin_name],
+                                         price.amount_float)) - (buy_price * poids_pieces_or[coin_name])) * 100.0 / (buy_price * poids_pieces_or[coin_name]),
 
                                      frais_port=20.0,session_id=session_id)
                     session.add(coin)

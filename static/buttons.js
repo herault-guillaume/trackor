@@ -136,11 +136,9 @@
                         overlappingContainer.style.zIndex = '1';
 
                         const changeSpan = document.createElement('span');
-                         if (button_id === 'best_deals') {
-                          changeSpan.textContent = item.ratio + " €/g";
-                        } else {
-                          changeSpan.textContent = item.diff;
-                        }
+
+                        changeSpan.textContent = item.prime + ' %';
+
                         changeSpan.style.fontSize = '1.0rem';
                                        // Add class to changeSpan
                                 // Apply oval styles directly to changeSpan
