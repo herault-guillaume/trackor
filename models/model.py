@@ -73,7 +73,7 @@ poids_pieces_or  = {
                         '1 oz taureau de clarence tudor beasts 2023' : 31.103,
                         '1 rand sud-africains or': 3.648,
                         '1/10 oz american eagle': 3.11,
-                        '1/10 oz krugerrand': 3.11,
+                        '1/10 oz krugerrand': 3.105,
                         '1/10 oz maple leaf': 3.11,
                         '1/10 oz nugget / kangourou': 3.11,
                         '1/10 oz kangourou 2024': 3.11,

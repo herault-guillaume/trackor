@@ -120,6 +120,7 @@ def find_best_deals(session, session_id, num_deals=50,filename='best_deals.json'
     results = (
         session.query(
             CoinPrice.nom,
+            CoinPrice.j_achete,
             CoinPrice.prime_achat_perso,
             CoinPrice.source,
             CoinPrice.timestamp
@@ -132,7 +133,18 @@ def find_best_deals(session, session_id, num_deals=50,filename='best_deals.json'
 
     for row in results:
         if row.nom in poids_pieces_or and not 'lingot' in str(row.nom).lower():
+            print(            row.nom,
+            row.prime_achat_perso,
+            row.j_achete,
+            row.source,
+            row.timestamp)
             deals.append({
+                "name": row.nom,
+                "prime": "{:.1f}".format(row.prime_achat_perso),
+                "source": row.source,
+                "last_updated": format_date_to_french_quarterly_hour(row.timestamp)
+            })
+        print({
                 "name": row.nom,
                 "prime": "{:.1f}".format(row.prime_achat_perso),
                 "source": row.source,
@@ -231,57 +243,58 @@ def fetch_and_update_data():
             session_id = uuid.uuid4()
             session = Session()
 
-            # buy_price,sell_price = bullionvault.get(session)
-            #
-            # abacor.get_price_for(session,session_id,buy_price)
-            # acheterorargent.get_price_for(session,session_id,buy_price)
-            # aucoffre.get_price_for(session,session_id,buy_price)
-            # bdor.get_price_for(session,session_id,buy_price)
-            # bullionbypost.get_price_for(session,session_id,buy_price)
-            # changedelabourse.get_price_for(session,session_id,buy_price)
-            # changerichelieu.get_price_for(session,session_id,buy_price)
-            # changevivienne.get_price_for(session,session_id,buy_price)
-            # gold.get_price_for(session,session_id,buy_price)
-            # goldavenue.get_price_delivery_for(session,session_id,buy_price)
-            # goldforex.get_price_for(session,session_id,buy_price)
-            # goldreserve.get_price_for(session,session_id,buy_price)
-            # lmp.get_price_for(session,session_id,buy_price)
-            # lcdor.get_price_for(session,session_id,buy_price)
-            # merson.get_price_for(session,session_id,buy_price)
-            # monlingot.get_price_for(session,session_id,buy_price)
-            # oretchange.get_price_for(session,session_id,buy_price)
-            # orinvestissement.get_price_for(session,session_id,buy_price)
-            # orobel.get_price_for(session,session_id,buy_price)
-            # shopcomptoirdelor.get_price_for(session,session_id,buy_price)
+            buy_price,sell_price = bullionvault.get(session)
+
+            abacor.get_price_for(session,session_id,buy_price)
+            acheterorargent.get_price_for(session,session_id,buy_price)
+            aucoffre.get_price_for(session,session_id,buy_price)
+            bdor.get_price_for(session,session_id,buy_price)
+            bullionbypost.get_price_for(session,session_id,buy_price)
+            changedelabourse.get_price_for(session,session_id,buy_price)
+            changerichelieu.get_price_for(session,session_id,buy_price)
+            changevivienne.get_price_for(session,session_id,buy_price)
+            gold.get_price_for(session,session_id,buy_price)
+            goldavenue.get_price_delivery_for(session,session_id,buy_price)
+            goldforex.get_price_for(session,session_id,buy_price)
+            goldreserve.get_price_for(session,session_id,buy_price)
+            lmp.get_price_for(session,session_id,buy_price)
+            lcdor.get_price_for(session,session_id,buy_price)
+            merson.get_price_for(session,session_id,buy_price)
+            monlingot.get_price_for(session,session_id,buy_price)
+            oretchange.get_price_for(session,session_id,buy_price)
+            orinvestissement.get_price_for(session,session_id,buy_price)
+            orobel.get_price_for(session,session_id,
+                                 buy_price)
+            shopcomptoirdelor.get_price_for(session,session_id,buy_price)
 
             # goldunion.get(session,session_id)  # arnaque?
             # joubertchange.get(session,session_id)
             # pieceor.get(session,session_id)
-            print(find_best_deals(session,uuid.UUID('ffc8ad72ad0344d9a5c9ef459637fe71'),num_deals=15))
-            calculate_and_store_coin_data(session,uuid.UUID('ffc8ad72ad0344d9a5c9ef459637fe71'),['1 oz krugerrand'],'1_oz_krugerrand.json')
-            calculate_and_store_coin_data(session,uuid.UUID('ffc8ad72ad0344d9a5c9ef459637fe71'),['20 francs or coq marianne',
+            print(find_best_deals(session,session_id,num_deals=15))
+            calculate_and_store_coin_data(session,session_id,['1 oz krugerrand'],'1_oz_krugerrand.json')
+            calculate_and_store_coin_data(session,session_id,['20 francs or coq marianne',
                                                                         '20 francs or cérès',
                                                                         '20 francs or génie debout',
                                                                         '20 francs or napoléon III'],'20_fr_france.json')
-            calculate_and_store_coin_data(session,uuid.UUID('ffc8ad72ad0344d9a5c9ef459637fe71'),['20 francs or leopold I','20 francs or union latine léopold II'],'20_fr_belgique.json')
-            calculate_and_store_coin_data(session,uuid.UUID('ffc8ad72ad0344d9a5c9ef459637fe71'),['20 lire or umberto I','20 lire or vittorio emanuele II'],'20_lires_italie.json')
-            calculate_and_store_coin_data(session,uuid.UUID('ffc8ad72ad0344d9a5c9ef459637fe71'),['20 francs or vreneli croix suisse',
+            calculate_and_store_coin_data(session,session_id,['20 francs or leopold I','20 francs or union latine léopold II'],'20_fr_belgique.json')
+            calculate_and_store_coin_data(session,session_id,['20 lire or umberto I','20 lire or vittorio emanuele II'],'20_lires_italie.json')
+            calculate_and_store_coin_data(session,session_id,['20 francs or vreneli croix suisse',
                                                                         '20 francs or helvetia suisse'],'20_fr_suisse.json')
-            calculate_and_store_coin_data(session,uuid.UUID('ffc8ad72ad0344d9a5c9ef459637fe71'),['souverain or edouart VII',
+            calculate_and_store_coin_data(session,session_id,['souverain or edouart VII',
                                                                         'souverain or georges V',
                                                                         'souverain or victoria jubilee'],'1_souv_ru.json')
-            calculate_and_store_coin_data(session,uuid.UUID('ffc8ad72ad0344d9a5c9ef459637fe71'),['souverain or edouart VII',
+            calculate_and_store_coin_data(session,session_id,['souverain or edouart VII',
                                                                                                             'souverain or elizabeth II',
                                                                                                             'souverain or georges V',
                                                                                                             'souverain or victoria jubilee'],'1_souv_eliz_ru.json')
-            calculate_and_store_coin_data(session,uuid.UUID('ffc8ad72ad0344d9a5c9ef459637fe71'),['1/2 souverain georges V',
+            calculate_and_store_coin_data(session,session_id,['1/2 souverain georges V',
                                                                         '1/2 souverain victoria'],'1_2_souv_ru.json')
-            calculate_and_store_coin_data(session,uuid.UUID('ffc8ad72ad0344d9a5c9ef459637fe71'),['50 pesos or'],'50_pesos_mex.json')
-            calculate_and_store_coin_data(session,uuid.UUID('ffc8ad72ad0344d9a5c9ef459637fe71'),['20 mark or wilhelm II'],'20_mark_all.json')
-            calculate_and_store_coin_data(session,uuid.UUID('ffc8ad72ad0344d9a5c9ef459637fe71'),['5 dollars or liberté','5 dollars or tête indien'],'5_dol_usa.json')
-            calculate_and_store_coin_data(session,uuid.UUID('ffc8ad72ad0344d9a5c9ef459637fe71'),['20 dollars or liberté'],'20_dol_usa.json')
-            calculate_and_store_coin_data(session,uuid.UUID('ffc8ad72ad0344d9a5c9ef459637fe71'),['10 dollars or liberté','10 dollars or tête indien'],'10_dol_usa.json')
-            calculate_and_store_coin_data(session,uuid.UUID('ffc8ad72ad0344d9a5c9ef459637fe71'),['10 francs or coq marianne',
+            calculate_and_store_coin_data(session,session_id,['50 pesos or'],'50_pesos_mex.json')
+            calculate_and_store_coin_data(session,session_id,['20 mark or wilhelm II'],'20_mark_all.json')
+            calculate_and_store_coin_data(session,session_id,['5 dollars or liberté','5 dollars or tête indien'],'5_dol_usa.json')
+            calculate_and_store_coin_data(session,session_id,['20 dollars or liberté'],'20_dol_usa.json')
+            calculate_and_store_coin_data(session,session_id,['10 dollars or liberté','10 dollars or tête indien'],'10_dol_usa.json')
+            calculate_and_store_coin_data(session,session_id,['10 francs or coq marianne',
                                                                         '10 francs or cérès 1850-1851',
                                                                         '10 francs or napoléon III'],'10_fr_france.json')
             print("--- %s seconds ---" % (time.time() - start_time))

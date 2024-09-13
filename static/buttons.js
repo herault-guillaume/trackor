@@ -84,7 +84,7 @@
 
                         // Button styling
                         button.style.padding = '10px 30px'; // Adjusted padding to accommodate the overlapping container
-                        button.style.fontFamily = 'Lora';
+                        button.style.fontFamily = 'Manrope';
                         button.style.fontWeight = 'bold';
                         button.style.fontSize = '1.1rem';
                         button.style.textAlign = 'center';
@@ -186,7 +186,7 @@
                     lastUpdateText.style.textAlign = 'center';
                     lastUpdateText.style.marginBottom = '0px';
                     lastUpdateText.style.color = 'white';
-                    lastUpdateText.style.fontFamily = 'Lora';
+                    lastUpdateText.style.fontFamily = 'Manrope';
                     lastUpdateText.style.fontSize = '0.8rem';
 
                     // Insert the text element at the beginning of the container
@@ -204,7 +204,7 @@
             button.textContent = name; // Utilise le nom pour le texte du bouton
             button.id = id; // Utilise le nom pour le texte du bouton
             button.style.padding = '5px 5px'; // Adjusted padding to accommodate the overlapping container
-            button.style.fontFamily = 'Lora';
+            button.style.fontFamily = 'Manrope';
             button.style.fontWeight = 'bold';
             button.style.fontSize = '1.0rem';
             button.style.textAlign = 'center';
