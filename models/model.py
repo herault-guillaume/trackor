@@ -29,7 +29,8 @@ class GoldPrice(Base):
     id = Column(Integer, primary_key=True)
     buy_price = Column(Float,nullable=True)
     sell_price = Column(Float,nullable=True)
-    timestamp = Column(DateTime, default=datetime.utcnow)
+    timestamp = Column(DateTime, default=lambda: datetime.now(pytz.timezone('CET')))
+    session_id = Column(UUID(as_uuid=True))
 
 poids_pieces_or  = {
                         '1 ducat or': 3.44,
@@ -214,6 +215,6 @@ poids_pieces_or  = {
 
 
 # Configuration de la base de données
-engine = create_engine('sqlite:///pieces_or.db')
+engine = create_engine(r'sqlite:///C:\Users\Guillaume Hérault\PycharmProjects\trackor\models\pieces_or.db')
 Base.metadata.create_all(engine)
 Session = sessionmaker(bind=engine)

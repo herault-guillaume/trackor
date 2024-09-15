@@ -5,7 +5,7 @@ from seleniumbase import Driver
 
 from models.model import GoldPrice
 
-def get(session):
+def get(session,session_id):
     """Uses Selenium to click the currency button, then scrapes the 1 kg gold price in Euros."""
 
     driver = Driver(uc=True, headless=True)
@@ -54,7 +54,7 @@ def get(session):
         sell_price_eur = float(sell_price_text.split('€')[0].replace('\xa0', '').replace(',', '.').replace(' ',''))/1000.0  # Remove € and nbsp
 
         # Create GoldPrice object and add to session
-        gold_price = GoldPrice(buy_price=buy_price_eur, sell_price=sell_price_eur)
+        gold_price = GoldPrice(buy_price=buy_price_eur, sell_price=sell_price_eur,session_id=session_id)
         session.add(gold_price)
         session.commit()
 

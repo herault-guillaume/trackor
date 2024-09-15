@@ -102,7 +102,7 @@ def update_json_file(new_data,
 
     print(f"File '{filename}' updated in bucket '{bucket_name}'")
 
-def find_best_deals(session, session_id, num_deals=50,filename='best_deals.json'):
+def find_best_deals(session, session_id, num_deals=50,filename='results/best_deals.json'):
     """
     Calculates the `num_deals` best deals (gold weight / price ratio)
     among the available coins and returns information about the corresponding coins.
@@ -237,13 +237,14 @@ def calculate_and_store_coin_data(session, session_id, coin_names, filename):
     return data
 
 def fetch_and_update_data():
-    for attempt in range(3):  # Retry up to 3 times
+    for attempt in range(5):
+        time.sleep(5)# Retry up to 5 times
         try:
             start_time = time.time()
             session_id = uuid.uuid4()
             session = Session()
 
-            buy_price,sell_price = bullionvault.get(session)
+            buy_price,sell_price = bullionvault.get(session,session_id)
 
             abacor.get_price_for(session,session_id,buy_price)
             acheterorargent.get_price_for(session,session_id,buy_price)
@@ -271,32 +272,42 @@ def fetch_and_update_data():
             # joubertchange.get(session,session_id)
             # pieceor.get(session,session_id)
             print(find_best_deals(session,session_id,num_deals=15))
-            calculate_and_store_coin_data(session,session_id,['1 oz krugerrand'],'1_oz_krugerrand.json')
-            calculate_and_store_coin_data(session,session_id,['20 francs or coq marianne',
+            calculate_and_store_coin_data(session, session_id, ['1 oz krugerrand'], 'results/1_oz_krugerrand.json')
+            calculate_and_store_coin_data(session, session_id, ['20 francs or coq marianne',
                                                                         '20 francs or cérès',
                                                                         '20 francs or génie debout',
-                                                                        '20 francs or napoléon III'],'20_fr_france.json')
-            calculate_and_store_coin_data(session,session_id,['20 francs or leopold I','20 francs or union latine léopold II'],'20_fr_belgique.json')
-            calculate_and_store_coin_data(session,session_id,['20 lire or umberto I','20 lire or vittorio emanuele II'],'20_lires_italie.json')
-            calculate_and_store_coin_data(session,session_id,['20 francs or vreneli croix suisse',
-                                                                        '20 francs or helvetia suisse'],'20_fr_suisse.json')
-            calculate_and_store_coin_data(session,session_id,['souverain or edouart VII',
+                                                                        '20 francs or napoléon III'],
+                                          'results/20_fr_france.json')
+            calculate_and_store_coin_data(session, session_id, ['20 francs or leopold I','20 francs or union latine léopold II'],
+                                          'results/20_fr_belgique.json')
+            calculate_and_store_coin_data(session, session_id, ['20 lire or umberto I','20 lire or vittorio emanuele II'],
+                                          'results/20_lires_italie.json')
+            calculate_and_store_coin_data(session, session_id, ['20 francs or vreneli croix suisse',
+                                                                        '20 francs or helvetia suisse'],
+                                          'results/20_fr_suisse.json')
+            calculate_and_store_coin_data(session, session_id, ['souverain or edouart VII',
                                                                         'souverain or georges V',
-                                                                        'souverain or victoria jubilee'],'1_souv_ru.json')
-            calculate_and_store_coin_data(session,session_id,['souverain or edouart VII',
+                                                                        'souverain or victoria jubilee'],
+                                          'results/1_souv_ru.json')
+            calculate_and_store_coin_data(session, session_id, ['souverain or edouart VII',
                                                                                                             'souverain or elizabeth II',
                                                                                                             'souverain or georges V',
-                                                                                                            'souverain or victoria jubilee'],'1_souv_eliz_ru.json')
-            calculate_and_store_coin_data(session,session_id,['1/2 souverain georges V',
-                                                                        '1/2 souverain victoria'],'1_2_souv_ru.json')
-            calculate_and_store_coin_data(session,session_id,['50 pesos or'],'50_pesos_mex.json')
-            calculate_and_store_coin_data(session,session_id,['20 mark or wilhelm II'],'20_mark_all.json')
-            calculate_and_store_coin_data(session,session_id,['5 dollars or liberté','5 dollars or tête indien'],'5_dol_usa.json')
-            calculate_and_store_coin_data(session,session_id,['20 dollars or liberté'],'20_dol_usa.json')
-            calculate_and_store_coin_data(session,session_id,['10 dollars or liberté','10 dollars or tête indien'],'10_dol_usa.json')
-            calculate_and_store_coin_data(session,session_id,['10 francs or coq marianne',
+                                                                                                            'souverain or victoria jubilee'],
+                                          'results/1_souv_eliz_ru.json')
+            calculate_and_store_coin_data(session, session_id, ['1/2 souverain georges V',
+                                                                        '1/2 souverain victoria'],
+                                          'results/1_2_souv_ru.json')
+            calculate_and_store_coin_data(session, session_id, ['50 pesos or'], 'results/50_pesos_mex.json')
+            calculate_and_store_coin_data(session, session_id, ['20 mark or wilhelm II'], 'results/20_mark_all.json')
+            calculate_and_store_coin_data(session, session_id, ['5 dollars or liberté','5 dollars or tête indien'],
+                                          'results/5_dol_usa.json')
+            calculate_and_store_coin_data(session, session_id, ['20 dollars or liberté'], 'results/20_dol_usa.json')
+            calculate_and_store_coin_data(session, session_id, ['10 dollars or liberté','10 dollars or tête indien'],
+                                          'results/10_dol_usa.json')
+            calculate_and_store_coin_data(session, session_id, ['10 francs or coq marianne',
                                                                         '10 francs or cérès 1850-1851',
-                                                                        '10 francs or napoléon III'],'10_fr_france.json')
+                                                                        '10 francs or napoléon III'],
+                                          'results/10_fr_france.json')
             print("--- %s seconds ---" % (time.time() - start_time))
             return  # Sortir de la fonction si la mise à jour est réussie
 
@@ -305,34 +316,31 @@ def fetch_and_update_data():
             print(traceback.format_exc())
             time.sleep(5)  # Attendre 5 secondes avant de réessayer
 
-# scheduler = BackgroundScheduler()
-#
-# # Schedule the jobs at 11 AM and 7 PM with randomization
-# scheduler.add_job(
-#     fetch_and_update_data,
-#     CronTrigger(hour=11, minute=random.randint(0,15)),  # Adjust for minutes
-#     id='job_at_11am'
-# )
-#
-# scheduler.add_job(
-#     fetch_and_update_data,
-#     CronTrigger(hour=18, minute=random.randint(0,15)),  # Adjust for minutes
-#     id='job_at_7pm'
-# )
-#
-# scheduler.add_job(
-#     fetch_and_update_data,
-#     CronTrigger(hour=19, minute=52),  # Adjust for minutes
-#     id='job_at_8pm'
-# )
-#
-# scheduler.start()
-#
-# try:
-#     while True:
-#         time.sleep(2)  # Keep the main thread alive
-# except (KeyboardInterrupt, SystemExit):
-#     scheduler.shutdown()
+scheduler = BackgroundScheduler()
 
+# Schedule the jobs at 11 AM and 7 PM with randomization
+scheduler.add_job(
+    fetch_and_update_data,
+    CronTrigger(hour=12, minute=random.randint(0,30)),  # Adjust for minutes
+    id='job_at_12am'
+)
 
-fetch_and_update_data()
+scheduler.add_job(
+    fetch_and_update_data,
+    CronTrigger(hour=19, minute=random.randint(0,30)),  # Adjust for minutes
+    id='job_at_9pm'
+)
+
+scheduler.add_job(
+    fetch_and_update_data,
+    CronTrigger(hour=9, minute=random.randint(0,30)),  # Adjust for minutes
+    id='job_at_9am'
+)
+
+scheduler.start()
+
+try:
+    while True:
+        time.sleep(2)  # Keep the main thread alive
+except (KeyboardInterrupt, SystemExit):
+    scheduler.shutdown()
