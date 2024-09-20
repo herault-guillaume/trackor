@@ -24,6 +24,7 @@ coin_name_to_map = {
     'Britannia 1 OZ Or': '1 oz britannia',
     "10 Florins":'10 florins or wilhelmina', # ou '10 florins or willem III'
     "20 Frs Tunisie": '20 francs or tunisie',
+    "20 francs Tunisie": '20 francs or tunisie',
     "Union Latine": '20 francs or union latine léopold II',
     "Reichsmark": '20 mark or wilhelm II',
     # non côté

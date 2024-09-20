@@ -31,7 +31,10 @@ def get_price_for(session,session_id,buy_price):
         "10 francs or napoléon III": "https://www.abacor.fr/produit/piece-d-or-10-francs-napoleon/",
         "20 francs or tunisie": "https://www.abacor.fr/produit/piece-d-or-20-francs-tunisie/",
         "souverain or elizabeth II": "https://www.abacor.fr/produit/piece-d-or-souverain-elizabeth-ii/",
-        "5 dollars or liberté": "https://www.abacor.fr/produit/test-5-dollars-us/"
+        "souverain or georges V": "https://www.abacor.fr/produit/piece-d-or-souverain/",
+        "5 dollars or liberté": "https://www.abacor.fr/produit/test-5-dollars-us/",
+        "10 florins or wilhelmina": "https://www.abacor.fr/produit/piece-d-or-10-florins/",
+        "20 francs or tunisie": "https://www.abacor.fr/produit/piece-d-or-20-francs-tunisie/",
     }
 
 

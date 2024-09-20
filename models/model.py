@@ -34,11 +34,10 @@ class GoldPrice(Base):
 
 poids_pieces_or  = {
                         '1 ducat or': 3.44,
-                        '1 oz american eagle': 31.103,
                         '1 oz buffalo': 31.103,
                         '1 oz krugerrand': 31.103,# -> CPor
-                        '1 oz maple leaf': 31.103,
                         '1 oz nugget / kangourou': 31.103,
+                        '1 oz philharmonique': 31.103,
                         '1 oz philharmonique': 31.103,
                         '1 oz britannia' : 31.103,
                         '1 oz dragon chinois 2024' : 31.103,
@@ -48,6 +47,8 @@ poids_pieces_or  = {
                         '1 oz 125e anniv perth mint 2024' : 31.103,
                         '1 oz koala 2024 RAM' : 31.103,
                         '1 oz dragon 2024 lunar III' : 31.103,
+                        '1 oz dragon chinois 2018' : 31.103,
+                        '1 oz dragon chinois 2022' : 31.103,
                         '1 oz dragon chinois 2023' : 31.103,
                         '1 oz dragon tudor beasts 2024' : 31.103,
                         '1 oz st george et le dragon 2024' : 31.103,
@@ -55,7 +56,6 @@ poids_pieces_or  = {
                         '1 oz buffalo 2024' : 31.103,
                         '1 oz american eagle' : 31.103,
                         '1 oz britannia 2024' : 31.103,
-                        '1 oz american eagle 2024' : 31.103,
                         '1 oz maple leaf 2024' : 31.103,
                         '1 oz philharmonique 2024' : 31.103,
                         "1 oz lion d'angleterre tudor beasts 2022" : 31.103,
@@ -68,13 +68,12 @@ poids_pieces_or  = {
                         '1 oz morgan le fay mythes et légendes 2024' : 31.103,
                         '1 oz the royal arms 2023' : 31.103,
                         '1 oz cygne 2017' : 31.103,
-                        '1 oz maple leaf' : 31.103,
-                        '1 oz britannia elizabeth II 2023' : 31.103,
                         '1 oz britannia elizabeth II 2023' : 31.103,
                         '1 oz taureau de clarence tudor beasts 2023' : 31.103,
+                        '1 oz serpent 2025 lunar III' : 31.103,
                         '1 rand sud-africains or': 3.648,
                         '1/10 oz american eagle': 3.11,
-                        '1/10 oz krugerrand': 3.105,
+                        '1/10 oz krugerrand': 3.11,
                         '1/10 oz maple leaf': 3.11,
                         '1/10 oz nugget / kangourou': 3.11,
                         '1/10 oz kangourou 2024': 3.11,
@@ -87,13 +86,12 @@ poids_pieces_or  = {
                         '1/10 oz american eagle 2024': 3.11,
                         '1/10 oz couronnement charles III 2023': 3.11,
                         '1/2 oz american eagle': 15.552,
-                        '1/2 oz krugerrand': 15.269,
+                        '1/2 oz krugerrand': 15.55,
                         '1/2 oz maple leaf': 15.552,
                         '1/2 oz nugget / kangourou': 15.552,
                         '1/2 oz kangourou 2024': 15.552,
                         '1/2 oz dragon 2024 lunar III': 15.552,
                         '1/2 oz lapin 2023 lunar III': 15.552,
-                        '1/2 oz american eagle': 15.552,
                         '1/2 oz american eagle 2024': 15.552,  # -> CPor
                         '1/2 oz britannia 2024': 15.552,
                         '1/2 oz philharmonique 2024': 15.552,
@@ -115,7 +113,6 @@ poids_pieces_or  = {
                         '1/4 oz dragon tudor beasts 2024': 7.776,
                         '1/4 oz st george et le dragon 2024': 7.776,
                         '1/4 oz britannia 2024': 7.776,
-                        '1/4 oz american eagle': 7.776,
                         '1/4 oz american eagle 2024': 7.776,
                         '1/4 oz souris 2020 Lunar III': 7.776,
                         '1/4 oz britannia charles III 2023': 7.776,
@@ -132,11 +129,13 @@ poids_pieces_or  = {
                         '10 francs or coq marianne': 2.903, # -> CPor
                         '10 francs or cérès 1850-1851': 2.903,
                         '10 francs or napoléon III': 2.903,
+                        '10 francs or napoléon III lauré': 2.903,
                         '10 francs or vreneli croix suisse': 2.903,
                         '10 pesos or': 7.5,
                         '10 lire or vittorio emanuele II': 2.898,
                         '100 couronnes or françois joseph I': 30.483,
                         '100 francs or napoléon III tête nue': 29.02,
+                        '100 francs or napoléon III tête lauré': 29.02,
                         '2 1/2 pesos or': 1.872,
                         '20 couronnes or françois joseph I': 6.093,
                         '20 dollars or tete indien': 30.096, # -> CPor
@@ -149,6 +148,7 @@ poids_pieces_or  = {
                         '20 francs or helvetia suisse': 5.805, # -> CPor
                         '20 francs or leopold I': 5.805, # -> CPor
                         '20 francs or louis XVIII buste nu': 5.805, # -> CPor
+                        '20 francs or charles X': 5.805, # -> CPor
                         '20 francs or louis XVIII buste habillé': 5.805, # -> CPor
                         '20 francs or louis philippe lauré': 5.805, # -> CPor
                         '20 francs or napoléon empereur': 5.805, # -> CPor
@@ -166,6 +166,8 @@ poids_pieces_or  = {
                         '4 ducats or': 13.78,
                         '4 florins 10 francs 1892 refrappe': 2.9,
                         '40 francs or napoléon empereur lauré': 11.61,
+                        '40 francs or louis XVIII': 11.61,
+                        '40 francs or louis philippe': 11.61,
                         '5 dollars or liberté': 7.523, # -> CPor
                         '5 dollars or tête indien': 7.523, # -> CPor
                         '2.5 dollars or tête liberté': 3.762, # -> CPor
@@ -173,7 +175,9 @@ poids_pieces_or  = {
                         'demi-eagle americain or 5 dollars tete liberte': 7.523, # -> CPor
                         '5 francs or napoléon III': 1.452,
                         '5 pesos or': 3.75,
+                        '5 roubles or': 3.87,
                         '50 francs or napoléon III tête nue': 14.51,
+                        '50 francs or napoléon III tête laurée': 14.51,
                         '50 pesos or': 37.5, # -> CPor
                         '50 écus or charles quint': 15.552,
                         '8 florins 20 francs or franz joseph I': 5.805,

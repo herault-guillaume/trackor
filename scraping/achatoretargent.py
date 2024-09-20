@@ -49,34 +49,46 @@ def get_price_for(session,session_id,buy_price):
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
     }
-    for coin_name, url  in urls.items():
-        try:
-            response = requests.get(url, headers=headers)
-            response.raise_for_status()  # Check for HTTP errors
+    # for coin_name, url  in urls.items():
+        # try:
+    response = requests.get('https://www.achat-or-et-argent.fr/or/2/pieces-d-or-d-investissement', headers=headers)
+    response.raise_for_status()  # Check for HTTP errors
 
-            soup = BeautifulSoup(response.content, 'html.parser')
+    soup = BeautifulSoup(response.content, 'html.parser')
 
-            # Find the specific price span element using its ID
-            price_element = soup.find('span', id="tpa")
+    tableau = soup.find('div',id='contentCategVitrine')
 
-            if price_element:
-                # Extract and clean the price text
-                price_text = price_element.text.strip().replace('€', '').replace(',', '.')
-                price = Price.fromstring(price_text)
-                print(coin_name, price)
-                coin = CoinPrice(nom=coin_name,
-                                 j_achete=price.amount_float,
-                                 source=url,
-                                 prime_achat_perso=((price.amount_float + get_delivery_price(price.amount_float)) - (
-                                             buy_price * poids_pieces_or[coin_name])) * 100.0 / (buy_price *
-                                                   poids_pieces_or[coin_name]),
+    for row in tableau.find_all('div',class_='row BStooltip align-items-center'):
+        try :
+            product_url = row.find('a')
+            url = 'https://www.achat-or-et-argent.fr'+product_url
+            print(url)
+            product_name= product_url.find('span').text.strip()
+            print(product_name)
+            div_prices = row.find('div',class_='row BStooltip align-items-center')
+            # Get the 'data-content' attribute
+            data_content = div_prices['title data-original-title']
 
-                                 frais_port=get_delivery_price(price.amount_float),session_id=session_id)
-                session.add(coin)
-                session.commit()
+            # Parse the 'data-content' as HTML
+            inner_soup = BeautifulSoup(data_content, 'html.parser')
+            target_cells = inner_soup.find_all('div', class_='col-6 text-left selected h5')
+            price = None
+            for cell in target_cells:
+                if '€' in cell.find_next_sibling('div').text:
+                    price = Price.fromstring(cell.find_next_sibling('div').text.strip())
+            print(product_name, price)
+            continue
 
-            else:
-                print("Price element not found.",url)
+            coin = CoinPrice(nom=coin_name,
+                             j_achete=price.amount_float,
+                             source=url,
+                             prime_achat_perso=((price.amount_float + get_delivery_price(price.amount_float)) - (
+                                         buy_price * poids_pieces_or[coin_name])) * 100.0 / (buy_price *
+                                               poids_pieces_or[coin_name]),
+
+                             frais_port=get_delivery_price(price.amount_float),session_id=session_id)
+            session.add(coin)
+            session.commit()
 
         except requests.exceptions.RequestException as e:
             print(f"An error occurred during the request: {e}",url)

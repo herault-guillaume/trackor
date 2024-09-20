@@ -1,62 +1,67 @@
 [
-    {
-        "source": "https://www.gold.fr/achat-piece-or/",
-        "prime": "4.8",
-        "last_updated": " Derni\u00e8re mise \u00e0 jour le dimanche 15 septembre 2024 \u00e0 11h05."
-    },
-    {
-        "source": "https://www.merson.fr/fr/achat-or-investissement/119-20-marks.html",
-        "prime": "5.5",
-        "last_updated": " Derni\u00e8re mise \u00e0 jour le dimanche 15 septembre 2024 \u00e0 11h05."
-    },
-    {
-        "source": "https://www.changedelabourse.com/or/pieces-d-or-d-investissement/20-reichsmarks",
-        "prime": "6.2",
-        "last_updated": " Derni\u00e8re mise \u00e0 jour le dimanche 15 septembre 2024 \u00e0 11h05."
-    },
-    {
-        "source": "https://www.changerichelieu.fr/or",
-        "prime": "6.2",
-        "last_updated": " Derni\u00e8re mise \u00e0 jour le dimanche 15 septembre 2024 \u00e0 11h05."
-    },
-    {
-        "source": "https://www.changevivienne.com/or",
-        "prime": "6.2",
-        "last_updated": " Derni\u00e8re mise \u00e0 jour le dimanche 15 septembre 2024 \u00e0 11h05."
-    },
-    {
-        "source": "https://monlingot.fr/pieces-or/Piece-investissement-Or-20-Reichsmark",
-        "prime": "9.0",
-        "last_updated": " Derni\u00e8re mise \u00e0 jour le dimanche 15 septembre 2024 \u00e0 11h05."
-    },
-    {
-        "source": "https://www.bullionbypost.fr/pieces-du-monde/pieces-allemandes/20-mark-allemand-meilleur-rapport-qualite-prix/",
-        "prime": "10.6",
-        "last_updated": " Derni\u00e8re mise \u00e0 jour le dimanche 15 septembre 2024 \u00e0 11h00."
-    },
-    {
-        "source": "https://www.goldreserve.fr/produit/reichmark-or/",
-        "prime": "11.4",
-        "last_updated": " Derni\u00e8re mise \u00e0 jour le dimanche 15 septembre 2024 \u00e0 11h05."
-    },
-    {
-        "source": "https://lcdor.fr/achat-or/pieces-dor/20-mark-or/",
-        "prime": "12.3",
-        "last_updated": " Derni\u00e8re mise \u00e0 jour le dimanche 15 septembre 2024 \u00e0 11h05."
-    },
-    {
-        "source": "https://www.lesmetauxprecieux.com/produit/reichmark/",
-        "prime": "15.6",
-        "last_updated": " Derni\u00e8re mise \u00e0 jour le dimanche 15 septembre 2024 \u00e0 11h05."
-    },
-    {
-        "source": "https://www.bdor.fr/achat-or-en-ligne/piece-d-or-20-mark",
-        "prime": "18.2",
-        "last_updated": " Derni\u00e8re mise \u00e0 jour le dimanche 15 septembre 2024 \u00e0 10h20."
-    },
-    {
-        "source": "https://or-investissement.fr/achat-piece-or-investissement/441-achat-piece-or-20-mark-allemande.html",
-        "prime": "22.2",
-        "last_updated": " Derni\u00e8re mise \u00e0 jour le dimanche 15 septembre 2024 \u00e0 11h05."
-    }
+{
+"source": "https://www.gold.fr/achat-piece-or/",
+"prime": "5.4",
+"last_updated": " Derni\u00e8re mise \u00e0 jour le mercredi 18 septembre 2024 \u00e0 19h10."
+},
+{
+"source": "https://capornumismatique.com/produits/metaux/629",
+"prime": "5.9",
+"last_updated": " Derni\u00e8re mise \u00e0 jour le mercredi 18 septembre 2024 \u00e0 19h10."
+},
+{
+"source": "https://www.merson.fr/fr/achat-or-investissement/119-20-marks.html",
+"prime": "5.9",
+"last_updated": " Derni\u00e8re mise \u00e0 jour le mercredi 18 septembre 2024 \u00e0 19h10."
+},
+{
+"source": "https://www.changedelabourse.com/or/pieces-d-or-d-investissement/20-reichsmarks",
+"prime": "6.7",
+"last_updated": " Derni\u00e8re mise \u00e0 jour le mercredi 18 septembre 2024 \u00e0 19h10."
+},
+{
+"source": "https://www.changerichelieu.fr/or",
+"prime": "6.7",
+"last_updated": " Derni\u00e8re mise \u00e0 jour le mercredi 18 septembre 2024 \u00e0 19h10."
+},
+{
+"source": "https://www.changevivienne.com/or",
+"prime": "6.7",
+"last_updated": " Derni\u00e8re mise \u00e0 jour le mercredi 18 septembre 2024 \u00e0 19h10."
+},
+{
+"source": "https://monlingot.fr/pieces-or/Piece-investissement-Or-20-Reichsmark",
+"prime": "8.8",
+"last_updated": " Derni\u00e8re mise \u00e0 jour le mercredi 18 septembre 2024 \u00e0 19h10."
+},
+{
+"source": "https://www.bullionbypost.fr/pieces-du-monde/pieces-allemandes/20-mark-allemand-meilleur-rapport-qualite-prix/",
+"prime": "10.2",
+"last_updated": " Derni\u00e8re mise \u00e0 jour le mercredi 18 septembre 2024 \u00e0 19h10."
+},
+{
+"source": "https://www.goldreserve.fr/produit/reichmark-or/",
+"prime": "11.1",
+"last_updated": " Derni\u00e8re mise \u00e0 jour le mercredi 18 septembre 2024 \u00e0 19h10."
+},
+{
+"source": "https://lcdor.fr/achat-or/pieces-dor/20-mark-or/",
+"prime": "12.2",
+"last_updated": " Derni\u00e8re mise \u00e0 jour le mercredi 18 septembre 2024 \u00e0 19h10."
+},
+{
+"source": "https://www.lesmetauxprecieux.com/produit/reichmark/",
+"prime": "16.0",
+"last_updated": " Derni\u00e8re mise \u00e0 jour le mercredi 18 septembre 2024 \u00e0 19h10."
+},
+{
+"source": "https://www.bdor.fr/achat-or-en-ligne/piece-d-or-20-mark",
+"prime": "17.9",
+"last_updated": " Derni\u00e8re mise \u00e0 jour le mercredi 18 septembre 2024 \u00e0 19h05."
+},
+{
+"source": "https://or-investissement.fr/achat-piece-or-investissement/441-achat-piece-or-20-mark-allemande.html",
+"prime": "22.0",
+"last_updated": " Derni\u00e8re mise \u00e0 jour le mercredi 18 septembre 2024 \u00e0 19h10."
+}
 ]

@@ -13,12 +13,12 @@ table_lookup = {
         "20 Fr Or Vreneli" : '20 francs or vreneli croix suisse',
         "20 Fr Or Génie" : '20 francs or génie debout',
         "20 Fr Or Napoléon Tête Nue" : '20 francs or napoléon III',
-        #20 Fr Or Napoléon Lauré
+        "20 Fr Or Napoléon Lauré" : '20 francs or napoléon empereur lauré',
         "10 Fr Or Coq" : "10 francs or coq marianne",
         "10 Fr Or Napoléon Tête Nue" : "10 francs or napoléon III",
-        #10 Fr Or Napoléon Lauré
+        "10 Fr Or Napoléon Lauré" : "10 francs or napoléon III lauré",
         "10 Fr Or Vreneli" : "10 francs or vreneli croix suisse",
-        #20 Dollars Or St Gaudens
+        "20 Dollars Or St Gaudens" : "20 dollars or tete indien",
         "20 Dollars Or Liberty" : "20 dollars or liberté",
         "50 Pesos Or" : "50 pesos or",
         "Krugerrand" : "1 oz krugerrand",
@@ -44,13 +44,13 @@ table_lookup = {
         "American Eagle Or" : '1 oz american eagle',
         "100 Frs Tête Nue" : '100 francs or napoléon III tête nue',
         "50 Francs Tête Nue" : '50 francs or napoléon III tête nue',
-         #100 Frs Tête Laurée
-         #50 Frs Tête Laurée
+        "100 Frs Tête Laurée" : '100 francs or napoléon III tête lauré',
+        "50 Frs Tête Laurée" : "50 francs or napoléon III tête laurée",
         "100 Corona" : '100 couronnes or françois joseph I',
         "4 Ducats" : '4 ducats or',
-        "20 Pesos Or" : "20 pesos or"
-        #2,5 Dollars Or
-        #5 Roubles
+        "20 Pesos Or" : "20 pesos or",
+        "2,5 Dollars Or" : "2.5 dollars or tête indien",
+        "5 Roubles" : "5 roubles or",
 }
 
 def get_delivery_price(price):

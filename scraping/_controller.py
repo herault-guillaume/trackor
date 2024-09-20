@@ -1,3 +1,4 @@
+import pathlib
 
 from models.model import CoinPrice, Session, poids_pieces_or
 from sqlalchemy import func, asc
@@ -22,6 +23,7 @@ import aucoffre
 # import joubertchange_5minimum
 import gold
 import achatoretargent
+import capornumismatique
 import changedelabourse
 import changevivienne
 import bdor
@@ -102,7 +104,7 @@ def update_json_file(new_data,
 
     print(f"File '{filename}' updated in bucket '{bucket_name}'")
 
-def find_best_deals(session, session_id, num_deals=50,filename='results/best_deals.json'):
+def find_best_deals(session, session_id, num_deals=50,filename='./results/best_deals.json'):
     """
     Calculates the `num_deals` best deals (gold weight / price ratio)
     among the available coins and returns information about the corresponding coins.
@@ -133,18 +135,7 @@ def find_best_deals(session, session_id, num_deals=50,filename='results/best_dea
 
     for row in results:
         if row.nom in poids_pieces_or and not 'lingot' in str(row.nom).lower():
-            print(            row.nom,
-            row.prime_achat_perso,
-            row.j_achete,
-            row.source,
-            row.timestamp)
             deals.append({
-                "name": row.nom,
-                "prime": "{:.1f}".format(row.prime_achat_perso),
-                "source": row.source,
-                "last_updated": format_date_to_french_quarterly_hour(row.timestamp)
-            })
-        print({
                 "name": row.nom,
                 "prime": "{:.1f}".format(row.prime_achat_perso),
                 "source": row.source,
@@ -156,9 +147,9 @@ def find_best_deals(session, session_id, num_deals=50,filename='results/best_dea
     print(sorted_deals)
     try:
         with open(filename, "w") as f:
-            json.dump(sorted_deals, f, indent=4)  # indent for better readability
+            json.dump(sorted_deals, f, indent=0)  # indent for better readability
         print(f"The best deals have been saved to {filename}")
-        update_json_file(sorted_deals,filename)
+        update_json_file(sorted_deals,pathlib.WindowsPath(filename).name)
     except IOError as e:
         print(f"Error writing to JSON file: {e}")
 
@@ -230,9 +221,9 @@ def calculate_and_store_coin_data(session, session_id, coin_names, filename):
 
     # Stockage dans un fichier JSON
     with open(filename, "w", encoding='utf8') as f:
-        json.dump(data, f, indent=4)
+        json.dump(data, f, indent=0)
 
-    update_json_file(data, filename=filename)
+    update_json_file(data, filename=pathlib.WindowsPath(filename).name)
 
     return data
 
@@ -251,6 +242,7 @@ def fetch_and_update_data():
             aucoffre.get_price_for(session,session_id,buy_price)
             bdor.get_price_for(session,session_id,buy_price)
             bullionbypost.get_price_for(session,session_id,buy_price)
+            capornumismatique.get_price_for(session,session_id,buy_price)
             changedelabourse.get_price_for(session,session_id,buy_price)
             changerichelieu.get_price_for(session,session_id,buy_price)
             changevivienne.get_price_for(session,session_id,buy_price)
@@ -271,43 +263,44 @@ def fetch_and_update_data():
             # goldunion.get(session,session_id)  # arnaque?
             # joubertchange.get(session,session_id)
             # pieceor.get(session,session_id)
-            print(find_best_deals(session,session_id,num_deals=15))
-            calculate_and_store_coin_data(session, session_id, ['1 oz krugerrand'], 'results/1_oz_krugerrand.json')
+
+            find_best_deals(session,session_id,num_deals=15)
+            calculate_and_store_coin_data(session, session_id, ['1 oz krugerrand'], './results/1_oz_krugerrand.json')
             calculate_and_store_coin_data(session, session_id, ['20 francs or coq marianne',
                                                                         '20 francs or cérès',
                                                                         '20 francs or génie debout',
                                                                         '20 francs or napoléon III'],
-                                          'results/20_fr_france.json')
+                                          './results/20_fr_france.json')
             calculate_and_store_coin_data(session, session_id, ['20 francs or leopold I','20 francs or union latine léopold II'],
-                                          'results/20_fr_belgique.json')
+                                          './results/20_fr_belgique.json')
             calculate_and_store_coin_data(session, session_id, ['20 lire or umberto I','20 lire or vittorio emanuele II'],
-                                          'results/20_lires_italie.json')
+                                          './results/20_lires_italie.json')
             calculate_and_store_coin_data(session, session_id, ['20 francs or vreneli croix suisse',
                                                                         '20 francs or helvetia suisse'],
-                                          'results/20_fr_suisse.json')
+                                          './results/20_fr_suisse.json')
             calculate_and_store_coin_data(session, session_id, ['souverain or edouart VII',
                                                                         'souverain or georges V',
                                                                         'souverain or victoria jubilee'],
-                                          'results/1_souv_ru.json')
+                                          './results/1_souv_ru.json')
             calculate_and_store_coin_data(session, session_id, ['souverain or edouart VII',
                                                                                                             'souverain or elizabeth II',
                                                                                                             'souverain or georges V',
                                                                                                             'souverain or victoria jubilee'],
-                                          'results/1_souv_eliz_ru.json')
+                                          './results/1_souv_eliz_ru.json')
             calculate_and_store_coin_data(session, session_id, ['1/2 souverain georges V',
                                                                         '1/2 souverain victoria'],
-                                          'results/1_2_souv_ru.json')
-            calculate_and_store_coin_data(session, session_id, ['50 pesos or'], 'results/50_pesos_mex.json')
-            calculate_and_store_coin_data(session, session_id, ['20 mark or wilhelm II'], 'results/20_mark_all.json')
+                                          './results/1_2_souv_ru.json')
+            calculate_and_store_coin_data(session, session_id, ['50 pesos or'], './results/50_pesos_mex.json')
+            calculate_and_store_coin_data(session, session_id, ['20 mark or wilhelm II'], './results/20_mark_all.json')
             calculate_and_store_coin_data(session, session_id, ['5 dollars or liberté','5 dollars or tête indien'],
-                                          'results/5_dol_usa.json')
-            calculate_and_store_coin_data(session, session_id, ['20 dollars or liberté'], 'results/20_dol_usa.json')
+                                          './results/5_dol_usa.json')
+            calculate_and_store_coin_data(session, session_id, ['20 dollars or liberté'], './results/20_dol_usa.json')
             calculate_and_store_coin_data(session, session_id, ['10 dollars or liberté','10 dollars or tête indien'],
-                                          'results/10_dol_usa.json')
+                                          './results/10_dol_usa.json')
             calculate_and_store_coin_data(session, session_id, ['10 francs or coq marianne',
                                                                         '10 francs or cérès 1850-1851',
                                                                         '10 francs or napoléon III'],
-                                          'results/10_fr_france.json')
+                                          './results/10_fr_france.json')
             print("--- %s seconds ---" % (time.time() - start_time))
             return  # Sortir de la fonction si la mise à jour est réussie
 
@@ -317,7 +310,7 @@ def fetch_and_update_data():
             time.sleep(5)  # Attendre 5 secondes avant de réessayer
 
 scheduler = BackgroundScheduler()
-
+fetch_and_update_data()
 # Schedule the jobs at 11 AM and 7 PM with randomization
 scheduler.add_job(
     fetch_and_update_data,
