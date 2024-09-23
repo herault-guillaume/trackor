@@ -1,8 +1,37 @@
 import requests
 from bs4 import BeautifulSoup
+from seleniumbase import Driver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from models.model import CoinPrice, poids_pieces_or
 from price_parser import Price
 import traceback
+
+from scraping.changedelabourse import coin_mapping_name
+
+coin_mapping_name = {
+    '20 Francs Marianne Coq': '20 francs or coq marianne',
+    '10 Francs Napoléon': '10 francs or napoléon III',
+    '50 Pesos Or': '50 pesos or',
+    "Louis d'Or - 20 Francs Or": '20 francs or',
+    '20 Francs Napoléon': '20 francs or napoléon III',
+    'Krugerrand': '1 oz krugerrand',
+    'Souverain': 'souverain or georges V',  # No exact match for "Souverain"
+    'Union Latine': '20 francs or union latine léopold II',
+    '20 Francs Suisse': '20 francs or helvetia suisse',
+    '20 Dollars US': '20 dollars or liberté',
+    '10 Dollars US': '10 dollars or liberté',
+    '5 Dollars US Or': '5 dollars or liberté',
+    '10 Florins Or': '10 florins or willem III',
+    '20 Reichsmarks': '20 mark or wilhelm II',
+    '1 Ducat Or Francois-Joseph 1915': '1 ducat or',
+    #'Set 5 pièces 20 Fr Or Marianne Coq': None,  # No exact match
+    #'Set 5 Pièces 20 Francs Or': '20 francs or',
+    '4 Ducats Or': '4 ducats or',
+    '20 Francs Tunisie': '20 francs or tunisie',
+    'Demi Souverain': '1/2 souverain georges V'
+}
 
 def get_delivery_price(price):
     if 0 <= price <= 1000:
@@ -19,77 +48,73 @@ def get_delivery_price(price):
         return 65.0
     else:  # price > 15000.01
         return 0.0  # Free delivery
-
-def get_price_for(session,session_id,buy_price):
-    """
-    Retrieves the '20 francs or coq marianne' coin purchase price from achat-or-et-argent.fr using requests.
-    """
+def get_price_for(session, session_id, buy_price):
+    """Retrieves coin purchase prices using SeleniumBase."""
     print("https://www.achat-or-et-argent.fr/")
 
-    urls = {
-        "20 dollars or liberté": "https://www.achat-or-et-argent.fr/or/20-dollars-us/19",
-        "20 francs or coq marianne": "https://www.achat-or-et-argent.fr/or/20-francs-marianne-coq/17",
-        "20 francs or napoléon III": "https://www.achat-or-et-argent.fr/or/louis-d-or-20-francs-or/5231",
-        "20 francs or helvetia suisse": "https://www.achat-or-et-argent.fr/or/20-francs-suisse/15",
-        "20 francs or union latine léopold II": "https://www.achat-or-et-argent.fr/or/union-latine/20",
-        "10 dollars or liberté": "https://www.achat-or-et-argent.fr/or/10-dollars-us/13",
-        "50 pesos or": "https://www.achat-or-et-argent.fr/or/50-pesos/11",
-        "1 oz krugerrand": "https://www.achat-or-et-argent.fr/or/krugerrand/12",
-        "10 francs or napoléon III": "https://www.achat-or-et-argent.fr/or/10-francs-napoleon/32",
-        "souverain or georges V": "https://www.achat-or-et-argent.fr/or/souverain/14",
-        "5 dollars or liberté": "https://www.achat-or-et-argent.fr/or/5-dollars-us/33",
-        "10 florins or willem III" : "https://www.achat-or-et-argent.fr/or/10-florins/18",
-        "20 mark or wilhelm II" : "https://www.achat-or-et-argent.fr/or/20-reichsmarks/34",
-        "1 ducat or" : "https://www.achat-or-et-argent.fr/or/1-ducat-or-francois-joseph-1915/4767",
-        "4 ducat or" : "https://www.achat-or-et-argent.fr/or/4-ducats-or/839",
-        "20 francs or tunisie" : "https://www.achat-or-et-argent.fr/or/20-francs-tunisie/44",
-        "1/2 souverain georges V" : "https://www.achat-or-et-argent.fr/or/demi-souverain/49",
-    }
+    driver = Driver(uc=True, headless=True)
+    driver.get("https://www.achat-or-et-argent.fr/or/2/pieces-d-or-d-investissement")
 
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
-    }
-    # for coin_name, url  in urls.items():
-        # try:
-    response = requests.get('https://www.achat-or-et-argent.fr/or/2/pieces-d-or-d-investissement', headers=headers)
-    response.raise_for_status()  # Check for HTTP errors
+    # Explicitly wait for the target element to be present
+    wait = WebDriverWait(driver, 5)  # Adjust timeout as needed
+    tableau = wait.until(EC.presence_of_element_located((By.ID, "contentCategVitrine")))
+    wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "div.row.BStooltip.align-items-center")))
 
-    soup = BeautifulSoup(response.content, 'html.parser')
+    # Use find_elements to get a list of matching elements
+    rows = tableau.find_elements(By.CSS_SELECTOR, "div[id*='prod']")
+    for row in rows:
+        try:
 
-    tableau = soup.find('div',id='contentCategVitrine')
+            # Wait for the 'a' tag to be present within the row
+            WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.TAG_NAME, "a"))
+            )
 
-    for row in tableau.find_all('div',class_='row BStooltip align-items-center'):
-        try :
-            product_url = row.find('a')
-            url = 'https://www.achat-or-et-argent.fr'+product_url
-            print(url)
-            product_name= product_url.find('span').text.strip()
-            print(product_name)
-            div_prices = row.find('div',class_='row BStooltip align-items-center')
-            # Get the 'data-content' attribute
-            data_content = div_prices['title data-original-title']
+            row_html = row.get_attribute('outerHTML')
+            row_soup = BeautifulSoup(row_html, 'html.parser')
 
-            # Parse the 'data-content' as HTML
-            inner_soup = BeautifulSoup(data_content, 'html.parser')
-            target_cells = inner_soup.find_all('div', class_='col-6 text-left selected h5')
+            product_url_elem = row_soup.find_all('a')
+
+            url = "https://www.achat-or-et-argent.fr" + product_url_elem[1]["href"]
+            # Explicitly wait for the span within the product_url_elem to be visible
+            wait.until(EC.presence_of_all_elements_located((By.TAG_NAME, "span")))
+
+            span_elem = row_soup.find('span')
+            product_name = span_elem.text.strip()
             price = None
-            for cell in target_cells:
-                if '€' in cell.find_next_sibling('div').text:
-                    price = Price.fromstring(cell.find_next_sibling('div').text.strip())
-            print(product_name, price)
-            continue
 
-            coin = CoinPrice(nom=coin_name,
+            row_price = row_soup.find('div',class_="row BStooltip align-items-center")
+            if row_price :
+                data_content = row_price["data-original-title"]
+
+
+                inner_soup = BeautifulSoup(data_content, 'html.parser')
+                target_cells = inner_soup.find_all('div', class_='col-6 text-left selected h5')
+
+
+                for cell in target_cells:
+                    if '€' in cell.find_next_sibling('div').text:
+                        price = Price.fromstring(cell.find_next_sibling('div').text.strip())
+                        break  # Exit loop once price is found
+
+
+            else:
+                row_price = row_soup.find('del', class_="small text-dark").parent
+                price = Price.fromstring(row_price.text)
+
+            print(product_name,price)
+            coin = CoinPrice(nom=coin_mapping_name[product_name],
                              j_achete=price.amount_float,
                              source=url,
                              prime_achat_perso=((price.amount_float + get_delivery_price(price.amount_float)) - (
-                                         buy_price * poids_pieces_or[coin_name])) * 100.0 / (buy_price *
-                                               poids_pieces_or[coin_name]),
+                                     buy_price * poids_pieces_or[coin_mapping_name[product_name]])) * 100.0 / (buy_price *
+                                                                                         poids_pieces_or[
+                                                                                             coin_mapping_name[product_name]]),
 
-                             frais_port=get_delivery_price(price.amount_float),session_id=session_id)
+                             frais_port=get_delivery_price(price.amount_float), session_id=session_id)
             session.add(coin)
             session.commit()
 
-        except requests.exceptions.RequestException as e:
-            print(f"An error occurred during the request: {e}",url)
-            print(traceback.format_exc())
+        except Exception as e:
+            #print(f"An error occurred while processing {url}: {e}")
+            traceback.print_exc()

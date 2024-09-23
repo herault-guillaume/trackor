@@ -57,6 +57,7 @@ poids_pieces_or  = {
                         '1 oz american eagle' : 31.103,
                         '1 oz britannia 2024' : 31.103,
                         '1 oz maple leaf 2024' : 31.103,
+                        '1 oz maple leaf' : 31.103,
                         '1 oz philharmonique 2024' : 31.103,
                         "1 oz lion d'angleterre tudor beasts 2022" : 31.103,
                         '1 oz beowulf et grendel mythes et légendes 2024' : 31.103,

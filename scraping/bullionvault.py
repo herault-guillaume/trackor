@@ -1,3 +1,5 @@
+import time
+
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -12,9 +14,8 @@ def get(session,session_id):
 
     try:
         url = "https://or.bullionvault.fr/"
-        print(url)
         driver.get(url)
-
+        time.sleep(3)
         try:
             cookie_button = WebDriverWait(driver, 4).until(  # Adjust wait time as needed
                 EC.element_to_be_clickable((By.XPATH, "//button[@onclick='webpageCookies.acceptAllCookies()']"))

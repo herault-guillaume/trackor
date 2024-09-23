@@ -239,6 +239,7 @@ def fetch_and_update_data():
 
             abacor.get_price_for(session,session_id,buy_price)
             acheterorargent.get_price_for(session,session_id,buy_price)
+            achatoretargent.get_price_for(session,session_id,buy_price)
             aucoffre.get_price_for(session,session_id,buy_price)
             bdor.get_price_for(session,session_id,buy_price)
             bullionbypost.get_price_for(session,session_id,buy_price)
@@ -269,7 +270,17 @@ def fetch_and_update_data():
             calculate_and_store_coin_data(session, session_id, ['20 francs or coq marianne',
                                                                         '20 francs or cérès',
                                                                         '20 francs or génie debout',
-                                                                        '20 francs or napoléon III'],
+                                                                        '20 francs or napoléon III',
+                                                                        '20 francs or louis XVIII buste nu',
+                                                                        '20 francs or charles X',
+                                                                        '20 francs or louis XVIII buste habillé',
+                                                                        '20 francs or louis philippe lauré',
+                                                                        '20 francs or napoléon empereur',
+                                                                        '20 francs or napoléon empereur lauré',
+                                                                        '20 francs or louis-napoléon bonaparte',
+                                                                        '20 francs or fr',
+                                                                        '20 francs or',
+                                                                        ],
                                           './results/20_fr_france.json')
             calculate_and_store_coin_data(session, session_id, ['20 francs or leopold I','20 francs or union latine léopold II'],
                                           './results/20_fr_belgique.json')
@@ -280,15 +291,12 @@ def fetch_and_update_data():
                                           './results/20_fr_suisse.json')
             calculate_and_store_coin_data(session, session_id, ['souverain or edouart VII',
                                                                         'souverain or georges V',
+                                                                        'souverain or elizabeth II'
                                                                         'souverain or victoria jubilee'],
                                           './results/1_souv_ru.json')
-            calculate_and_store_coin_data(session, session_id, ['souverain or edouart VII',
-                                                                                                            'souverain or elizabeth II',
-                                                                                                            'souverain or georges V',
-                                                                                                            'souverain or victoria jubilee'],
-                                          './results/1_souv_eliz_ru.json')
             calculate_and_store_coin_data(session, session_id, ['1/2 souverain georges V',
-                                                                        '1/2 souverain victoria'],
+                                                                        '1/2 souverain victoria',
+                                                                ],
                                           './results/1_2_souv_ru.json')
             calculate_and_store_coin_data(session, session_id, ['50 pesos or'], './results/50_pesos_mex.json')
             calculate_and_store_coin_data(session, session_id, ['20 mark or wilhelm II'], './results/20_mark_all.json')
