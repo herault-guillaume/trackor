@@ -107,7 +107,7 @@ def get_price_for(session,session_id,buy_price):
             # Extract price (assuming you want the "sell" price)
             price_span = div.find('span', class_='woocommerce-Price-amount amount')
             price = Price.fromstring(price_span.text)
-            print(coin_name[coin_label],price)
+            print(coin_name,price)
             #price = float(price_text.replace('€', '').replace(',', '.'))
             coin = CoinPrice(nom=coin_name[coin_label],
                              j_achete=price.amount_float,

@@ -21,7 +21,7 @@ coin_to_name = {
     "10 Dollars Or Liberty": '10 dollars or liberté',
     "American Buffalo Once": '1 oz buffalo',
     "American Eagle Once": '1 oz american eagle',
-    "20 Mark Or": '20 mark or wilhelm II',
+    "5 Roubles Or': '5 roubles or',
     #"5 Roubles Or": None  # No match found in the gold prices dictionary
 }
 

@@ -76,7 +76,7 @@ def get_price_for(session,session_id,buy_price):
             price = Price.fromstring(price_span.text)
 
 
-
+            print(price,coin_label)
             #price = float(price_text.replace('€', '').replace(',', '.'))
             coin = CoinPrice(nom=coin_name[coin_label],
                              j_achete=price.amount_float,
@@ -88,6 +88,5 @@ def get_price_for(session,session_id,buy_price):
                              frais_port=35.0,session_id=session_id)
             session.add(coin)
             session.commit()
-            print(coin_label)
         except Exception as e:
             print(traceback.format_exc())

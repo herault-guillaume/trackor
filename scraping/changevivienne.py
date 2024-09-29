@@ -25,6 +25,7 @@ coin_mapping = {
     '20 Dollars US' : '20 dollars or liberté',
     '20 Francs Marianne...' : '20 francs or coq marianne',
     '10 Francs Napoléon...' : '10 francs or coq marianne',
+    'Britannia 1 OZ Or' : '1 oz britannia',
 }
 def get_delivery_price(price):
     #https://www.changerichelieu.fr/livraison

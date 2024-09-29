@@ -45,14 +45,12 @@ def get_price_delivery_for(session,session_id,buy_price):
     for coin_name, url in urls.items():
         try:
             driver.get(url)  # Load the page
-            print(url)
             # Locate the price element by its unique combination of classes
             # Wait for the span element to be present (adjust timeout as needed)
             span_element = WebDriverWait(driver, 7).until(
                 EC.presence_of_all_elements_located((By.XPATH, "//span[@color='primary' and .//p[@display='inline']]"))
             )
             price = Price.fromstring("".join(span_element[1].text))
-            print(price)
             # Clean and combine the price text
             #price_text = ''.join(price_text_parts).replace('€', '').replace(',', '.')
 
