@@ -23,17 +23,20 @@ class CoinPrice(Base):
     source = Column(String,nullable=False)
     timestamp = Column(DateTime, default=lambda: datetime.now(pytz.timezone('CET')))
     session_id = Column(UUID(as_uuid=True))
+    metal = Column(String,nullable=True)
 
-class GoldPrice(Base):
-    __tablename__ = 'gold_price'
+class MetalPrice(Base):
+    __tablename__ = 'metal_price'
     id = Column(Integer, primary_key=True)
     buy_price = Column(Float,nullable=True)
     sell_price = Column(Float,nullable=True)
     timestamp = Column(DateTime, default=lambda: datetime.now(pytz.timezone('CET')))
     session_id = Column(UUID(as_uuid=True))
+    metal = Column(String,nullable=True)
 
 poids_pieces_or  = {
                         '1 ducat or': 3.44,
+                        '1 oz' : 31.103,
                         '1 oz buffalo': 31.103,
                         '1 oz krugerrand': 31.103,# -> CPor
                         '1 oz nugget / kangourou': 31.103,
@@ -73,6 +76,8 @@ poids_pieces_or  = {
                         '1 oz taureau de clarence tudor beasts 2023' : 31.103,
                         '1 oz serpent 2025 lunar III' : 31.103,
                         '1 rand sud-africains or': 3.648,
+                        '1/10 oz': 3.11,
+                        '1/10 oz philharmonique': 3.11,
                         '1/10 oz american eagle': 3.11,
                         '1/10 oz krugerrand': 3.11,
                         '1/10 oz maple leaf': 3.11,
@@ -86,6 +91,7 @@ poids_pieces_or  = {
                         '1/10 oz britannia charles III 2023': 3.11,
                         '1/10 oz american eagle 2024': 3.11,
                         '1/10 oz couronnement charles III 2023': 3.11,
+                        '1/2 oz': 15.552,
                         '1/2 oz american eagle': 15.552,
                         '1/2 oz krugerrand': 15.55,
                         '1/2 oz maple leaf': 15.552,
@@ -99,10 +105,12 @@ poids_pieces_or  = {
                         '1/2 souverain georges V': 3.661, # -> CPor
                         '1/2 souverain victoria': 3.661, # -> CPor
                         '1/10 oz koala 2023': 3.11, # -> CPor
+                        '1/20 oz': 1.55,
                         '1/20 oz nugget / kangourou': 1.55,
                         '1/20 oz dragon 2024 lunar III': 1.55,
                         '1/20 oz lapin 2023 lunar III': 1.55,
                         '1/20 oz boeuf 2021 Lunar III': 1.55,
+                        '1/4 oz': 7.776,
                         '1/4 oz american eagle': 7.776,
                         '1/4 oz krugerrand': 7.776,
                         '1/4 oz maple leaf': 7.776,
@@ -137,10 +145,14 @@ poids_pieces_or  = {
                         '100 couronnes or françois joseph I': 30.483,
                         '100 francs or napoléon III tête nue': 29.02,
                         '100 francs or napoléon III tête lauré': 29.02,
+                        '100 francs or génie': 29.02,
+                        '100 piastres or': 6.61,
                         '2 1/2 pesos or': 1.872,
+                        '2 pesos or': 1.494,
                         '20 couronnes or françois joseph I': 6.093,
                         '20 dollars or tete indien': 30.096, # -> CPor
                         '20 dollars or liberté': 30.096, # -> CPor
+                        '20 dollars or st gaudens': 30.096, # -> CPor
                         '20 francs or fr': 5.805, # -> CPor
                         '20 francs or': 5.805, # -> CPor
                         '20 francs or coq marianne': 5.805, # -> CPor
@@ -167,7 +179,11 @@ poids_pieces_or  = {
                         '4 ducats or': 13.78,
                         '4 florins 10 francs 1892 refrappe': 2.9,
                         '40 francs or napoléon empereur lauré': 11.61,
+                        '40 francs or napoléon empereur non lauré': 11.61,
                         '40 francs or louis XVIII': 11.61,
+                        '40 francs or louis philippe': 11.61,
+                        '40 francs or charles X': 11.61,
+                        '40 francs or louis philippe': 11.61,
                         '40 francs or louis philippe': 11.61,
                         '5 dollars or liberté': 7.523, # -> CPor
                         '5 dollars or tête indien': 7.523, # -> CPor
@@ -175,6 +191,7 @@ poids_pieces_or  = {
                         '2.5 dollars or tête indien': 3.762, # -> CPor
                         'demi-eagle americain or 5 dollars tete liberte': 7.523, # -> CPor
                         '5 francs or napoléon III': 1.452,
+                        '5 francs or napoléon III nue': 1.452,
                         '5 pesos or': 3.75,
                         '5 roubles or': 3.87,
                         '50 francs or napoléon III tête nue': 14.51,
@@ -203,6 +220,7 @@ poids_pieces_or  = {
                         'Lingot or 5 g LBMA': 5.0,
                         'Lingot or 50 g LBMA': 50.0,
                         'Lingot or 500 g LBMA': 500.0,
+                        'souverain or': 7.318, # -> CPor
                         'souverain or edouart VII': 7.318, # -> CPor
                         'souverain or elizabeth II': 7.318, # -> CPor
                         'souverain or georges V': 7.318, # -> CPor
@@ -218,6 +236,21 @@ poids_pieces_or  = {
                         'double souverain or 2022 charles III': 14.64, # -> CPor
                     }
 
+poids_pieces_argent = {
+                        # France
+                        '50 Francs Argent Hercule (1974-1980)': 30.0 * 0.900,  
+                        '10 Francs Argent Hercule (1965-1973)': 10.0 * 0.900,
+                        '5 Francs Argent Semeuse (différentes années)': 12.0 * 0.835,
+                        '2 Francs Argent Semeuse (différentes années)': 10.0 * 0.835,
+                        '1 Franc Argent Semeuse (différentes années)': 5 * 0.835,
+                        '50 Centimes Argent Semeuse (différentes années)': 2.5 * 0.835,
+                        '100 Francs Argent Génie (1878-1914)': 32.258 * 0.900,  
+                        '100 Francs Argent Panthéon': 15.0 * 0.900,
+                        '20 Francs Argent Turin (1860-1928)': 20.0 * 0.680,
+                        '10 Francs Argent Turin (1860-1928)': 10.0 * 0.680,
+                        '5 Francs Argent Ecu (1854-1860)': 25.0 * 0.900,
+
+                    }
 
 # Configuration de la base de données
 engine = create_engine(r'sqlite:///C:\Users\Guillaume Hérault\PycharmProjects\trackor\models\pieces_or.db')

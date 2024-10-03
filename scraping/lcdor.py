@@ -22,6 +22,7 @@ coin_to_name = {
     "American Buffalo Once": '1 oz buffalo',
     "American Eagle Once": '1 oz american eagle',
     "5 Roubles Or": '5 roubles or',
+    "20 Mark Or": '20 mark or wilhelm II',
     #"5 Roubles Or": None  # No match found in the gold prices dictionary
 }
 
@@ -56,7 +57,7 @@ def get_price_for(session,session_id,buy_price):
                                          buy_price * poids_pieces_or[coin_to_name[name]])) * 100.0 / (buy_price * poids_pieces_or[
                                                    coin_to_name[name]]),
 
-                             frais_port=7.0,session_id=session_id)
+                             frais_port=7.0,session_id=session_id,metal='g')
             session.add(coin)
             session.commit()
 

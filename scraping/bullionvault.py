@@ -5,7 +5,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from seleniumbase import Driver
 
-from models.model import GoldPrice
+from models.model import MetalPrice
 
 def get(session,session_id):
     """Uses Selenium to click the currency button, then scrapes the 1 kg gold price in Euros."""
@@ -55,7 +55,7 @@ def get(session,session_id):
         sell_price_eur = float(sell_price_text.split('€')[0].replace('\xa0', '').replace(',', '.').replace(' ',''))/1000.0  # Remove € and nbsp
 
         # Create GoldPrice object and add to session
-        gold_price = GoldPrice(buy_price=buy_price_eur, sell_price=sell_price_eur,session_id=session_id)
+        gold_price = MetalPrice(buy_price=buy_price_eur, sell_price=sell_price_eur, session_id=session_id, metal='g')
         session.add(gold_price)
         session.commit()
 

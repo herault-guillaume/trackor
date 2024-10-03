@@ -75,7 +75,7 @@ def get_price_for(session,session_id,buy_price):
                                                    coin_name[name]]),
 
                              source=url,
-                             frais_port=get_delivery_price(price.amount_float),session_id=session_id)
+                             frais_port=get_delivery_price(price.amount_float),session_id=session_id,metal='g')
             session.add(coin)
             session.commit()
 

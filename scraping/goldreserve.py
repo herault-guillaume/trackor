@@ -9,32 +9,31 @@ coin_name = {
     "20 Pesos – Mexique | Or": "20 pesos or",
     "20 Francs Napoléon – Premier Empire | Or": "20 francs or napoléon empereur lauré",  # Assuming this is the "tête laurée" type, most common for First Empire
     "2,5 Pesos – Mexique | Or": "2 1/2 pesos or",
-    #"2 Pesos – Mexique | Or": None,  # This key doesn't exist in the provided dictionary, handle this case later
     "4 Florins / 10 Francs – Franz Joseph | Or": "4 florins 10 francs 1892 refrappe",
     "1 Ducat – Autriche | Or": "1 ducat or",
-    #"40 Francs – Charles X | Or": None,  # This key doesn't exist, handle later
+    "40 Francs – Charles X | Or": "40 francs or charles X",  # This key doesn't exist, handle later
     "1/2 Souverain – Victoria (veuve) | Or": "1/2 souverain victoria",
-    "5 Roubles – Nicolas II | Or": None,  # This key doesn't exist, handle later
-    #"40 Francs – Louis Philippe | Or": None,  # This key doesn't exist, handle later
+    "5 Roubles – Nicolas II | Or": "5 roubles or",  # This key doesn't exist, handle later
+    "40 Francs – Louis Philippe | Or": "40 francs or louis philippe",  # This key doesn't exist, handle later
     "4 Ducats – Autriche | Or": "4 ducats or",
     "1/2 souverain – Edouard VII | Or": "1/2 souverain georges V",  # Assuming typo, should be George V
-    "10 Lire – Vittorio Emanuele | Or": "1 or vittorio emanuele II",  # Assuming it's a 20 Lire coin, clarify if needed
-    #"5 Roubles – Alexandre III | Or": None,  # This key doesn't exist, handle later
+    "10 Lire – Vittorio Emanuele | Or": "20 lire or vittorio emanuele II",  # Assuming it's a 20 Lire coin, clarify if needed
+    "5 Roubles – Alexandre III | Or": "5 roubles or",  # This key doesn't exist, handle later
     "20 Francs – Génie | Or": "20 francs or génie debout",
     "50 Francs – Napoléon tête nue | Or": "50 francs or napoléon III tête nue",
-    #"40 Francs – Bonaparte An XI à An 12 | Or": "non laurée",  # This key doesn't exist, handle later
+    "40 Francs – Bonaparte An XI à An 12 | Or": "40 francs or napoléon empereur non lauré",  # This key doesn't exist, handle later
     "10 Francs Suisse | Or": "10 francs or vreneli croix suisse",
     "20 Lire – Umberto I | Or": "20 lire or umberto I",
-    #"40 Francs – Louis XVIII | Or": None,  # This key doesn't exist, handle later
+    "40 Francs – Louis XVIII | Or": "40 francs or louis XVIII",  # This key doesn't exist, handle later
     "100 Francs – Napoléon tête nue | Or": "100 francs or napoléon III tête nue",
     "1/2 Souverain – Victoria (jubilé) | Or": '1/2 souverain victoria',
     "40 Francs – Napoléon tête laurée | Or": "40 francs or napoléon empereur lauré",
     "10 Francs France – Cérès | Or": "10 francs or cérès 1850-1851",
-    #"40 Francs – Napoléon Empereur An 13 | Or": None,  # This key doesn't exist, handle later
+    "40 Francs – Napoléon Empereur An 13 | Or": "40 francs or napoléon empereur lauré",  # This key doesn't exist, handle later
     "5 Francs – Napoléon tête nue | Or": "5 francs or napoléon III",
-    #"5 Francs – Napoléon tête laurée | Or": None,  # This key doesn't exist, handle later
-    #"50 Francs – Napoléon tête laurée | Or": None,  # This key doesn't exist, handle later
-    #"100 Francs – Génie | Or": None,  # This key doesn't exist, handle later
+    "5 Francs – Napoléon tête laurée | Or": "5 francs or napoléon III nue",  # This key doesn't exist, handle later
+    "50 Francs – Napoléon tête laurée | Or": "50 francs or napoléon III tête laurée",  # This key doesn't exist, handle later
+    "100 Francs – Génie | Or": "100 francs or génie",  # This key doesn't exist, handle later
     "Napoléon 20 Francs Coq Marianne | Or": "20 francs or coq marianne",
     "Napoléon 20 Francs | Or": "20 francs or napoléon III",
     "Demi Napoléon | Or": "10 francs or napoléon III",
@@ -58,12 +57,14 @@ coin_name = {
     "American Eagle 1 Once | Or": "1 oz american eagle",
     "Krugerrand 1/10 Once | Or": "1/10 oz krugerrand",
     "Krugerrand 1/4 Once | Or": "1/4 oz krugerrand",
-    #"Philharmonique 1/10 Once | Or": "1/10 oz american eagle",  # Assuming it's the same as American Eagle 1/10 oz
+    "Philharmonique 1/10 Once | Or": "",  # Assuming it's the same as American Eagle 1/10 oz
     "20 dollars Liberty": "20 dollars or liberté",
     "10 dollars Indien": "10 dollars or tête indien",
     "10 dollars Liberty": "10 dollars or liberté",
     "5 dollars indien": "5 dollars or tête indien",
     "5 dollars Liberty": "5 dollars or liberté",
+    "2 Pesos – Mexique | Or": "2 pesos or",
+    "2 Pesos – Mexique | Or": "2 pesos or",
 }
 
 def get_delivery_price(price):
@@ -116,7 +117,7 @@ def get_price_for(session,session_id,buy_price):
                                          buy_price * poids_pieces_or[coin_name[coin_label]])) * 100.0 / (buy_price * poids_pieces_or[
                                                    coin_name[coin_label]]),
 
-                             frais_port=get_delivery_price(price.amount_float), session_id=session_id)
+                             frais_port=get_delivery_price(price.amount_float), session_id=session_id,metal='g')
             session.add(coin)
             session.commit()
 

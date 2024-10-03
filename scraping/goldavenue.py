@@ -71,7 +71,7 @@ def get_price_delivery_for(session,session_id,buy_price):
                                          buy_price * poids_pieces_or[coin_name])) * 100.0 / (buy_price * poids_pieces_or[
                                                    coin_name]),
 
-                             frais_port=delivery_fee.amount_float,session_id=session_id)
+                             frais_port=delivery_fee.amount_float,session_id=session_id,metal='g')
             session.add(coin)
             session.commit()
 

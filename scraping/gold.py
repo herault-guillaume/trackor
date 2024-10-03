@@ -59,7 +59,7 @@ def get_price_for(session, session_id,buy_price):
                                          coin_name_to_map[name]])) * 100.0 / (buy_price * poids_pieces_or[coin_name_to_map[name]]),
 
                                      frais_port=30.0,
-                                     session_id=session_id)
+                                     session_id=session_id,metal='g')
                     session.add(coin)
                     session.commit()
 

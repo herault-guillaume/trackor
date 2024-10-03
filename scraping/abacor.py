@@ -18,23 +18,33 @@ def get_price_for(session,session_id,buy_price):
     """
     print("https://www.abacor.fr/")
 
-    urls = {
-        "20 dollars or liberté": "https://www.abacor.fr/produit/test-20-dollars-us/",
-        "20 francs or coq marianne": "https://www.abacor.fr/produit/piece-dor-20-francs-coq-marianne/",
-        "20 francs or napoléon III": "https://www.abacor.fr/produit/piece-d-or-20-francs-napoleon/",
-        "20 francs or helvetia suisse": "https://www.abacor.fr/produit/piece-d-or-20-francs-suisse/",
-        "20 francs or union latine léopold II": "https://www.abacor.fr/produit/test-union-latine/",
-        "10 dollars or liberté": "https://www.abacor.fr/produit/piece-d-or-10-dollars-liberty/",
-        "10 dollars or tête indien": "https://www.abacor.fr/produit/piece-d-or-10-dollars-tete-d-indien/",
-        "50 pesos or": "https://www.abacor.fr/produit/piece-d-or-50-pesos/",
-        "1 oz krugerrand": "https://www.abacor.fr/produit/piece-d-or-krugerrand/",
-        "10 francs or napoléon III": "https://www.abacor.fr/produit/piece-d-or-10-francs-napoleon/",
-        "20 francs or tunisie": "https://www.abacor.fr/produit/piece-d-or-20-francs-tunisie/",
-        "souverain or elizabeth II": "https://www.abacor.fr/produit/piece-d-or-souverain-elizabeth-ii/",
-        "souverain or georges V": "https://www.abacor.fr/produit/piece-d-or-souverain/",
-        "5 dollars or liberté": "https://www.abacor.fr/produit/test-5-dollars-us/",
-        "10 florins or wilhelmina": "https://www.abacor.fr/produit/piece-d-or-10-florins/",
-        "20 francs or tunisie": "https://www.abacor.fr/produit/piece-d-or-20-francs-tunisie/",
+    urls = ['https://www.abacor.fr/boutique-achat-vente/','https://www.abacor.fr/boutique-achat-vente/page/2/']
+
+    coin_to_name = {
+        'Lingot d’Or 1 Kg': 'Lingot or 1 kg LBMA',
+        'Lingot Or 500 Gr': 'Lingot or 500 g LBMA',
+        'Lingot Or 250 Gr': 'Lingot or 250 g LBMA',
+        'Lingot Or 100 Gr': 'Lingot or 100 g LBMA',
+        'Lingotin Or 50 Gr': 'Lingot or 50 g LBMA',
+        'Lingot Or Once 31.1 Gr': '1 oz',
+        'Lingotin Or 20 Gr': 'Lingot or 20 g LBMA',
+        'Lingotin Or 10 Gr': 'Lingot or 10 g LBMA',
+        'Lingotin Or 5 Gr': 'Lingot or 5 g LBMA',
+        'Pièce d’Or 20 Francs Coq Marianne': '20 francs or coq marianne',
+        'Pièce d’Or 20 Francs Napoléon / Louis d’Or': '20 francs or napoléon empereur', # Or '20 francs or louis XVIII buste nu' depending on the coin
+        'Pièce d’Or 20 Francs Suisse': '20 francs or helvetia suisse',
+        'Union Latine Or': '20 francs or union latine léopold II',
+        'Pièce d’Or Souverain': 'souverain or',
+        'Pièce d’Or 20 Dollars US': '20 dollars or liberté',  # Or '20 dollars or st gaudens' depending on the coin
+        'Pièce d’Or 10 Dollars Liberty': '10 dollars or liberté',
+        'Pièce d’Or 10 Dollars Tête d’Indien': '10 dollars or tête indien',
+        'Pièce d’Or 50 Pesos Mexicain': '50 pesos or',
+        'Pièce d’Or 10 Florins – 10 Gulden': '10 florins or wilhelmina', # Or '10 florins or willem III' depending on the coin
+        'Pièce d’Or Krugerrand': '1 oz krugerrand',
+        'Pièce d’Or 10 Francs Napoléon': '10 francs or napoléon III', # Or '10 francs or napoléon III lauré' depending on the coin
+        'Pièce d’Or 20 Francs Tunisie': '20 francs or tunisie',
+        'Pièce d’Or Souverain Elizabeth II': 'souverain or elizabeth II',
+        'Pièce d’Or 5 Dollars US': '5 dollars or liberté',  # Or '5 dollars or tête indien' depending on the coin
     }
 
 
@@ -42,43 +52,38 @@ def get_price_for(session,session_id,buy_price):
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
 
     }
-    for coin_name, url in urls.items() :
+    for url in urls :
         try:
             response = requests.get(url, headers=headers)
             response.raise_for_status()
 
             soup = BeautifulSoup(response.content, 'html.parser')
 
+            tableau = soup.find('ul',class_='products columns-4')
+            products = tableau.find_all('li')
+            for p in products:
 
-            # Use a more specific CSS selector to target the price element
-            price_elements = soup.select('span.woocommerce-Price-amount.amount bdi')  # Find the <bdi> element within the <span>
+                product_name = p.find('h2').text
+                source = p.find('a')['href']
+                # Use a more specific CSS selector to target the price element
+                price_elements = p.find('span',class_='price')  # Find the <bdi> element within the <span>
+                solde = price_elements.find('ins')
+                if solde:
+                    price = Price.fromstring(solde.text)
+                else:
+                    price = Price.fromstring(price_elements.text)
+                print(product_name,price)
 
-            if price_elements:
-                # Clean the price text
-                try:
-                    if len(price_elements) == 3:
-                        #en cas de reduction
-                        price_text = price_elements[2].text.strip()
-                    else:
-                        price_text = price_elements[1].text.strip()
-                    price = Price.fromstring(price_text)
-                    print(coin_name,price)
-                    coin = CoinPrice(nom=coin_name,
-                                     j_achete=price.amount_float,
-                                     frais_port=get_delivery_price(price.amount_float),
-                                     prime_achat_perso=((price.amount_float+get_delivery_price(price.amount_float))-(buy_price*poids_pieces_or[coin_name]))*100.0/(buy_price*poids_pieces_or[coin_name]),
-                                     source=url,session_id=session_id)
-                    session.add(coin)
-                    session.commit()
+                coin = CoinPrice(nom=coin_to_name[product_name],
+                                 j_achete=price.amount_float,
+                                 frais_port=get_delivery_price(price.amount_float),
+                                 prime_achat_perso=((price.amount_float+get_delivery_price(price.amount_float))-(buy_price*poids_pieces_or[coin_to_name[product_name]]))*100.0/(buy_price*poids_pieces_or[coin_to_name[product_name]]),
+                                 source=source,session_id=session_id,metal='g')
+                session.add(coin)
+                session.commit()
 
-                except (ValueError, IndexError) as e:
-                    print(f"Failed to parse price: {e}",url)
-                    print(traceback.format_exc())
-            else:
-                print("Price element not found on page.")
-
-        except requests.RequestException as e:
-            print(f"Error making request to {url}: {e}",url)
+        except Exception as e:
+            print(e)
             print(traceback.format_exc())
 
     return None  # Return None on failure

@@ -40,6 +40,16 @@ coin_name = {
     "Pièce d'or 5 dollars Liberty": "5 dollars or liberté",
     "Pièce d'or 2.5 dollars Indien": "2.5 dollars or tête indien",
     "Pièce d'or 2.5 dollars Liberty": "2.5 dollars or liberté",
+    "Pièce d'or 1/2 demi once": "1/2 oz",
+    "Pièce d'or 1 dixième d'once 1/10": "1/10 oz",
+    "Pièce d'or Souverain Livre ancienne": "souverain or",
+    "Pièce d'or Tientjes 10 Gulden": "10 florins or wilhelmina",
+    "Pièce d'or Britannia 1 once": "1 oz britannia",
+    "100 Piastres Turc": "100 piastres or turc",
+    "2,5 Pesos Mexicains": "2 1/2 pesos or",
+    "2,5 Pesos Mexicains": "2 1/2 pesos or",
+    "Pièce d'or 20 dollars St Gaudens": '20 dollars or st gaudens',
+    "2.5 dollars or liberté": '2.5 dollars or tête liberté',
 }
 
 #https://www.goldforex.be/fr/content/1-livraison
@@ -85,7 +95,7 @@ def get_price_for(session,session_id,buy_price):
                                          buy_price * poids_pieces_or[coin_name[coin_label]])) * 100.0 / (buy_price * poids_pieces_or[
                                                    coin_name[coin_label]]),
 
-                             frais_port=35.0,session_id=session_id)
+                             frais_port=35.0,session_id=session_id,metal='g')
             session.add(coin)
             session.commit()
         except Exception as e:
