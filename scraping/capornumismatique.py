@@ -13,8 +13,8 @@ coin_mapping_name = {'20 Francs Marianne Coq': '20 francs or coq marianne',
  '10 Francs Napoleon': '10 francs or napoléon III',
  'Krugerrand': '1 oz krugerrand',
  'Souverain': 'souverain or elizabeth II',
- '1/2 Souverain': '1/2 souverain georges V',
- '20 Francs Union Latine': '20 francs or union latine léopold II',
+ '1/2 Souverain': '1/2 souverain or georges V',
+ '20 Francs Union Latine': '20 francs or union latine',
  '20 Francs Croix Suisse': '20 francs or vreneli croix suisse',
  '20 Dollars': '20 dollars or liberté',
  '10 Dollars': '10 dollars or liberté',
@@ -79,7 +79,7 @@ def get_price_for(session,session_id,buy_price):
             product_name = product_name_link.text.strip()
             url = product_name_link['href']
             #print(product_name)
-            print(coin_mapping_name[product_name], price)
+            print(price,coin_mapping_name[product_name],'https://capornumismatique.com'+url)
 
             if price:
 

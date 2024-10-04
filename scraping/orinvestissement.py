@@ -10,7 +10,7 @@ coin_name = {
     "Pièce Or 20 Francs Suisse": '20 francs or vreneli croix suisse',  # Assuming "Suisse" refers to the Vreneli coin
     "Pièce Or 10 Dollars US": '10 dollars or liberté',  # Assuming "Liberté" is the most common 10 dollar US gold coin
     "Pièce Or 20 Dollars US": '20 dollars or liberté',  # Similar assumption as above
-    "Pièce Or Union Latine": '20 francs or union latine léopold II',  # Assuming the most common Union Latine coin
+    "Pièce Or Union Latine": '20 francs or union latine',  # Assuming the most common Union Latine coin
     "Pièce Or 50 Pesos": '50 pesos or',
     "Pièce Or Souverain": 'souverain or elizabeth II',  # Assuming the most recent monarch
     "Pièce Or Krugerrand": '1 oz krugerrand',
@@ -49,7 +49,7 @@ def get_price_for(session,session_id,buy_price):
 
             name = name_title.text.strip()
 
-            print(name,price)
+            print(price,coin_name[name],url)
 
             #price = float(price_text.replace('€', '').replace(',', '.'))
             coin = CoinPrice(nom=coin_name[name],

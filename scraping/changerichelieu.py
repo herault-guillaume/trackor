@@ -7,9 +7,9 @@ import traceback
 coin_mapping = {
     "20 Francs Napoléon": "20 francs or fr",
     "20 Francs Suisse": "20 francs or vreneli croix suisse",
-    "Union Latine": "20 francs or union latine léopold II",
+    "Union Latine": "20 francs or union latine",
     "Souverain": "souverain or elizabeth II",
-    "Demi Souverain": "1/2 souverain georges V",
+    "Demi Souverain": "1/2 souverain or georges V",
     "50 Pesos": "50 pesos or",
     "10 Francs Napoléon": "10 francs or napoléon III",
     "Krugerrand": "1 oz krugerrand",
@@ -67,7 +67,7 @@ def get_price_for(session,session_id,buy_price):
             product_name_element = div.find('a', class_='product-name product_name_grand')
             product_name = product_name_element.text.strip()
 
-            print(product_name,price)
+            print(price,coin_mapping[product_name], url)
             # Clean the price text
             #price = float(price_text.replace('€', '').replace(',', '.').replace('net',''))
             coin = CoinPrice(nom=coin_mapping[product_name],

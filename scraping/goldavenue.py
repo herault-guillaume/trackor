@@ -63,7 +63,7 @@ def get_price_delivery_for(session,session_id,buy_price):
             span_element = delivery_elements[1].find_element(By.XPATH, ".//span[@font-style='italic']")
             delivery_fee = Price.fromstring(span_element.text)
 
-            print(coin_name,price)
+            print(price,coin_name,url)
             coin = CoinPrice(nom=coin_name,
                              j_achete=price.amount_float,
                              source=url,

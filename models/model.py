@@ -102,8 +102,9 @@ poids_pieces_or  = {
                         '1/2 oz american eagle 2024': 15.552,  # -> CPor
                         '1/2 oz britannia 2024': 15.552,
                         '1/2 oz philharmonique 2024': 15.552,
-                        '1/2 souverain georges V': 3.661, # -> CPor
-                        '1/2 souverain victoria': 3.661, # -> CPor
+                        '1/2 souverain or': 3.661, # -> CPor
+                        '1/2 souverain or georges V': 3.661, # -> CPor
+                        '1/2 souverain or victoria': 3.661, # -> CPor
                         '1/10 oz koala 2023': 3.11, # -> CPor
                         '1/20 oz': 1.55,
                         '1/20 oz nugget / kangourou': 1.55,
@@ -131,10 +132,11 @@ poids_pieces_or  = {
                         "1/4 oz lion d'angleterre tudor beasts 2022": 7.776,
                         '10 couronnes or françois joseph I': 3.096,
                         '10 dollars or liberté': 15.047,
-                        'eagle americain or 10 dollars tete liberte': 15.047,
                         '10 dollars or tête indien': 15.047,
+                        '10 florins or': 6.056, # -> CPor
                         '10 florins or wilhelmina': 6.056, # -> CPor
                         '10 florins or willem III': 6.056, # -> CPor
+                        '10 francs or': 2.903, # -> CPor
                         '10 francs or coq marianne': 2.903, # -> CPor
                         '10 francs or cérès 1850-1851': 2.903,
                         '10 francs or napoléon III': 2.903,
@@ -145,21 +147,26 @@ poids_pieces_or  = {
                         '100 couronnes or françois joseph I': 30.483,
                         '100 francs or napoléon III tête nue': 29.02,
                         '100 francs or napoléon III tête lauré': 29.02,
-                        '100 francs or génie': 29.02,
+                        '100 francs or génie DPF': 29.02,
+                        '100 francs or génie LEF': 29.02,
                         '100 piastres or': 6.61,
                         '2 1/2 pesos or': 1.872,
                         '2 pesos or': 1.494,
                         '20 couronnes or françois joseph I': 6.093,
+                        '20 dollars or': 30.096, # -> CPor
                         '20 dollars or tete indien': 30.096, # -> CPor
                         '20 dollars or liberté': 30.096, # -> CPor
                         '20 dollars or st gaudens': 30.096, # -> CPor
                         '20 francs or fr': 5.805, # -> CPor
                         '20 francs or': 5.805, # -> CPor
                         '20 francs or coq marianne': 5.805, # -> CPor
+                        '20 francs or coq marianne refrappe pinay': 5.805, # -> CPor
                         '20 francs or cérès': 5.805, # -> CPor
                         '20 francs or génie debout': 5.805,
                         '20 francs or helvetia suisse': 5.805, # -> CPor
                         '20 francs or leopold I': 5.805, # -> CPor
+                        '20 francs or leopold II': 5.805, # -> CPor
+                        '20 francs or albert I': 5.805, # -> CPor
                         '20 francs or louis XVIII buste nu': 5.805, # -> CPor
                         '20 francs or charles X': 5.805, # -> CPor
                         '20 francs or louis XVIII buste habillé': 5.805, # -> CPor
@@ -169,7 +176,7 @@ poids_pieces_or  = {
                         '20 francs or louis-napoléon bonaparte': 5.805, # -> CPor
                         '20 francs or napoléon III': 5.805, # -> CPor
                         '20 francs or tunisie': 5.805, # -> CPor
-                        '20 francs or union latine léopold II': 5.805, # -> CPor
+                        '20 francs or union latine': 5.805, # -> CPor
                         '20 francs or vreneli croix suisse': 5.805, # -> CPor
                         '20 francs or louis philippe I nu': 5.805, # -> CPor
                         '20 lire or umberto I': 5.805,
@@ -180,10 +187,10 @@ poids_pieces_or  = {
                         '4 florins 10 francs 1892 refrappe': 2.9,
                         '40 francs or napoléon empereur lauré': 11.61,
                         '40 francs or napoléon empereur non lauré': 11.61,
+                        '40 francs or napoléon premier consul': 11.61,
                         '40 francs or louis XVIII': 11.61,
                         '40 francs or louis philippe': 11.61,
                         '40 francs or charles X': 11.61,
-                        '40 francs or louis philippe': 11.61,
                         '40 francs or louis philippe': 11.61,
                         '5 dollars or liberté': 7.523, # -> CPor
                         '5 dollars or tête indien': 7.523, # -> CPor

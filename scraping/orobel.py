@@ -19,13 +19,13 @@ coin_name = {
     #"Swiss Bullion 1+ (1 Oz 999,9 ‰)": 'Lingot or 1 once LBMA',
     "Maple Leaf": '1 oz maple leaf',
     "Australian Nugget": '1 oz nugget / kangourou',
-    "Louis Belge": '20 francs or union latine léopold II',
+    "Louis Belge": '20 francs or union latine',
     "Souverain": 'souverain or elizabeth II',
     #"Souverain Or 2023 – Roi Charles": 'souverain or elizabeth II',
     "50 Pesos Mexique": '50 pesos or',
     "American Buffalo": '1 oz buffalo',
     "50 dollars eagle": '1 oz american eagle',
-    "Demi-souverain": '1/2 souverain georges V',
+    "Demi-souverain": '1/2 souverain or georges V',
     "4 Ducats": '4 ducats or',
     "20 Dollars Eagle (US)": '20 dollars or liberté',
     "50 ECU": '50 écus or charles quint',
@@ -100,7 +100,7 @@ def get_price_for(session, session_id,buy_price):
                 url = name_title.find_element(By.TAG_NAME, 'a').get_attribute('href')
                 name = name_title.text.strip()
 
-                print(name,price)
+                print(price,coin_name[name],url)
 
                 # Check if the name is in your coin_name dictionary
                 if name in coin_name:
@@ -111,8 +111,7 @@ def get_price_for(session, session_id,buy_price):
                         prime_achat_perso=((price.amount_float + get_delivery_price(price.amount_float)) - (
                                 buy_price * poids_pieces_or[coin_name[name]])) * 100.0 / (buy_price * poids_pieces_or[coin_name[name]]),
                         frais_port=get_delivery_price(price.amount_float),
-                        session_id=session_id,metal='g'
-                    )
+                        session_id=session_id,metal='g')
                     session.add(coin)
                     session.commit()
 

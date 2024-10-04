@@ -40,7 +40,7 @@ unique_coins =  ['20 francs or coq marianne',
                  '20 francs or napoléon III',
                  '20 dollars or liberté',
                  '20 francs or helvetia suisse',
-                 '20 francs or union latine léopold II',
+                 '20 francs or union latine',
                  '10 dollars or liberté',
                  '10 dollars or tête indien',
                  ]

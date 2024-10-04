@@ -19,7 +19,7 @@ urls = {
     "https://monlingot.fr/or/achat-lingotin-1-onces-311-gr": 'Lingot or 1 once LBMA',
     "https://monlingot.fr/or/achat-lingotin-or-50-grammes": 'Lingot or 50 g LBMA',
     "https://monlingot.fr/or/achat-piece-or-5-dollars-us": '5 dollars or liberté',
-    "https://monlingot.fr/or/achat-piece-or-demi-souverain": '1/2 souverain georges V',  # Assuming Georges V based on your data
+    "https://monlingot.fr/or/achat-piece-or-demi-souverain": '1/2 souverain or georges V',  # Assuming Georges V based on your data
     "https://monlingot.fr/pieces-or-modernes/nugget-1-once-d-or": '1 oz nugget / kangourou',
     "https://monlingot.fr/or/achat-lingotin-or-100-grammes": 'Lingot or 100 g LBMA',
     "https://monlingot.fr/or/achat-piece-or-50-pesos": '50 pesos or',
@@ -29,7 +29,7 @@ urls = {
     "https://monlingot.fr/or/achat-lingot-or-250-grammes": 'Lingot or 250 g LBMA',
     "https://monlingot.fr/pieces-or/Piece-investissement-Or-20-Reichsmark": '20 mark or wilhelm II',
     "https://monlingot.fr/pieces-or/10-florins-or": '10 florins or wilhelmina',  # Assuming Wilhelmina based on your data
-    "https://monlingot.fr/pieces-or/Piece-investissement-Or-Union-Latine": '20 francs or union latine léopold II',
+    "https://monlingot.fr/pieces-or/Piece-investissement-Or-Union-Latine": '20 francs or union latine',
     "https://monlingot.fr/or/achat-piece-or-20-francs-suisse": '20 francs or helvetia suisse',
     "https://monlingot.fr/or/achat-piece-or-krugerrand-1-once": '1 oz krugerrand',
     "https://monlingot.fr/or/achat-piece-or-20-francs-coq-marianne": '20 francs or coq marianne',
@@ -76,7 +76,7 @@ def get_price_for(session,session_id,buy_price):
             second_td = td_elements[1]
 
             price = Price.fromstring(second_td.text)
-            print(coin_name,price)
+            print(price,coin_name,url)
 
             #price = float(price_text.replace('€', '').replace(',', '.').replace(' ', '').replace('\xa0NET',''))
 

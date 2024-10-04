@@ -12,11 +12,11 @@ coin_name = {
     "4 Florins / 10 Francs – Franz Joseph | Or": "4 florins 10 francs 1892 refrappe",
     "1 Ducat – Autriche | Or": "1 ducat or",
     "40 Francs – Charles X | Or": "40 francs or charles X",  # This key doesn't exist, handle later
-    "1/2 Souverain – Victoria (veuve) | Or": "1/2 souverain victoria",
+    "1/2 Souverain – Victoria (veuve) | Or": "1/2 souverain or victoria",
     "5 Roubles – Nicolas II | Or": "5 roubles or",  # This key doesn't exist, handle later
     "40 Francs – Louis Philippe | Or": "40 francs or louis philippe",  # This key doesn't exist, handle later
     "4 Ducats – Autriche | Or": "4 ducats or",
-    "1/2 souverain – Edouard VII | Or": "1/2 souverain georges V",  # Assuming typo, should be George V
+    "1/2 souverain – Edouard VII | Or": "1/2 souverain or georges V",  # Assuming typo, should be George V
     "10 Lire – Vittorio Emanuele | Or": "20 lire or vittorio emanuele II",  # Assuming it's a 20 Lire coin, clarify if needed
     "5 Roubles – Alexandre III | Or": "5 roubles or",  # This key doesn't exist, handle later
     "20 Francs – Génie | Or": "20 francs or génie debout",
@@ -26,7 +26,7 @@ coin_name = {
     "20 Lire – Umberto I | Or": "20 lire or umberto I",
     "40 Francs – Louis XVIII | Or": "40 francs or louis XVIII",  # This key doesn't exist, handle later
     "100 Francs – Napoléon tête nue | Or": "100 francs or napoléon III tête nue",
-    "1/2 Souverain – Victoria (jubilé) | Or": '1/2 souverain victoria',
+    "1/2 Souverain – Victoria (jubilé) | Or": '1/2 souverain or victoria',
     "40 Francs – Napoléon tête laurée | Or": "40 francs or napoléon empereur lauré",
     "10 Francs France – Cérès | Or": "10 francs or cérès 1850-1851",
     "40 Francs – Napoléon Empereur An 13 | Or": "40 francs or napoléon empereur lauré",  # This key doesn't exist, handle later
@@ -43,11 +43,11 @@ coin_name = {
     "Lingotin 31,1 g | Or": "Lingot or 1 once LBMA",
     "Souverain George V | Or": "souverain or georges V",
     "Souverain Elisabeth | Or": "souverain or elizabeth II",
-    "Demi Souverain | Or": "1/2 souverain georges V",
+    "Demi Souverain | Or": "1/2 souverain or georges V",
     "Lingotin 50 g | Or": "Lingot or 50 g LBMA",
     "Lingotin 100 g | Or": "Lingot or 100 g LBMA",
     "Lingot 250 g | Or": "Lingot or 250 g LBMA",
-    "Union Latine | Or": "20 francs or union latine léopold II",
+    "Union Latine | Or": "20 francs or union latine",
     "Reichmark | Or": "20 mark or wilhelm II",
     "10 Florins | Or": "10 florins or wilhelmina",  # Assuming Wilhelmina, clarify if needed
     "Lingotin 500 g | Or": "Lingot or 500 g LBMA",
@@ -108,7 +108,7 @@ def get_price_for(session,session_id,buy_price):
             # Extract price (assuming you want the "sell" price)
             price_span = div.find('span', class_='woocommerce-Price-amount amount')
             price = Price.fromstring(price_span.text)
-            print(coin_name,price)
+            print(price,coin_name[coin_label],url)
             #price = float(price_text.replace('€', '').replace(',', '.'))
             coin = CoinPrice(nom=coin_name[coin_label],
                              j_achete=price.amount_float,

@@ -19,15 +19,24 @@ def get_price_for(session,session_id,buy_price):
         '10 francs or cérès 1850-1851': ["https://www.aucoffre.com/recherche/metal-1/marketing_list-5/stype-7/produit","demi-napoleon-10f-ceres"],
         '10 francs or coq marianne': ["https://www.aucoffre.com/recherche/metal-1/marketing_list-5/stype-7/produit","demi-napoleon-10f-marianne-coq"],
         '10 francs or napoléon III': ["https://www.aucoffre.com/recherche/metal-1/marketing_list-5/stype-7/produit","demi-napoleon-10f-napoleon-iii"],
-        '40 francs or napoléon empereur lauré': ["https://www.aucoffre.com/recherche/metal-1/marketing_list-5/stype-11/produit","napoleon-40f"],
-        '50 francs or napoléon III tête nue': ["https://www.aucoffre.com/recherche/marketing_list-5/stype-12/produit","napoleon-50f"],
-        '100 francs or napoléon III tête nue': ["https://www.aucoffre.com/recherche/marketing_list-5/stype-13/produit","napoleon-100f"],
+        '40 francs or charles X': ["https://www.aucoffre.com/recherche/metal-1/marketing_list-5/stype-11/produit","napoleon-40f-charles-x-2eme"],
+        '40 francs or napoléon empereur lauré': ["https://www.aucoffre.com/recherche/metal-1/marketing_list-5/stype-11/produit","napoleon-40f-napoleon-ier-tete-lauree"],
+        '40 francs or louis philippe': ["https://www.aucoffre.com/recherche/metal-1/marketing_list-5/stype-11/produit","napoleon-40f-louis-philippe"],
+        '40 francs or napoléon premier consul': ["https://www.aucoffre.com/recherche/metal-1/marketing_list-5/stype-11/produit","napoleon-40f-bonaparte-premier-consul"],
+        '40 francs or louis XVIII': ["https://www.aucoffre.com/recherche/metal-1/marketing_list-5/stype-11/produit","napoleon-40f-louis-xviii"],
+        '40 francs or napoléon empereur non lauré': ["https://www.aucoffre.com/recherche/metal-1/marketing_list-5/stype-11/produit","napoleon-40f-napoleon-1er-tete-nue-"],
+        '50 francs or napoléon III tête nue': ["https://www.aucoffre.com/recherche/marketing_list-5/stype-12/produit","apoleon-50f-napoleon-iii-tete-nue"],
+        '50 francs or napoléon III tête laurée': ["https://www.aucoffre.com/recherche/marketing_list-5/stype-12/produit","napoleon-50f-napoleon-iii-tete-lauree"],
+        '100 francs or napoléon III tête nue': ["https://www.aucoffre.com/recherche/marketing_list-5/stype-13/produit","napoleon-100f-napoleon-iii-tete-nue"],
+        '100 francs or napoléon III tête laurée': ["https://www.aucoffre.com/recherche/marketing_list-5/stype-13/produit", "napoleon-100f-napoleon-iii-tete-lauree"],
+        '100 francs or génie LEF': ["https://www.aucoffre.com/recherche/marketing_list-5/stype-13/produit","napoleon-100f-genie-iiieme-republique-lef"],
+        '100 francs or génie DPF': ["https://www.aucoffre.com/recherche/marketing_list-5/stype-13/produit","napoleon-100f-genie-iiieme-republique-dpf"],
         '20 francs or vreneli croix suisse': ["https://www.aucoffre.com/recherche/marketing_list-6/stype-180/produit","20-francs-suisse-vreneli"],
-        '20 francs or union latine léopold II': ["https://www.aucoffre.com/recherche/stype-51/produit","union-latine"],
+        '20 francs or union latine': ["https://www.aucoffre.com/recherche/stype-51/produit","union-latine"],
         '20 dollars or liberté': ["https://www.aucoffre.com/recherche/metal-1/marketing_list-9/stype-8/produit","20-dollars-us-double-eagle-liberty"],
         '10 dollars or liberté': ["https://www.aucoffre.com/recherche/metal-1/marketing_list-9/stype-56/produit","10-dollars-us-liberty"],
         'souverain or georges V': ["https://www.aucoffre.com/recherche/marketing_list-8/stype-3/produit","souverain-george-v"],
-        '1/2 souverain georges V': ["https://www.aucoffre.com/recherche/marketing_list-8/stype-16/produit","demi-souverain"],
+        '1/2 souverain or georges V': ["https://www.aucoffre.com/recherche/marketing_list-8/stype-16/produit","demi-souverain"],
         'souverain or elizabeth II': ["https://www.aucoffre.com/recherche/marketing_list-8/stype-6/produit","souverain-elisabeth-ii"],
         'souverain or victoria jubilee': ["https://www.aucoffre.com/recherche/marketing_list-8/stype-3/produit","souverain-victoria-jubilee"],
         '20 mark or wilhelm II': ["https://www.aucoffre.com/recherche/stype-73/produit","20-mark-allemand-wilhelm-ii"],
@@ -61,47 +70,53 @@ def get_price_for(session,session_id,buy_price):
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
     }
     for coin_name, url in urls.items():
-        try:
-            response = requests.get(url[0], headers=headers)
-            response.raise_for_status()  # Raise an exception for HTTP errors
+        flag_one_find = False
+        for p in ['/page={page}'.format(page=page) for page in range(1,5)]:
+            try:
+                response = requests.get(url[0]+p, headers=headers)
+                response.raise_for_status()  # Raise an exception for HTTP errors
 
-            soup = BeautifulSoup(response.content,'html.parser')
+                soup = BeautifulSoup(response.content,'html.parser')
 
-            # Use a more specific selector to avoid accidental matches
-            elements = soup.select("div[data-url*='{coin_name}']".format(coin_name=url[1]))
+                # Use a more specific selector to avoid accidental matches
+                elements = soup.select("div[data-url*='{coin_name}']".format(coin_name=url[1]))
 
-            for element in elements :
-                element_location = element.find("dl","dl-horizontal dl-left dl-small mb-0")
+                for element in elements :
+                    element_location = element.find("dl","dl-horizontal dl-left dl-small mb-0")
 
-                img_tag = element_location.find('img')
+                    img_tag = element_location.find('img')
 
-                if not img_tag['title'] == 'Localisation France (FR)' :
-                    continue
+                    if not img_tag['title'] == 'Localisation France (FR)' :
+                        continue
 
-                price_element = element.select_one("div[data-url*='{coin_name}'] .text-xlarge.text-bolder.m-0.text-nowrap".format(coin_name=url[1]))
+                    price_element = element.select_one("div[data-url*='{coin_name}'] .text-xlarge.text-bolder.m-0.text-nowrap".format(coin_name=url[1]))
 
-                if price_element :
+                    if price_element :
 
-                    price_text = price_element.text.strip()
+                        price_text = price_element.text.strip()
 
-                    price = Price.fromstring(price_text)
-                    print(price,url)
-                    # More robust price cleaning: handle variations in formatting
-                    #price = float(price_text.replace('€', '').replace(' ', '').replace(',', '.'))
+                        price = Price.fromstring(price_text)
+                        print(price,coin_name,url)
+                        # More robust price cleaning: handle variations in formatting
+                        #price = float(price_text.replace('€', '').replace(' ', '').replace(',', '.'))
 
-                    coin = CoinPrice(nom=coin_name,
-                                     j_achete=price.amount_float,
-                                     source=url[0],
-                                     prime_achat_perso=((price.amount_float + 15.0) - (buy_price * poids_pieces_or[
-                                         coin_name])) * 100.0 / (buy_price * poids_pieces_or[coin_name]),
+                        coin = CoinPrice(nom=coin_name,
+                                         j_achete=price.amount_float,
+                                         source=url[0],
+                                         prime_achat_perso=((price.amount_float + 15.0) - (buy_price * poids_pieces_or[
+                                             coin_name])) * 100.0 / (buy_price * poids_pieces_or[coin_name]),
 
-                                     frais_port=15.0,session_id=session_id,metal='g')
-                    session.add(coin)
-                    session.commit()
+                                         frais_port=15.0,session_id=session_id,metal='g')
+                        session.add(coin)
+                        session.commit()
 
-                else:
-                    print("Price element not found on page.", url)
+                    else:
+                        print("Price element not found on page.", url)
+                    break
+                    flag_one_find = True
+            if flag_one_find:
                 break
-        except (requests.exceptions.RequestException, ValueError) as e:
-            print(f"Error retrieving or parsing price: {e}",url)
-            print(traceback.format_exc())
+            except (requests.exceptions.RequestException, ValueError) as e:
+                print(f"Error retrieving or parsing price: {e}",url)
+                print(traceback.format_exc())
+                pass

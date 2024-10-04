@@ -26,7 +26,7 @@ coin_name = {
     "Pièce d'or 1 dixième d'once Krugerrand": "1/10 oz krugerrand",
     "Pièce d'or 50 écus": "50 écus or charles quint",
     "Pièce d'or Vreneli 20 francs suisse": "20 francs or vreneli croix suisse",
-    "Pièce d'or Leopold II 20 francs": "20 francs or union latine léopold II",  # Assuming Leopold II is part of the Latin Monetary Union
+    "Pièce d'or Leopold II 20 francs": "20 francs or union latine",  # Assuming Leopold II is part of the Latin Monetary Union
     "Pièce d'or Souverain Nouveau Elisabeth 2": "souverain or elizabeth II",
     "Pièce d'or 50 pesos mexicain": "50 pesos or",
     "1 Ducat Autriche": "1 ducat or",
@@ -86,7 +86,7 @@ def get_price_for(session,session_id,buy_price):
             price = Price.fromstring(price_span.text)
 
 
-            print(price,coin_label)
+            print(coin_label,price,url)
             #price = float(price_text.replace('€', '').replace(',', '.'))
             coin = CoinPrice(nom=coin_name[coin_label],
                              j_achete=price.amount_float,

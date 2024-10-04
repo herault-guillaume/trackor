@@ -54,7 +54,7 @@ coin_name = {
     #'Krugerrand 1/10 OZ or 2024': '1/10 oz krugerrand',
     ##'Krugerrand 1/4 OZ or 2024': '1/4 oz krugerrand',
     #'Brittannia 1/4 oz or 2024': '1/4 oz krugerrand',
-    "1/2 Souverain d'or / Livre diverses années": '1/2 souverain georges V',
+    "1/2 Souverain d'or / Livre diverses années": '1/2 souverain or georges V',
 }
 
 # def get_delivery_price(url="https://www.shop-comptoirdelor.be/info/livraison"):
@@ -133,7 +133,7 @@ def get_price_for(session, session_id,buy_price):
                     url = name_title.get_attribute('href')
                     name = name_title.text.strip()
 
-                    print(name)
+                    print(price,coin_name[name],url)
 
                     #Check if the name is in your coin_name dictionary
                     if name in coin_name:
@@ -145,8 +145,7 @@ def get_price_for(session, session_id,buy_price):
                                     buy_price * poids_pieces_or[coin_name[name]])) * 100.0 / (buy_price *
                                               poids_pieces_or[coin_name[name]]),
                             frais_port=24.95,
-                            session_id=session_id,metal='g'
-                        )
+                            session_id=session_id,metal='g')
                         session.add(coin)
                         session.commit()
 

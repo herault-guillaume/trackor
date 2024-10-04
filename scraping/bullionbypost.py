@@ -42,7 +42,7 @@ urls = {
     "1/10 oz nugget / kangourou": "https://www.bullionbypost.fr/pieces-or/pieces-or-dixieme-once/australian-gold-nugget-tenth-ounce/",
     "20 dollars or liberté": "https://www.bullionbypost.fr/pieces-or/1-once-piece-or-eagle-americain/double-eagle-en-or-20-dollars-notre-choix/",
     "souverain or elizabeth II": "https://www.bullionbypost.fr/pieces-or/piece-or-souverain-entiere/piece-or-souverain-meilleure-offre-1/",
-    "1/2 souverain georges V": "https://www.bullionbypost.fr/pieces-or/demi-souverains/demi-souverain-notre-choix/",
+    "1/2 souverain or georges V": "https://www.bullionbypost.fr/pieces-or/demi-souverains/demi-souverain-notre-choix/",
     "8 florins 20 francs or franz joseph I": "https://www.bullionbypost.fr/pieces-du-monde/pieces-autrichiennes/20-Francs-8-Florins-Autriche-en-or/",
     "4 florins 10 francs 1892 refrappe": "https://www.bullionbypost.fr/pieces-du-monde/pieces-autrichiennes/10-Francs-4-Florins-Autriche-en-or/",
     "10 couronnes or françois joseph I": "https://www.bullionbypost.fr/pieces-du-monde/pieces-autrichiennes/10-couronnes-autriche-or/",
@@ -51,7 +51,7 @@ urls = {
     "4 ducats or": "https://www.bullionbypost.fr/pieces-du-monde/pieces-autrichiennes/4-ducats-autriche-or/",
     "1 ducat or": "https://www.bullionbypost.fr/pieces-du-monde/pieces-autrichiennes/1-ducat-autriche-or/",
     "demi-eagle americain or 5 dollars tete liberte": "https://www.bullionbypost.fr/pieces-du-monde/pieces-americaines/demi-eagle-americain-or-5-dollars-tete-liberte-/",
-    "eagle americain or 10 dollars tete liberte": "https://www.bullionbypost.fr/pieces-du-monde/pieces-americaines/eagle-americain-or-10-dollars-tete-liberte/",
+    "10 dollars tete liberte": "https://www.bullionbypost.fr/pieces-du-monde/pieces-americaines/eagle-americain-or-10-dollars-tete-liberte/",
     "10 florins or wilhelmina": "https://www.bullionbypost.fr/pieces-du-monde/pieces-hollandaises/10-florins-neerlandais-notre-choix/",
     "20 mark or wilhelm II": "https://www.bullionbypost.fr/pieces-du-monde/pieces-allemandes/20-mark-allemand-meilleur-rapport-qualite-prix/",
     "20 lire or vittorio emanuele II": "https://www.bullionbypost.fr/pieces-du-monde/pieces-italiennes/20-lires-italiennes-or-emmanuel-II/",
@@ -75,7 +75,7 @@ def get_price_for(session,session_id,buy_price):
             price_text = price_element.text.strip()
             price = Price.fromstring(price_text)
 
-            print(coin_name,price)
+            print(price,coin_name,url)
             try :
                 coin = CoinPrice(nom=coin_name,
                                  j_achete=price.amount_float,

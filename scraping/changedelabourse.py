@@ -16,9 +16,9 @@ coin_mapping_name = {
     "Krugerrand": "1 oz krugerrand",
     "10 Florins": "10 florins or wilhelmina",  # Assuming Wilhelmina reign
     "20 Reichsmarks": "20 mark or wilhelm II",
-    "Union Latine": "20 francs or union latine léopold II",
+    "Union Latine": "20 francs or union latine",
     "20 Francs Tunisie": "20 francs or tunisie",
-    "Demi Souverain": "1/2 souverain georges V",  # Assuming a George V half Sovereign
+    "Demi Souverain": "1/2 souverain or georges V",  # Assuming a George V half Sovereign
     "1 Ducat Francois-Joseph 1915 Or": "1 ducat or"
 }
 def get_delivery_price(price):
@@ -67,7 +67,7 @@ def get_price_for(session,session_id,buy_price):
             product_name = product_name_link.text.strip()
             url = product_name_link['href']
 
-            print(coin_mapping_name[product_name], price)
+            print(price,coin_mapping_name[product_name], url)
 
             if price:
 

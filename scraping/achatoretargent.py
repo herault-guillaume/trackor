@@ -12,25 +12,25 @@ from scraping.changedelabourse import coin_mapping_name
 
 coin_mapping_name = {
     '20 Francs Marianne Coq': '20 francs or coq marianne',
-    '10 Francs Napoléon': '10 francs or napoléon III',
+    '10 Francs Napoléon': '10 francs or',
     '50 Pesos Or': '50 pesos or',
     "Louis d'Or - 20 Francs Or": '20 francs or',
-    '20 Francs Napoléon': '20 francs or napoléon III',
+    '20 Francs Napoléon': '20 francs or',
     'Krugerrand': '1 oz krugerrand',
-    'Souverain': 'souverain or georges V',  # No exact match for "Souverain"
-    'Union Latine': '20 francs or union latine léopold II',
-    '20 Francs Suisse': '20 francs or helvetia suisse',
-    '20 Dollars US': '20 dollars or liberté',
-    '10 Dollars US': '10 dollars or liberté',
+    'Souverain': 'souverain or',  # No exact match for "Souverain"
+    'Union Latine': '20 francs or union latine',
+    '20 Francs Suisse': '20 francs or vreneli croix suisse',
+    '20 Dollars US': '20 dollars or',
+    '10 Dollars US': '20 dollars or liberté',
     '5 Dollars US Or': '5 dollars or liberté',
-    '10 Florins Or': '10 florins or willem III',
+    '10 Florins Or': '10 florins or',
     '20 Reichsmarks': '20 mark or wilhelm II',
     '1 Ducat Or Francois-Joseph 1915': '1 ducat or',
     #'Set 5 pièces 20 Fr Or Marianne Coq': None,  # No exact match
     #'Set 5 Pièces 20 Francs Or': '20 francs or',
     '4 Ducats Or': '4 ducats or',
     '20 Francs Tunisie': '20 francs or tunisie',
-    'Demi Souverain': '1/2 souverain georges V'
+    'Demi Souverain': '1/2 souverain or'
 }
 
 def get_delivery_price(price):
@@ -75,7 +75,7 @@ def get_price_for(session, session_id, buy_price):
 
             product_url_elem = row_soup.find_all('a')
 
-            url = "https://www.achat-or-et-argent.fr" + product_url_elem[1]["href"]
+            source = "https://www.achat-or-et-argent.fr" + product_url_elem[1]["href"]
             # Explicitly wait for the span within the product_url_elem to be visible
             wait.until(EC.presence_of_all_elements_located((By.TAG_NAME, "span")))
 
@@ -102,10 +102,10 @@ def get_price_for(session, session_id, buy_price):
                 row_price = row_soup.find('del', class_="small text-dark").parent
                 price = Price.fromstring(row_price.text)
 
-            print(product_name,price)
+            print(price,coin_mapping_name[product_name],source)
             coin = CoinPrice(nom=coin_mapping_name[product_name],
                              j_achete=price.amount_float,
-                             source=url,
+                             source=source,
                              prime_achat_perso=((price.amount_float + get_delivery_price(price.amount_float)) - (
                                      buy_price * poids_pieces_or[coin_mapping_name[product_name]])) * 100.0 / (buy_price *
                                                                                          poids_pieces_or[

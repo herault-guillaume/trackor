@@ -7,7 +7,7 @@ import traceback
 #frais de livraison via leur calculette en ligne
 coin_name = {
     "Souverain": "souverain or elizabeth II",  # Assuming you want Elizabeth II
-    "Union Latine": "20 francs or union latine léopold II",
+    "Union Latine": "20 francs or union latine",
     "20 Reichsmark": "20 mark or wilhelm II",
     "20 francs Marianne Coq": "20 francs or coq marianne",
     "Krugerrand": "1 oz krugerrand",
@@ -37,7 +37,7 @@ def get_price_for(session,session_id,buy_price):
             name_title = product.find("h2","woocommerce-loop-product__title")
             name = name_title.text
             url = product.find('a')['href']
-            print(name,price)
+            print(price,coin_name[name],url)
             #price = float(price_text.replace('€', '').replace(',', '.'))
 
             # Extract and clean:

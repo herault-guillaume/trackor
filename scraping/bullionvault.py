@@ -54,6 +54,7 @@ def get(session,session_id):
         # Clean the text and convert to a float
         sell_price_eur = float(sell_price_text.split('€')[0].replace('\xa0', '').replace(',', '.').replace(' ',''))/1000.0  # Remove € and nbsp
 
+
         # Create GoldPrice object and add to session
         gold_price = MetalPrice(buy_price=buy_price_eur, sell_price=sell_price_eur, session_id=session_id, metal='g')
         session.add(gold_price)

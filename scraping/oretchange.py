@@ -10,14 +10,14 @@ coin_name = {
     "20 Francs Napoléon Or": '20 francs or napoléon III',
     "Souverain Or Victoria ou Edouard VII ou George V": 'souverain or georges V',
     "20 Francs Suisse Vrénéli ou Confédération": '20 francs or vreneli croix suisse',
-    "20 Francs Union Latine": '20 francs or union latine léopold II',
+    "20 Francs Union Latine": '20 francs or union latine',
     "50 Pesos Mexique": '50 pesos or',
     "Krugerrand Or": '1 oz krugerrand',
     "20 Dollars Or": '20 dollars or liberté',
     "10 Dollars Or Liberté ou Tête d’indien": '10 dollars or liberté',
     "5 Dollars Or Liberté ou Tête d'indien": '5 dollars or liberté',
     "10 Francs Napoléon III": '10 francs or napoléon III',
-    "Demi-souverain Or Victoria, Edouard VII ou George V": '1/2 souverain georges V'
+    "Demi-souverain Or Victoria, Edouard VII ou George V": '1/2 souverain or georges V'
 }
 
 def get_price_for(session,session_id,buy_price):
@@ -55,7 +55,7 @@ def get_price_for(session,session_id,buy_price):
             name = name_title.text.strip()
             url = name_title.find('a')['href']
 
-            print(name,price)
+            print(price,coin_name[name],url)
 
             #price = float(price_text.replace('€', '').replace(',', '.'))
             coin = CoinPrice(nom=coin_name[name],

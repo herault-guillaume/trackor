@@ -9,7 +9,7 @@ coin_to_name = {
     "20 Francs Or Napoléon III": '20 francs or napoléon III',
     "20 Francs Or Génie": '20 francs or génie debout',
     "20 Francs Or Vreneli": '20 francs or vreneli croix suisse',
-    "20 Francs Or Leopold 2": '20 francs or union latine léopold II',
+    "20 Francs Or Leopold 2": '20 francs or union latine',
     "Souverain Or": 'souverain or elizabeth II',  # Assuming you want Elizabeth II
     "Souverain Or Elizabeth II": 'souverain or elizabeth II',
     "Krugerrand Or": '1 oz krugerrand',
@@ -47,7 +47,7 @@ def get_price_for(session,session_id,buy_price):
             name_title = product.find("h3","wd-entities-title")
             name = name_title.text
             url = name_title.find('a')['href']
-            print(name, price)
+            print( price,coin_to_name[name],url)
             #price = float(price_text.replace('€', '').replace(',', '.'))
 
             coin = CoinPrice(nom=coin_to_name[name],

@@ -19,13 +19,13 @@ coin_name_to_map = {
     'Souverain (toutes effigies)': 'souverain or georges V',
     "Elisabeth II": 'souverain or elizabeth II',
     "Demi Napoléon / 10 Frs Napoléon": '10 francs or coq marianne',
-    "Demi Souverain": '1/2 souverain victoria',
+    "Demi Souverain": '1/2 souverain or victoria',
     '20 francs Or (toutes effigies)': '20 francs or',
     'Britannia 1 OZ Or': '1 oz britannia',
     "10 Florins":'10 florins or wilhelmina', # ou '10 florins or willem III'
     "20 Frs Tunisie": '20 francs or tunisie',
     "20 francs Tunisie": '20 francs or tunisie',
-    "Union Latine": '20 francs or union latine léopold II',
+    "Union Latine": '20 francs or union latine',
     "Reichsmark": '20 mark or wilhelm II',
     # non côté
 }
@@ -51,7 +51,7 @@ def get_price_for(session, session_id,buy_price):
                 if name_element and price_element:
                     name = name_element.text.strip()
                     price = Price.fromstring(price_element.text)
-                    print(price,name)
+                    print(price,coin_name_to_map[name],url)
                     coin = CoinPrice(nom=coin_name_to_map[name],
                                      j_achete=price.amount_float,
                                      source=url,

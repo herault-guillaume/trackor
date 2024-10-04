@@ -27,7 +27,7 @@ table_lookup = {
         "20 Fr Or Autriche" : "8 florins 20 francs or franz joseph I",
         "20 Fr Or Belgique" : "20 francs or leopold I",
         "Souverain Or Elizabeth II" : "souverain or elizabeth II",
-        "Demi Souverain Or" : '1/2 souverain georges V',
+        "Demi Souverain Or" : '1/2 souverain or georges V',
         "Souverain Or" : 'souverain or georges V',
         # Elizabeth II 2022 RARE
         # Demi Souverain Elizabeth II 2022
@@ -109,7 +109,7 @@ def get_price_for(session,session_id,buy_price):
                 # Extract the href attribute
                 source = first_a_tag.get_attribute("href")
                 price = Price.fromstring(tr_element[1].find_elements(By.TAG_NAME, 'td')[1].get_attribute('innerHTML'))
-                print(product_name, price)
+                print(price,product_name, source)
                 coin = CoinPrice(nom=product_name,
                                  j_achete=price.amount_float,
                                  source=source,
