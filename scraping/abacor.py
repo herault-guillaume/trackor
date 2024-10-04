@@ -50,8 +50,8 @@ def get_price_for(session,session_id,buy_price):
 
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
-
     }
+
     for url in urls :
         try:
             response = requests.get(url, headers=headers)

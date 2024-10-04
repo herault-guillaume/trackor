@@ -71,7 +71,7 @@ def get_price_for(session,session_id,buy_price):
     }
     for coin_name, url in urls.items():
         flag_one_find = False
-        for p in ['/page={page}'.format(page=page) for page in range(1,5)]:
+        for p in ['?page={page}'.format(page=page) for page in range(1,5)]:
             try:
                 response = requests.get(url[0]+p, headers=headers)
                 response.raise_for_status()  # Raise an exception for HTTP errors
@@ -92,7 +92,7 @@ def get_price_for(session,session_id,buy_price):
                     price_element = element.select_one("div[data-url*='{coin_name}'] .text-xlarge.text-bolder.m-0.text-nowrap".format(coin_name=url[1]))
 
                     if price_element :
-
+                        print('go')
                         price_text = price_element.text.strip()
 
                         price = Price.fromstring(price_text)
@@ -109,14 +109,16 @@ def get_price_for(session,session_id,buy_price):
                                          frais_port=15.0,session_id=session_id,metal='g')
                         session.add(coin)
                         session.commit()
+                        flag_one_find = True
+                        break
 
                     else:
                         print("Price element not found on page.", url)
+
+                if flag_one_find:
                     break
-                    flag_one_find = True
-            if flag_one_find:
-                break
-            except (requests.exceptions.RequestException, ValueError) as e:
-                print(f"Error retrieving or parsing price: {e}",url)
+
+            except Exception as e:
+                print(e)
                 print(traceback.format_exc())
                 pass

@@ -22,7 +22,7 @@ pd.set_option('display.width', None)
 pd.set_option('display.max_colwidth', None)
 
 Base = declarative_base()
-engine = create_engine(r'sqlite:///C:\Users\Guillaume Hérault\PycharmProjects\trackor\models\pieces_or.db')
+engine = create_engine(r'sqlite:///C:\Users\guillaume.herault\PycharmProjects\trackor\models\pieces_or.db')
 Base.metadata.create_all(engine)
 Session = sessionmaker(bind=engine)
 
