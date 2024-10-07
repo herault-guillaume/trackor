@@ -22,7 +22,7 @@ pd.set_option('display.width', None)
 pd.set_option('display.max_colwidth', None)
 
 Base = declarative_base()
-engine = create_engine(r'sqlite:///C:\Users\guillaume.herault\PycharmProjects\trackor\models\pieces_or.db')
+engine = create_engine(r'sqlite:///C:\Users\Guillaume Hérault\PycharmProjects\trackor\models\pieces_or.db')
 Base.metadata.create_all(engine)
 Session = sessionmaker(bind=engine)
 
@@ -38,8 +38,8 @@ gp_df = pd.read_sql_query(gp, engine)
 # Récupérer les noms uniques de pièces et les sources uniques
 unique_coins =  ['20 francs or coq marianne',
                  '20 francs or napoléon III',
-                 '20 dollars or liberté',
-                 '20 francs or helvetia suisse',
+                 '20 dollars or liberté longacre',
+                 '20 francs or confederatio suisse',
                  '20 francs or union latine',
                  '10 dollars or liberté',
                  '10 dollars or tête indien',

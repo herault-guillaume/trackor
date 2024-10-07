@@ -91,7 +91,7 @@ def update_json_file(new_data,
         file_name: The name of the JSON file within the bucket.
         new_data: The new JSON data (Python dictionary or list) to write to the file.
     """
-    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = r"C:\Users\guillaume.herault\PycharmProjects\trackor\trackor-431010-1ff28b492956.json"
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = r"C:\Users\Guillaume Hérault\PycharmProjects\trackor\trackor-431010-1ff28b492956.json"
     storage_client = storage.Client()
     bucket = storage_client.bucket(bucket_name)
     blob = bucket.blob(filename)
@@ -267,28 +267,28 @@ def fetch_and_update_data():
 
             find_best_deals(session,session_id,num_deals=15)
             calculate_and_store_coin_data(session, session_id, ['1 oz krugerrand'], './results/1_oz_krugerrand.json')
-            calculate_and_store_coin_data(session, session_id, ['20 francs or coq marianne',
-                                                                        '20 francs or cérès',
-                                                                        '20 francs or génie debout',
+            calculate_and_store_coin_data(session, session_id, ['20 francs or fr coq marianne',
+                                                                        '20 francs or fr cérès',
+                                                                        '20 francs or fr génie debout',
                                                                         '20 francs or napoléon III',
                                                                         '20 francs or louis XVIII buste nu',
                                                                         '20 francs or charles X',
                                                                         '20 francs or louis XVIII buste habillé',
-                                                                        '20 francs or louis philippe lauré',
+                                                                        '20 francs or louis philippe laurée',
                                                                         '20 francs or napoléon empereur',
-                                                                        '20 francs or napoléon empereur lauré',
+                                                                        '20 francs or napoléon empereur laurée',
                                                                         '20 francs or louis-napoléon bonaparte',
                                                                         '20 francs or fr',
                                                                         '20 francs or',
                                                                         ],
                                           './results/20_fr_france.json')
-            calculate_and_store_coin_data(session, session_id, ['20 francs or leopold I','20 francs or union latine',
+            calculate_and_store_coin_data(session, session_id, ['20 francs or bel leopold I','20 francs or union latine',
                                                                 '20 lire or umberto I','20 lire or vittorio emanuele II'],
                                           './results/20_fr_union_latine.json')
             calculate_and_store_coin_data(session, session_id, [],
                                           './results/20_lires_italie.json')
             calculate_and_store_coin_data(session, session_id, ['20 francs or vreneli croix suisse',
-                                                                        '20 francs or helvetia suisse'],
+                                                                        '20 francs or confederatio suisse'],
                                           './results/20_fr_suisse.json')
             calculate_and_store_coin_data(session, session_id, ['souverain or edouart VII',
                                                                         'souverain or georges V',
@@ -303,7 +303,7 @@ def fetch_and_update_data():
             calculate_and_store_coin_data(session, session_id, ['20 mark or wilhelm II'], './results/20_mark_all.json')
             calculate_and_store_coin_data(session, session_id, ['5 dollars or liberté','5 dollars or tête indien'],
                                           './results/5_dol_usa.json')
-            calculate_and_store_coin_data(session, session_id, ['20 dollars or liberté'], './results/20_dol_usa.json')
+            calculate_and_store_coin_data(session, session_id, ['20 dollars or liberté longacre','20 dollars or liberté st gaudens','20 dollars or tete indien','20 dollars or'], './results/20_dol_usa.json')
             calculate_and_store_coin_data(session, session_id, ['10 dollars or liberté','10 dollars or tête indien'],
                                           './results/10_dol_usa.json')
             calculate_and_store_coin_data(session, session_id, ['10 francs or coq marianne',

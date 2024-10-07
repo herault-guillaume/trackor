@@ -5,7 +5,7 @@ from price_parser import Price
 import traceback
 
 urls = {
-    "https://monlingot.fr/or/achat-piece-or-20-francs-napoleon": '20 francs or napoléon III',
+    "https://monlingot.fr/or/achat-piece-or-20-francs-napoleon": '20 francs or fr napoléon III',
     "https://monlingot.fr/or/achat-piece-or-american-eagle-1-once": '1 oz american eagle',
     "https://monlingot.fr/or/achat-lingotin-or-5-grammes": 'Lingot or 5 g LBMA',
     "https://monlingot.fr/or/achat-piece-or-10-francs-napoleon": '10 francs or napoléon III',
@@ -30,7 +30,7 @@ urls = {
     "https://monlingot.fr/pieces-or/Piece-investissement-Or-20-Reichsmark": '20 mark or wilhelm II',
     "https://monlingot.fr/pieces-or/10-florins-or": '10 florins or wilhelmina',  # Assuming Wilhelmina based on your data
     "https://monlingot.fr/pieces-or/Piece-investissement-Or-Union-Latine": '20 francs or union latine',
-    "https://monlingot.fr/or/achat-piece-or-20-francs-suisse": '20 francs or helvetia suisse',
+    "https://monlingot.fr/or/achat-piece-or-20-francs-suisse": '20 francs or confederatio suisse',
     "https://monlingot.fr/or/achat-piece-or-krugerrand-1-once": '1 oz krugerrand',
     "https://monlingot.fr/or/achat-piece-or-20-francs-coq-marianne": '20 francs or coq marianne',
     "https://monlingot.fr/or/achat-piece-or-britannia-1-once" : '1 oz britannia',  # Assuming this is the intended mapping

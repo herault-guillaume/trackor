@@ -5,14 +5,14 @@ from price_parser import Price
 import traceback
 
 coin_name = {
-    "20 Francs Or Napoléon type Coq": '20 francs or coq marianne',
+    "20 Francs Or Napoléon type Coq": '20 francs or fr coq marianne',
     "Souverain Or Georges": 'souverain or georges V',
     "50 Pesos Or Mexique": '50 pesos or',
     "Krugerrand Or Afrique du Sud": '1 oz krugerrand',
-    "20 Francs Or Suisse": '20 francs or vreneli croix suisse',
+    "20 Francs Or Suisse": '20 francs or sui vreneli croix suisse',
     "20 Dollars Or": '20 dollars or liberté',
     "10 Dollars Or": '10 dollars or liberté',
-    "10 Francs Or": '10 francs or coq marianne',
+    "10 Francs Or": '10 francs or fr coq marianne',
     "20 Francs Union Latine Or": '20 francs or union latine',
     "10 Florins Or Hollandais": '10 florins or wilhelmina', # or '10 florins or willem III' depending on the specific coin
     "20 Francs Or Tunisie": '20 francs or tunisie',

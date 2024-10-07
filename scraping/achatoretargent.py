@@ -11,17 +11,17 @@ import traceback
 from scraping.changedelabourse import coin_mapping_name
 
 coin_mapping_name = {
-    '20 Francs Marianne Coq': '20 francs or coq marianne',
-    '10 Francs Napoléon': '10 francs or',
+    '20 Francs Marianne Coq': '20 francs or fr coq marianne',
+    '10 Francs Napoléon': '10 francs or fr',
     '50 Pesos Or': '50 pesos or',
-    "Louis d'Or - 20 Francs Or": '20 francs or',
-    '20 Francs Napoléon': '20 francs or',
+    "Louis d'Or - 20 Francs Or": '20 francs or fr',
+    '20 Francs Napoléon': '20 francs or fr',
     'Krugerrand': '1 oz krugerrand',
     'Souverain': 'souverain or',  # No exact match for "Souverain"
     'Union Latine': '20 francs or union latine',
     '20 Francs Suisse': '20 francs or vreneli croix suisse',
     '20 Dollars US': '20 dollars or',
-    '10 Dollars US': '20 dollars or liberté',
+    '10 Dollars US': '10 dollars or liberté',
     '5 Dollars US Or': '5 dollars or liberté',
     '10 Florins Or': '10 florins or',
     '20 Reichsmarks': '20 mark or wilhelm II',

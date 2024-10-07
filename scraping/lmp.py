@@ -9,14 +9,14 @@ coin_name = {
     "Souverain": "souverain or elizabeth II",  # Assuming you want Elizabeth II
     "Union Latine": "20 francs or union latine",
     "20 Reichsmark": "20 mark or wilhelm II",
-    "20 francs Marianne Coq": "20 francs or coq marianne",
+    "20 francs Marianne Coq": "20 francs or fr coq marianne",
     "Krugerrand": "1 oz krugerrand",
     "50 pesos": "50 pesos or",
-    "20 francs Suisse": "20 francs or vreneli croix suisse",  # Assuming Vreneli
+    "20 francs Suisse": "20 francs or sui vreneli croix suisse",  # Assuming Vreneli
     "5 dollars US": "5 dollars or liberté",
     "10 dollars US": "10 dollars or liberté",
     "20 dollars US": "20 dollars or liberté",
-    "20 francs Napoléon": "20 francs or napoléon III"
+    "20 francs Napoléon": "20 francs or fr napoléon III"
 }
 def get_price_for(session,session_id,buy_price):
     url = 'https://www.lesmetauxprecieux.com/achat-vente-or/pieces-or/'

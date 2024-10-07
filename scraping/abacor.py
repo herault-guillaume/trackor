@@ -14,7 +14,7 @@ def get_delivery_price(price):
 
 def get_price_for(session,session_id,buy_price):
     """
-    Retrieves the '20 francs or coq marianne' coin purchase price from Goldforex using requests and BeautifulSoup.
+    Retrieves the '20 francs or fr coq marianne' coin purchase price from Goldforex using requests and BeautifulSoup.
     """
     print("https://www.abacor.fr/")
 
@@ -30,18 +30,18 @@ def get_price_for(session,session_id,buy_price):
         'Lingotin Or 20 Gr': 'Lingot or 20 g LBMA',
         'Lingotin Or 10 Gr': 'Lingot or 10 g LBMA',
         'Lingotin Or 5 Gr': 'Lingot or 5 g LBMA',
-        'Pièce d’Or 20 Francs Coq Marianne': '20 francs or coq marianne refrappe pinay',
-        'Pièce d’Or 20 Francs Napoléon / Louis d’Or': '20 francs or napoléon empereur lauré', # Or '20 francs or louis XVIII buste nu' depending on the coin
-        'Pièce d’Or 20 Francs Suisse': '20 francs or vreneli croix suisse',
+        'Pièce d’Or 20 Francs Coq Marianne': '20 francs or fr coq marianne refrappe pinay',
+        'Pièce d’Or 20 Francs Napoléon / Louis d’Or': '20 francs or fr napoléon empereur laurée', # Or '20 francs or fr louis XVIII buste nu' depending on the coin
+        'Pièce d’Or 20 Francs Suisse': '20 francs or sui vreneli croix suisse',
         'Union Latine Or': '20 francs or union latine',
         'Pièce d’Or Souverain': 'souverain or',
-        'Pièce d’Or 20 Dollars US': '20 dollars or liberté',  # Or '20 dollars or st gaudens' depending on the coin
+        'Pièce d’Or 20 Dollars US': '20 dollars or',
         'Pièce d’Or 10 Dollars Liberty': '10 dollars or liberté',
         'Pièce d’Or 10 Dollars Tête d’Indien': '10 dollars or tête indien',
         'Pièce d’Or 50 Pesos Mexicain': '50 pesos or',
         'Pièce d’Or 10 Florins – 10 Gulden': '10 florins or wilhelmina', # Or '10 florins or willem III' depending on the coin
         'Pièce d’Or Krugerrand': '1 oz krugerrand',
-        'Pièce d’Or 10 Francs Napoléon': '10 francs or napoléon III lauré', # Or '10 francs or napoléon III lauré' depending on the coin
+        'Pièce d’Or 10 Francs Napoléon': '10 francs or fr napoléon III laurée', # Or '10 francs or fr napoléon III laurée' depending on the coin
         'Pièce d’Or 20 Francs Tunisie': '20 francs or tunisie',
         'Pièce d’Or Souverain Elizabeth II': 'souverain or elizabeth II',
         'Pièce d’Or 5 Dollars US': '5 dollars or liberté',  # Or '5 dollars or tête indien' depending on the coin

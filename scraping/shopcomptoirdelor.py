@@ -18,7 +18,7 @@ coin_name = {
     #"Lunar 1/10 OZ or diverses années": '1/10 oz nugget / kangourou',
     "50 ECU Belgique diverses années": '50 écus or charles quint',
     "100 ECU Belgique diverses années": '100 écus or charles quint',
-    "10 francs français or diverses années": '10 francs or coq marianne',
+    "10 francs français or diverses années": '10 francs or fr coq marianne',
     "Aigle américain 1/2 OZ or diverses années": '1/2 oz american eagle',
     "Aigle américain 1/10 OZ or diverses années": '1/10 oz american eagle',
     "5 dollars USA or diverses années": '5 dollars or liberté',

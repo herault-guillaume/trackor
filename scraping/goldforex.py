@@ -5,7 +5,7 @@ from price_parser import Price
 import traceback
 
 coin_name = {
-    "Napoléon 20 francs": "20 francs or napoléon III",
+    "Napoléon 20 francs": "20 francs or fr napoléon III",
     "Pièce d'or Krugerrand 1 once": "1 oz krugerrand",
     "Lingot d'or 1 kg": "Lingot or 1 kg LBMA",
     "Lingot d'or 500 grammes": "Lingot or 500 g LBMA",
@@ -25,7 +25,7 @@ coin_name = {
     "Pièce d'or quart 1/4 d'once": "1/4 oz american eagle",  # Assuming this is the American Eagle
     "Pièce d'or 1 dixième d'once Krugerrand": "1/10 oz krugerrand",
     "Pièce d'or 50 écus": "50 écus or charles quint",
-    "Pièce d'or Vreneli 20 francs suisse": "20 francs or vreneli croix suisse",
+    "Pièce d'or Vreneli 20 francs suisse": "20 francs or sui vreneli croix suisse",
     "Pièce d'or Leopold II 20 francs": "20 francs or union latine",  # Assuming Leopold II is part of the Latin Monetary Union
     "Pièce d'or Souverain Nouveau Elisabeth 2": "souverain or elizabeth II",
     "Pièce d'or 50 pesos mexicain": "50 pesos or",
@@ -48,7 +48,7 @@ coin_name = {
     "100 Piastres Turc": "100 piastres or turc",
     "2,5 Pesos Mexicains": "2 1/2 pesos or",
     "2,5 Pesos Mexicains": "2 1/2 pesos or",
-    "Pièce d'or 20 dollars St Gaudens": '20 dollars or st gaudens',
+    "Pièce d'or 20 dollars St Gaudens": '20 dollars or liberté st gaudens',
     "2.5 dollars or liberté": '2.5 dollars or tête liberté',
 }
 

@@ -7,13 +7,13 @@ from price_parser import Price
 import traceback
 
 coin_name = {
-    "10 Francs Français – Marianne Coq": '10 francs or coq marianne',
+    "10 Francs Français – Marianne Coq": '10 francs or fr coq marianne',
     #"MapleGram25 2021 (25 x 1g) Or  – Edition Limitée": 'Lingot or 25 g LBMA',
     #"50 Dollars Eagle 2022 (1Oz)": '1 oz american eagle',
     #"Queen’s Beast 2021 – 1 Oz (Edition Limitée)": 'souverain or elizabeth II',
-    "20 Francs Napoléon": '20 francs or napoléon III',
-    "20 Francs Marianne Coq": '20 francs or coq marianne',
-    "20 Francs Suisse (Vrenelis)": '20 francs or vreneli croix suisse',
+    "20 Francs Napoléon": '20 francs or fr napoléon III',
+    "20 Francs Marianne Coq": '20 francs or fr coq marianne',
+    "20 Francs Suisse (Vrenelis)": '20 francs or sui vreneli croix suisse',
     "Krugerrand": '1 oz krugerrand',
     #"Krugerrand 1 Oz Or (2024)": '1 oz krugerrand',
     #"Swiss Bullion 1+ (1 Oz 999,9 ‰)": 'Lingot or 1 once LBMA',
@@ -30,7 +30,7 @@ coin_name = {
     "20 Dollars Eagle (US)": '20 dollars or liberté',
     "50 ECU": '50 écus or charles quint',
     #"Chien Lunar 2018 1 once": 'Lingot or 1 once LBMA',
-    "10 Francs Français": '10 francs or napoleon'
+    "10 Francs Français": '10 francs or fr'
 }
 
 def get_delivery_price(price):

@@ -5,10 +5,10 @@ from price_parser import Price
 import traceback
 
 coin_to_name = {
-    "20 Francs Or Coq": '20 francs or coq marianne',
-    "20 Francs Or Napoléon III": '20 francs or napoléon III',
-    "20 Francs Or Génie": '20 francs or génie debout',
-    "20 Francs Or Vreneli": '20 francs or vreneli croix suisse',
+    "20 Francs Or Coq": '20 francs or fr coq marianne',
+    "20 Francs Or Napoléon III": '20 francs or fr napoléon III',
+    "20 Francs Or Génie": '20 francs or fr génie debout',
+    "20 Francs Or Vreneli": '20 francs or sui vreneli croix suisse',
     "20 Francs Or Leopold 2": '20 francs or union latine',
     "Souverain Or": 'souverain or elizabeth II',  # Assuming you want Elizabeth II
     "Souverain Or Elizabeth II": 'souverain or elizabeth II',
@@ -16,8 +16,8 @@ coin_to_name = {
     "Maple Leaf Or": '1 oz maple leaf',
     "Philharmonique Or": '1 oz philharmonique',
     "50 Pesos Or": '50 pesos or',
-    "20 Dollars Or Liberty": '20 dollars or liberté',
-    "20 Dollars Or St Gaudens": '20 dollars or liberté', # Assuming St Gaudens is similar to Liberty
+    "20 Dollars Or Liberty": '20 dollars or liberté longacre',
+    "20 Dollars Or St Gaudens": '20 dollars or liberté st gaudens', # Assuming St Gaudens is similar to Liberty
     "10 Dollars Or Liberty": '10 dollars or liberté',
     "American Buffalo Once": '1 oz buffalo',
     "American Eagle Once": '1 oz american eagle',

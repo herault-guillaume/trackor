@@ -7,20 +7,20 @@ from price_parser import Price
 import traceback
 
 coin_mapping_name = {'20 Francs Marianne Coq': '20 francs or coq marianne',
- '20 Francs Napoleon': '20 francs or napoléon empereur',
+ '20 Francs Napoleon': '20 francs or',
  '50 Pesos': '50 pesos or',
  '10 Francs Marianne Coq': '10 francs or coq marianne',
- '10 Francs Napoleon': '10 francs or napoléon III',
+ '10 Francs Napoleon': '10 francs or',
  'Krugerrand': '1 oz krugerrand',
- 'Souverain': 'souverain or elizabeth II',
- '1/2 Souverain': '1/2 souverain or georges V',
+ 'Souverain': 'souverain or',
+ '1/2 Souverain': '1/2 souverain or',
  '20 Francs Union Latine': '20 francs or union latine',
  '20 Francs Croix Suisse': '20 francs or vreneli croix suisse',
- '20 Dollars': '20 dollars or liberté',
+ '20 Dollars': '20 dollars or',
  '10 Dollars': '10 dollars or liberté',
  '5 Dollars': '5 dollars or liberté',
- '10 Florins': '10 florins or wilhelmina',
- '20 DeutschMarks': '20 mark or wilhelm II',
+ '10 Florins': '10 florins or',
+ '20 DeutschMarks': '20 mark or',
  '20 Francs Tunisie': '20 francs or tunisie',
  '5 Roubles': '5 roubles or'}
 def get_delivery_price(price):
@@ -47,7 +47,7 @@ def get_price_for(session,session_id,buy_price):
     """
     Retrieves the '20 francs or coq marianne' coin purchase price from Change de la Bourse using requests and BeautifulSoup.
     """
-
+    print('https://capornumismatique.com/produits/or/or-bourse')
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
 

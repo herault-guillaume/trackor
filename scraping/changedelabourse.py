@@ -7,18 +7,18 @@ import traceback
 coin_mapping_name = {
     "Napoléon Or 20 Francs": "20 francs or fr",  # Assuming a standard 20 Francs gold coin
     "50 Pesos": "50 pesos or",
-    "Souverain": "souverain or elizabeth II",  # Assuming a modern Sovereign
-    "20 Dollars US": "20 dollars or liberté",
-    "10 Francs Napoléon": "10 francs or napoléon III",
-    "20 Francs Suisse": "20 francs or vreneli croix suisse",
+    "Souverain": "souverain or",  # Assuming a modern Sovereign
+    "20 Dollars US": "20 dollars or",
+    "10 Francs Napoléon": "10 francs or",
+    "20 Francs Suisse": "20 francs or sui vreneli croix suisse",
     "10 Dollars US": "10 dollars or liberté",
     "5 Dollars US": "5 dollars or liberté",
     "Krugerrand": "1 oz krugerrand",
-    "10 Florins": "10 florins or wilhelmina",  # Assuming Wilhelmina reign
-    "20 Reichsmarks": "20 mark or wilhelm II",
-    "Union Latine": "20 francs or union latine",
+    "10 Florins": "10 florins or",  # Assuming Wilhelmina reign
+    "20 Reichsmarks": "20 mark",
+    "Union Latine": "20 francs or fr union latine",
     "20 Francs Tunisie": "20 francs or tunisie",
-    "Demi Souverain": "1/2 souverain or georges V",  # Assuming a George V half Sovereign
+    "Demi Souverain": "1/2 souverain or",  # Assuming a George V half Sovereign
     "1 Ducat Francois-Joseph 1915 Or": "1 ducat or"
 }
 def get_delivery_price(price):
@@ -41,7 +41,7 @@ def get_price_for(session,session_id,buy_price):
     """
     Retrieves the '20 francs or coq marianne' coin purchase price from Change de la Bourse using requests and BeautifulSoup.
     """
-
+    print('https://www.changedelabourse.com/or/pieces-d-or-d-investissement')
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
 

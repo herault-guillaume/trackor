@@ -7,7 +7,7 @@ import traceback
 
 coin_name = {
     "20 Pesos – Mexique | Or": "20 pesos or",
-    "20 Francs Napoléon – Premier Empire | Or": "20 francs or napoléon empereur lauré",  # Assuming this is the "tête laurée" type, most common for First Empire
+    "20 Francs Napoléon – Premier Empire | Or": "20 francs or fr napoléon empereur laurée",  # Assuming this is the "tête laurée" type, most common for First Empire
     "2,5 Pesos – Mexique | Or": "2 1/2 pesos or",
     "4 Florins / 10 Francs – Franz Joseph | Or": "4 florins 10 francs 1892 refrappe",
     "1 Ducat – Autriche | Or": "1 ducat or",
@@ -17,19 +17,19 @@ coin_name = {
     "40 Francs – Louis Philippe | Or": "40 francs or louis philippe",  # This key doesn't exist, handle later
     "4 Ducats – Autriche | Or": "4 ducats or",
     "1/2 souverain – Edouard VII | Or": "1/2 souverain or georges V",  # Assuming typo, should be George V
-    "10 Lire – Vittorio Emanuele | Or": "20 lire or vittorio emanuele II",  # Assuming it's a 20 Lire coin, clarify if needed
+    "10 Lire – Vittorio Emanuele | Or": "10 lire or vittorio emanuele II",  # Assuming it's a 20 Lire coin, clarify if needed
     "5 Roubles – Alexandre III | Or": "5 roubles or",  # This key doesn't exist, handle later
-    "20 Francs – Génie | Or": "20 francs or génie debout",
+    "20 Francs – Génie | Or": "20 francs or fr génie debout",
     "50 Francs – Napoléon tête nue | Or": "50 francs or napoléon III tête nue",
-    "40 Francs – Bonaparte An XI à An 12 | Or": "40 francs or napoléon empereur non lauré",  # This key doesn't exist, handle later
+    "40 Francs – Bonaparte An XI à An 12 | Or": "40 francs or napoléon empereur non laurée",  # This key doesn't exist, handle later
     "10 Francs Suisse | Or": "10 francs or vreneli croix suisse",
     "20 Lire – Umberto I | Or": "20 lire or umberto I",
     "40 Francs – Louis XVIII | Or": "40 francs or louis XVIII",  # This key doesn't exist, handle later
     "100 Francs – Napoléon tête nue | Or": "100 francs or napoléon III tête nue",
     "1/2 Souverain – Victoria (jubilé) | Or": '1/2 souverain or victoria',
-    "40 Francs – Napoléon tête laurée | Or": "40 francs or napoléon empereur lauré",
+    "40 Francs – Napoléon tête laurée | Or": "40 francs or napoléon empereur laurée",
     "10 Francs France – Cérès | Or": "10 francs or cérès 1850-1851",
-    "40 Francs – Napoléon Empereur An 13 | Or": "40 francs or napoléon empereur lauré",  # This key doesn't exist, handle later
+    "40 Francs – Napoléon Empereur An 13 | Or": "40 francs or napoléon empereur laurée",  # This key doesn't exist, handle later
     "5 Francs – Napoléon tête nue | Or": "5 francs or napoléon III",
     "5 Francs – Napoléon tête laurée | Or": "5 francs or napoléon III nue",  # This key doesn't exist, handle later
     "50 Francs – Napoléon tête laurée | Or": "50 francs or napoléon III tête laurée",  # This key doesn't exist, handle later

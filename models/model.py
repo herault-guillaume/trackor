@@ -136,57 +136,62 @@ poids_pieces_or  = {
                         '10 florins or': 6.056, # -> CPor
                         '10 florins or wilhelmina': 6.056, # -> CPor
                         '10 florins or willem III': 6.056, # -> CPor
-                        '10 francs or': 2.903, # -> CPor
-                        '10 francs or coq marianne': 2.903, # -> CPor
-                        '10 francs or cérès 1850-1851': 2.903,
-                        '10 francs or napoléon III': 2.903,
-                        '10 francs or napoléon III lauré': 2.903,
-                        '10 francs or vreneli croix suisse': 2.903,
+                        '10 francs or fr': 2.903, # -> CPor
+                        '10 francs or fr coq marianne': 2.903, # -> CPor
+                        '10 francs or fr cérès 1850-1851': 2.903,
+                        '10 francs or fr napoléon III': 2.903,
+                        '10 francs or fr napoléon III laurée': 2.903,
+                        '10 francs or sui vreneli croix suisse': 2.903,
                         '10 pesos or': 7.5,
                         '10 lire or vittorio emanuele II': 2.898,
                         '100 couronnes or françois joseph I': 30.483,
-                        '100 francs or napoléon III tête nue': 29.02,
-                        '100 francs or napoléon III tête lauré': 29.02,
-                        '100 francs or génie DPF': 29.02,
-                        '100 francs or génie LEF': 29.02,
+                        '100 francs or fr': 29.02,
+                        '100 francs or fr napoléon III tête nue': 29.02,
+                        '100 francs or fr napoléon III tête laurée': 29.02,
+                        '100 francs or fr génie DPF': 29.02,
+                        '100 francs or fr génie LEF': 29.02,
                         '100 piastres or': 6.61,
                         '2 1/2 pesos or': 1.872,
                         '2 pesos or': 1.494,
                         '20 couronnes or françois joseph I': 6.093,
                         '20 dollars or': 30.096, # -> CPor
                         '20 dollars or tete indien': 30.096, # -> CPor
-                        '20 dollars or liberté': 30.096, # -> CPor
-                        '20 dollars or st gaudens': 30.096, # -> CPor
+                        '20 dollars or liberté longacre': 30.096, # -> CPor
+                        '20 dollars or liberté st gaudens': 30.096, # -> CPor
                         '20 francs or fr': 5.805, # -> CPor
-                        '20 francs or': 5.805, # -> CPor
-                        '20 francs or coq marianne': 5.805, # -> CPor
-                        '20 francs or coq marianne refrappe pinay': 5.805, # -> CPor
+                        '20 francs or fr coq marianne': 5.805, # -> CPor
+                        '20 francs or fr coq marianne refrappe pinay': 5.805, # -> CPor
                         '20 francs or cérès': 5.805, # -> CPor
                         '20 francs or génie debout': 5.805,
-                        '20 francs or helvetia suisse': 5.805, # -> CPor
-                        '20 francs or leopold I': 5.805, # -> CPor
-                        '20 francs or leopold II': 5.805, # -> CPor
-                        '20 francs or albert I': 5.805, # -> CPor
+                        '20 francs or confederatio suisse': 5.805, # -> CPor
+                        '20 francs or bel leopold I': 5.805, # -> CPor
+                        '20 francs or bel leopold II': 5.805, # -> CPor
+                        '20 francs or bel albert I': 5.805, # -> CPor
                         '20 francs or louis XVIII buste nu': 5.805, # -> CPor
                         '20 francs or charles X': 5.805, # -> CPor
                         '20 francs or louis XVIII buste habillé': 5.805, # -> CPor
-                        '20 francs or louis philippe lauré': 5.805, # -> CPor
+                        '20 francs or louis philippe laurée': 5.805, # -> CPor
                         '20 francs or napoléon empereur': 5.805, # -> CPor
-                        '20 francs or napoléon empereur lauré': 5.805, # -> CPor
+                        '20 francs or napoléon empereur nue': 5.805, # -> CPor
+                        '20 francs or napoléon empereur laurée': 5.805, # -> CPor
                         '20 francs or louis-napoléon bonaparte': 5.805, # -> CPor
                         '20 francs or napoléon III': 5.805, # -> CPor
                         '20 francs or tunisie': 5.805, # -> CPor
                         '20 francs or union latine': 5.805, # -> CPor
+                        '20 francs or suisse': 5.805, # -> CPor
                         '20 francs or vreneli croix suisse': 5.805, # -> CPor
+                        '20 francs or vreneli croix suisse 1935L': 5.805, # -> CPor
                         '20 francs or louis philippe I nu': 5.805, # -> CPor
                         '20 lire or umberto I': 5.805,
                         '20 lire or vittorio emanuele II': 5.805,
+                        '20 mark or': 7.168, # -> CPor
                         '20 mark or wilhelm II': 7.168, # -> CPor
                         '20 pesos or': 15.0,
                         '4 ducats or': 13.78,
                         '4 florins 10 francs 1892 refrappe': 2.9,
-                        '40 francs or napoléon empereur lauré': 11.61,
-                        '40 francs or napoléon empereur non lauré': 11.61,
+                        '40 francs or fr': 11.61,
+                        '40 francs or napoléon empereur laurée': 11.61,
+                        '40 francs or napoléon empereur non laurée': 11.61,
                         '40 francs or napoléon premier consul': 11.61,
                         '40 francs or louis XVIII': 11.61,
                         '40 francs or louis philippe': 11.61,
@@ -196,7 +201,7 @@ poids_pieces_or  = {
                         '5 dollars or tête indien': 7.523, # -> CPor
                         '2.5 dollars or tête liberté': 3.762, # -> CPor
                         '2.5 dollars or tête indien': 3.762, # -> CPor
-                        'demi-eagle americain or 5 dollars tete liberte': 7.523, # -> CPor
+                        '5 dollars or liberté': 7.523, # -> CPor
                         '5 francs or napoléon III': 1.452,
                         '5 francs or napoléon III nue': 1.452,
                         '5 pesos or': 3.75,
@@ -260,6 +265,6 @@ poids_pieces_argent = {
                     }
 
 # Configuration de la base de données
-engine = create_engine(r'sqlite:///C:\Users\guillaume.herault\PycharmProjects\trackor\models\pieces_or.db')
+engine = create_engine(r'sqlite:///C:\Users\Guillaume Hérault\PycharmProjects\trackor\models\pieces_or.db')
 Base.metadata.create_all(engine)
 Session = sessionmaker(bind=engine)

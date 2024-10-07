@@ -12,31 +12,33 @@ def get_price_for(session,session_id,buy_price):
     """
     print('https://www.aucoffre.com/')
     urls = {
-        '20 francs or coq marianne': ["https://www.aucoffre.com/recherche/metal-1/marketing_list-5/stype-1/produit","20f-marianne"],
-        '20 francs or napoléon III': ["https://www.aucoffre.com/recherche/metal-1/marketing_list-5/stype-1/produit","napoleon-20f-napoleon-iii-tete-nue"],
-        '20 francs or génie debout': ["https://www.aucoffre.com/recherche/metal-1/marketing_list-5/stype-1/produit","napoleon-20f-genie"],
-        '20 francs or cérès': ["https://www.aucoffre.com/recherche/metal-1/marketing_list-5/stype-1/produit","napoleon-20f-ceres"],
-        '10 francs or cérès 1850-1851': ["https://www.aucoffre.com/recherche/metal-1/marketing_list-5/stype-7/produit","demi-napoleon-10f-ceres"],
-        '10 francs or coq marianne': ["https://www.aucoffre.com/recherche/metal-1/marketing_list-5/stype-7/produit","demi-napoleon-10f-marianne-coq"],
-        '10 francs or napoléon III': ["https://www.aucoffre.com/recherche/metal-1/marketing_list-5/stype-7/produit","demi-napoleon-10f-napoleon-iii"],
-        '40 francs or charles X': ["https://www.aucoffre.com/recherche/metal-1/marketing_list-5/stype-11/produit","napoleon-40f-charles-x-2eme"],
-        '40 francs or napoléon empereur lauré': ["https://www.aucoffre.com/recherche/metal-1/marketing_list-5/stype-11/produit","napoleon-40f-napoleon-ier-tete-lauree"],
-        '40 francs or louis philippe': ["https://www.aucoffre.com/recherche/metal-1/marketing_list-5/stype-11/produit","napoleon-40f-louis-philippe"],
-        '40 francs or napoléon premier consul': ["https://www.aucoffre.com/recherche/metal-1/marketing_list-5/stype-11/produit","napoleon-40f-bonaparte-premier-consul"],
+        '20 francs or fr coq marianne': ["https://www.aucoffre.com/recherche/metal-1/marketing_list-5/stype-1/produit","20f-marianne"],
+        '20 francs or fr napoléon empereur nue': ["https://www.aucoffre.com/recherche/metal-1/marketing_list-5/stype-1/produit","napoleon-20f-napoleon-iii-tete-nue"],
+        '20 francs or fr génie debout': ["https://www.aucoffre.com/recherche/metal-1/marketing_list-5/stype-1/produit","napoleon-20f-genie"],
+        '20 francs or fr cérès': ["https://www.aucoffre.com/recherche/metal-1/marketing_list-5/stype-1/produit","napoleon-20f-ceres"],
+        '10 francs or fr cérès 1850-1851': ["https://www.aucoffre.com/recherche/metal-1/marketing_list-5/stype-7/produit","demi-napoleon-10f-ceres"],
+        '10 francs or fr coq marianne': ["https://www.aucoffre.com/recherche/metal-1/marketing_list-5/stype-7/produit","demi-napoleon-10f-marianne-coq"],
+        '10 francs or fr napoléon III': ["https://www.aucoffre.com/recherche/metal-1/marketing_list-5/stype-7/produit","demi-napoleon-10f-napoleon-iii"],
+        '40 francs or fr charles X': ["https://www.aucoffre.com/recherche/metal-1/marketing_list-5/stype-11/produit","napoleon-40f-charles-x-2eme"],
+        '40 francs or fr napoléon empereur laurée': ["https://www.aucoffre.com/recherche/metal-1/marketing_list-5/stype-11/produit","napoleon-40f-napoleon-ier-tete-lauree"],
+        '40 francs or fr louis philippe': ["https://www.aucoffre.com/recherche/metal-1/marketing_list-5/stype-11/produit","napoleon-40f-louis-philippe"],
+        '40 francs or fr napoléon premier consul': ["https://www.aucoffre.com/recherche/metal-1/marketing_list-5/stype-11/produit","napoleon-40f-bonaparte-premier-consul"],
         '40 francs or louis XVIII': ["https://www.aucoffre.com/recherche/metal-1/marketing_list-5/stype-11/produit","napoleon-40f-louis-xviii"],
-        '40 francs or napoléon empereur non lauré': ["https://www.aucoffre.com/recherche/metal-1/marketing_list-5/stype-11/produit","napoleon-40f-napoleon-1er-tete-nue-"],
+        '40 francs or napoléon empereur non laurée': ["https://www.aucoffre.com/recherche/metal-1/marketing_list-5/stype-11/produit","napoleon-40f-napoleon-1er-tete-nue-"],
         '50 francs or napoléon III tête nue': ["https://www.aucoffre.com/recherche/marketing_list-5/stype-12/produit","apoleon-50f-napoleon-iii-tete-nue"],
         '50 francs or napoléon III tête laurée': ["https://www.aucoffre.com/recherche/marketing_list-5/stype-12/produit","napoleon-50f-napoleon-iii-tete-lauree"],
         '100 francs or napoléon III tête nue': ["https://www.aucoffre.com/recherche/marketing_list-5/stype-13/produit","napoleon-100f-napoleon-iii-tete-nue"],
         '100 francs or napoléon III tête laurée': ["https://www.aucoffre.com/recherche/marketing_list-5/stype-13/produit", "napoleon-100f-napoleon-iii-tete-lauree"],
         '100 francs or génie LEF': ["https://www.aucoffre.com/recherche/marketing_list-5/stype-13/produit","napoleon-100f-genie-iiieme-republique-lef"],
         '100 francs or génie DPF': ["https://www.aucoffre.com/recherche/marketing_list-5/stype-13/produit","napoleon-100f-genie-iiieme-republique-dpf"],
-        '20 francs or vreneli croix suisse': ["https://www.aucoffre.com/recherche/marketing_list-6/stype-180/produit","20-francs-suisse-vreneli"],
+        '20 francs or sui vreneli croix suisse 1935L': ["https://www.aucoffre.com/recherche/marketing_list-6/stype-180/produit","20-francs-suisse-vreneli"],
         '20 francs or union latine': ["https://www.aucoffre.com/recherche/stype-51/produit","union-latine"],
-        '20 dollars or liberté': ["https://www.aucoffre.com/recherche/metal-1/marketing_list-9/stype-8/produit","20-dollars-us-double-eagle-liberty"],
+        '20 dollars or liberté longacre': ["https://www.aucoffre.com/recherche/metal-1/marketing_list-9/stype-8/produit","20-dollars-us-double-eagle-liberty-de-longacre"],
+        '20 dollars or liberté st gaudens': ["https://www.aucoffre.com/recherche/metal-1/marketing_list-9/stype-8/produit","20-dollars-us-double-eagle-liberty-de-saint-gaudens"],
         '10 dollars or liberté': ["https://www.aucoffre.com/recherche/metal-1/marketing_list-9/stype-56/produit","10-dollars-us-liberty"],
+        '10 dollars or tête indien': ["https://www.aucoffre.com/recherche/metal-1/marketing_list-9/stype-56/produit","10-dollars-us-indien"],
         'souverain or georges V': ["https://www.aucoffre.com/recherche/marketing_list-8/stype-3/produit","souverain-george-v"],
-        '1/2 souverain or georges V': ["https://www.aucoffre.com/recherche/marketing_list-8/stype-16/produit","demi-souverain"],
+        '1/2 souverain or': ["https://www.aucoffre.com/recherche/marketing_list-8/stype-16/produit","demi-souverain"],
         'souverain or elizabeth II': ["https://www.aucoffre.com/recherche/marketing_list-8/stype-6/produit","souverain-elisabeth-ii"],
         'souverain or victoria jubilee': ["https://www.aucoffre.com/recherche/marketing_list-8/stype-3/produit","souverain-victoria-jubilee"],
         '20 mark or wilhelm II': ["https://www.aucoffre.com/recherche/stype-73/produit","20-mark-allemand-wilhelm-ii"],
@@ -63,7 +65,8 @@ def get_price_for(session,session_id,buy_price):
         '1/4 oz nugget / kangourou': ["https://www.aucoffre.com/recherche/stype-36/produit","australian-nugget-1-4-once"],
         '1/10 oz nugget / kangourou': ["https://www.aucoffre.com/recherche/marketing_list-13/stype-37/produit","australian-nugget-1-10-once"],
         '1/20 oz nugget / kangourou': ["https://www.aucoffre.com/recherche/marketing_list-13/stype-38/produit","australian-nugget-1-20-once"],
-        '20 francs or helvetia suisse': ["https://www.aucoffre.com/recherche/marketing_list-6/stype-5/produit","20-francs-suisse-vreneli-1901"],
+        '20 francs or sui vreneli croix suisse': ["https://www.aucoffre.com/recherche/marketing_list-6/stype-5/produit","20-francs-suisse-vreneli-1901"],
+        '20 francs or sui confederatio suisse': ["https://www.aucoffre.com/recherche/marketing_list-6/stype-5/produit","20-francs-suisse-confederation-helvetique"],
         '10 francs or vreneli croix suisse': ["https://www.aucoffre.com/recherche/marketing_list-6/stype-55/produit","demi-vreneli-10"]
     }
     headers = {
@@ -92,7 +95,6 @@ def get_price_for(session,session_id,buy_price):
                     price_element = element.select_one("div[data-url*='{coin_name}'] .text-xlarge.text-bolder.m-0.text-nowrap".format(coin_name=url[1]))
 
                     if price_element :
-                        print('go')
                         price_text = price_element.text.strip()
 
                         price = Price.fromstring(price_text)

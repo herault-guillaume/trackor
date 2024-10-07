@@ -6,10 +6,10 @@ import traceback
 
 # https://www.oretchange.com/content/1-livraison
 coin_name = {
-    "20 Francs Coq Or": '20 francs or coq marianne',
-    "20 Francs Napoléon Or": '20 francs or napoléon III',
+    "20 Francs Coq Or": '20 francs or fr coq marianne',
+    "20 Francs Napoléon Or": '20 francs or fr napoléon III',
     "Souverain Or Victoria ou Edouard VII ou George V": 'souverain or georges V',
-    "20 Francs Suisse Vrénéli ou Confédération": '20 francs or vreneli croix suisse',
+    "20 Francs Suisse Vrénéli ou Confédération": '20 francs or sui suisse',
     "20 Francs Union Latine": '20 francs or union latine',
     "50 Pesos Mexique": '50 pesos or',
     "Krugerrand Or": '1 oz krugerrand',
