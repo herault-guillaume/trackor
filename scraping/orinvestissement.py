@@ -7,9 +7,9 @@ import traceback
 coin_name = {
     "Pièce Or 20 Francs Marianne Coq": '20 francs or fr coq marianne',
     "Pièce Or 20 Francs Napoléon III": '20 francs or fr napoléon III',
-    "Pièce Or 20 Francs Suisse": '20 francs or sui vreneli croix suisse',  # Assuming "Suisse" refers to the Vreneli coin
+    "Pièce Or 20 Francs Suisse": '20 francs or sui vreneli croix',  # Assuming "Suisse" refers to the Vreneli coin
     "Pièce Or 10 Dollars US": '10 dollars or liberté',  # Assuming "Liberté" is the most common 10 dollar US gold coin
-    "Pièce Or 20 Dollars US": '20 dollars or liberté',  # Similar assumption as above
+    "Pièce Or 20 Dollars US": '20 dollars or',  # Similar assumption as above
     "Pièce Or Union Latine": '20 francs or union latine',  # Assuming the most common Union Latine coin
     "Pièce Or 50 Pesos": '50 pesos or',
     "Pièce Or Souverain": 'souverain or elizabeth II',  # Assuming the most recent monarch

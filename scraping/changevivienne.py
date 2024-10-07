@@ -6,12 +6,12 @@ import traceback
 
 coin_mapping = {
     "20 Francs Napoléon": "20 francs or fr",
-    "20 Francs Suisse": "20 francs or vreneli croix suisse",
+    "20 Francs Suisse": "20 francs or sui vreneli croix",
     "Union Latine": "20 francs or union latine",
     "Souverain": "souverain or elizabeth II",
     "Demi Souverain": "1/2 souverain or georges V",
     "50 Pesos": "50 pesos or",
-    "10 Francs Napoléon": "10 francs or napoléon III",
+    "10 Francs Napoléon": "10 francs or fr napoléon III",
     "Krugerrand": "1 oz krugerrand",
     "10 Dollars US": "10 dollars or liberté",
     "5 Dollars US": "5 dollars or liberté",
@@ -23,8 +23,8 @@ coin_mapping = {
     "American Buffalo 1 OZ": "1 oz buffalo",
     "Nugget 1 OZ": "1 oz nugget / kangourou",
     '20 Dollars US' : '20 dollars or liberté',
-    '20 Francs Marianne...' : '20 francs or coq marianne',
-    '10 Francs Napoléon...' : '10 francs or coq marianne',
+    '20 Francs Marianne...' : '20 francs or fr coq marianne',
+    '10 Francs Napoléon...' : '10 francs or fr coq marianne',
     'Britannia 1 OZ Or' : '1 oz britannia',
 }
 def get_delivery_price(price):

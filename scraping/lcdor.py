@@ -8,7 +8,7 @@ coin_to_name = {
     "20 Francs Or Coq": '20 francs or fr coq marianne',
     "20 Francs Or Napoléon III": '20 francs or fr napoléon III',
     "20 Francs Or Génie": '20 francs or fr génie debout',
-    "20 Francs Or Vreneli": '20 francs or sui vreneli croix suisse',
+    "20 Francs Or Vreneli": '20 francs or sui vreneli croix',
     "20 Francs Or Leopold 2": '20 francs or union latine',
     "Souverain Or": 'souverain or elizabeth II',  # Assuming you want Elizabeth II
     "Souverain Or Elizabeth II": 'souverain or elizabeth II',

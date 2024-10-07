@@ -8,7 +8,7 @@ from price_parser import Price
 import traceback
 
 coin_name_to_map = {
-    "20 $ US" :  '20 dollars or liberté',
+    "20 $ US" :  '20 dollars or',
     "10 $ US" : '10 dollars or liberté',
     "5 $ US" :'5 dollars or liberté',
     "Napoléon 20 Frs (Louis d'Or)" : '20 francs or fr coq marianne',

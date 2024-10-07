@@ -19,7 +19,7 @@ coin_mapping_name = {
     'Krugerrand': '1 oz krugerrand',
     'Souverain': 'souverain or',  # No exact match for "Souverain"
     'Union Latine': '20 francs or union latine',
-    '20 Francs Suisse': '20 francs or vreneli croix suisse',
+    '20 Francs Suisse': '20 francs or sui vreneli croix',
     '20 Dollars US': '20 dollars or',
     '10 Dollars US': '10 dollars or liberté',
     '5 Dollars US Or': '5 dollars or liberté',

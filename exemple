@@ -1,0 +1,57 @@
+<script>
+// Create the map container dynamically
+const mapDiv = document.createElement('div');
+mapDiv.id = 'map';
+mapDiv.style.height='400px';
+mapDiv.style.width='400px';
+document.body.appendChild(mapDiv);
+  let map;
+
+  async function initMap() {
+    const { Map } = await google.maps.importLibrary("maps");
+
+    map = new Map(document.getElementById("map"), {
+      center: { lat: -34.397, lng: 150.644 },
+      zoom: 8,
+    });
+  }
+
+  // Define the initialize function
+  function initialize() {
+    // Call the initMap function to create the map
+    initMap();
+  }
+</script>
+
+<script async defer
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAhXPa0Kuo5CE6M_ZhteXSzPid2YdxP-hI&callback=initialize">
+</script>
+
+<script>
+// Create the map container dynamically
+const mapDiv = document.createElement('div');
+mapDiv.id = 'map';
+mapDiv.style.height='400px';
+mapDiv.style.width='400px';
+document.body.appendChild(mapDiv);
+  let map;
+
+  async function initMap() {
+    const { Map } = await google.maps.importLibrary("maps");
+
+    map = new Map(document.getElementById("map"), {
+      center: { lat: -34.397, lng: 150.644 },
+      zoom: 8,
+    });
+  }
+
+  // Define the initialize function
+  function initialize() {
+    // Call the initMap function to create the map
+    initMap();
+  }
+</script>
+
+<script async defer
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCPBPOey8pqWRH82aqSxRo-pmmBHEvYT2Q&callback=initialize">
+</script>

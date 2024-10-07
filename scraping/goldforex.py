@@ -25,7 +25,7 @@ coin_name = {
     "Pièce d'or quart 1/4 d'once": "1/4 oz american eagle",  # Assuming this is the American Eagle
     "Pièce d'or 1 dixième d'once Krugerrand": "1/10 oz krugerrand",
     "Pièce d'or 50 écus": "50 écus or charles quint",
-    "Pièce d'or Vreneli 20 francs suisse": "20 francs or sui vreneli croix suisse",
+    "Pièce d'or Vreneli 20 francs suisse": "20 francs or sui vreneli croix",
     "Pièce d'or Leopold II 20 francs": "20 francs or union latine",  # Assuming Leopold II is part of the Latin Monetary Union
     "Pièce d'or Souverain Nouveau Elisabeth 2": "souverain or elizabeth II",
     "Pièce d'or 50 pesos mexicain": "50 pesos or",

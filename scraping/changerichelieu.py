@@ -6,7 +6,7 @@ import traceback
 
 coin_mapping = {
     "20 Francs Napoléon": "20 francs or fr",
-    "20 Francs Suisse": "20 francs or sui vreneli croix suisse",
+    "20 Francs Suisse": "20 francs or sui vreneli croix",
     "Union Latine": "20 francs or union latine",
     "Souverain": "souverain or",
     "Demi Souverain": "1/2 souverain or",

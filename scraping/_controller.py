@@ -91,7 +91,7 @@ def update_json_file(new_data,
         file_name: The name of the JSON file within the bucket.
         new_data: The new JSON data (Python dictionary or list) to write to the file.
     """
-    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = r"C:\Users\Guillaume Hérault\PycharmProjects\trackor\trackor-431010-1ff28b492956.json"
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = r"C:\Users\guillaume.herault\PycharmProjects\trackor\trackor-431010-1ff28b492956.json"
     storage_client = storage.Client()
     bucket = storage_client.bucket(bucket_name)
     blob = bucket.blob(filename)
@@ -237,12 +237,12 @@ def fetch_and_update_data():
 
             buy_price,sell_price = bullionvault.get(session,session_id)
 
-            abacor.get_price_for(session,session_id,buy_price)
-            acheterorargent.get_price_for(session,session_id,buy_price)
-            achatoretargent.get_price_for(session,session_id,buy_price)
-            aucoffre.get_price_for(session,session_id,buy_price)
-            bdor.get_price_for(session,session_id,buy_price)
-            bullionbypost.get_price_for(session,session_id,buy_price)
+            # abacor.get_price_for(session,session_id,buy_price)
+            # acheterorargent.get_price_for(session,session_id,buy_price)
+            # achatoretargent.get_price_for(session,session_id,buy_price)
+            # aucoffre.get_price_for(session,session_id,buy_price)
+            # bdor.get_price_for(session,session_id,buy_price)
+            # bullionbypost.get_price_for(session,session_id,buy_price)
             capornumismatique.get_price_for(session,session_id,buy_price)
             changedelabourse.get_price_for(session,session_id,buy_price)
             changerichelieu.get_price_for(session,session_id,buy_price)
@@ -270,16 +270,16 @@ def fetch_and_update_data():
             calculate_and_store_coin_data(session, session_id, ['20 francs or fr coq marianne',
                                                                         '20 francs or fr cérès',
                                                                         '20 francs or fr génie debout',
-                                                                        '20 francs or napoléon III',
-                                                                        '20 francs or louis XVIII buste nu',
-                                                                        '20 francs or charles X',
-                                                                        '20 francs or louis XVIII buste habillé',
-                                                                        '20 francs or louis philippe laurée',
-                                                                        '20 francs or napoléon empereur',
-                                                                        '20 francs or napoléon empereur laurée',
-                                                                        '20 francs or louis-napoléon bonaparte',
+                                                                        '20 francs or fr napoléon III',
+                                                                        '20 francs or fr louis XVIII buste nu',
+                                                                        '20 francs or fr charles X',
+                                                                        '20 francs or fr louis XVIII buste habillé',
+                                                                        '20 francs or fr louis philippe laurée',
+                                                                        '20 francs or fr napoléon empereur',
+                                                                        '20 francs or fr napoléon empereur laurée',
+                                                                        '20 francs or fr louis-napoléon bonaparte',
+                                                                        '20 francs or fr fr',
                                                                         '20 francs or fr',
-                                                                        '20 francs or',
                                                                         ],
                                           './results/20_fr_france.json')
             calculate_and_store_coin_data(session, session_id, ['20 francs or bel leopold I','20 francs or union latine',
@@ -287,7 +287,7 @@ def fetch_and_update_data():
                                           './results/20_fr_union_latine.json')
             calculate_and_store_coin_data(session, session_id, [],
                                           './results/20_lires_italie.json')
-            calculate_and_store_coin_data(session, session_id, ['20 francs or vreneli croix suisse',
+            calculate_and_store_coin_data(session, session_id, ['20 francs or sui vreneli croix',
                                                                         '20 francs or confederatio suisse'],
                                           './results/20_fr_suisse.json')
             calculate_and_store_coin_data(session, session_id, ['souverain or edouart VII',

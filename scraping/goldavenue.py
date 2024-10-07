@@ -14,7 +14,7 @@ urls = {
     '40 francs or napoléon empereur laurée': "https://www.goldavenue.com/fr/acheter/or/produit/piece-de-monnaie-d-or-pur-900-0-40-francs-napoleon-bonaparte-premier-consul-an-xi",
     '50 francs or napoléon III tête nue': "https://www.goldavenue.com/fr/acheter/or/produit/piece-de-monnaie-d-or-pur-900-0-50-francs-napoleon-iii-tete-nue-1855-a-paris",
     '100 francs or napoléon III tête laurée': "https://www.goldavenue.com/fr/acheter/or/produit/piece-de-monnaie-d-or-pur-900-0-100-francs-napoleon-iii-tete-lauree-1869-a",
-    '20 francs or sui vreneli croix suisse': "https://www.goldavenue.com/fr/acheter/or/produit/piece-d-or-pur-900-0-vreneli-20-francs-suisse-helvetia-annees-mixtes",
+    '20 francs or sui vreneli croix': "https://www.goldavenue.com/fr/acheter/or/produit/piece-d-or-pur-900-0-vreneli-20-francs-suisse-helvetia-annees-mixtes",
     'souverain or victoria jubilee': "https://www.goldavenue.com/fr/acheter/or/produit/piece-souverain-or-victoria-or-pur-916-7",
     'souverain or edouart VII': "https://www.goldavenue.com/fr/acheter/or/produit/souverain-en-or-pur-916-7-roi-edouard-vii",
     'souverain or elizabeth II': "https://www.goldavenue.com/fr/acheter/or/produit/piece-d-or-pur-916-7-souverain-elizabeth-bu-annees-mixtes",

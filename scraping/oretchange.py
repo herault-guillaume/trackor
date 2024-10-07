@@ -13,10 +13,10 @@ coin_name = {
     "20 Francs Union Latine": '20 francs or union latine',
     "50 Pesos Mexique": '50 pesos or',
     "Krugerrand Or": '1 oz krugerrand',
-    "20 Dollars Or": '20 dollars or liberté',
+    "20 Dollars Or": '20 dollars or',
     "10 Dollars Or Liberté ou Tête d’indien": '10 dollars or liberté',
     "5 Dollars Or Liberté ou Tête d'indien": '5 dollars or liberté',
-    "10 Francs Napoléon III": '10 francs or napoléon III',
+    "10 Francs Napoléon III": '10 francs or fr napoléon III',
     "Demi-souverain Or Victoria, Edouard VII ou George V": '1/2 souverain or georges V'
 }
 

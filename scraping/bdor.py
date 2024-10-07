@@ -10,7 +10,7 @@ import traceback
 
 table_lookup = {
         "20 Fr Or Coq" : '20 francs or fr coq marianne',
-        "20 Fr Or Vreneli" : '20 francs or sui vreneli croix suisse',
+        "20 Fr Or Vreneli" : '20 francs or sui vreneli croix',
         "20 Fr Or Génie" : '20 francs or fr génie debout',
         "20 Fr Or Napoléon Tête Nue" : '20 francs or fr napoléon empereur nue',
         "20 Fr Or Napoléon Lauré" : '20 francs or fr napoléon empereur laurée',
@@ -43,9 +43,9 @@ table_lookup = {
         "Philharmonique Or" : '1 oz philharmonique',
         "American Eagle Or" : '1 oz american eagle',
         "100 Frs Tête Nue" : '100 francs or fr napoléon III tête nue',
-        "50 Francs Tête Nue" : '50 francs or napoléon III tête nue',
-        "100 Frs Tête Laurée" : '100 francs or napoléon III tête laurée',
-        "50 Frs Tête Laurée" : "50 francs or napoléon III tête laurée",
+        "50 Francs Tête Nue" : '50 francs or fr napoléon III tête nue',
+        "100 Frs Tête Laurée" : '100 francs or fr napoléon III tête laurée',
+        "50 Frs Tête Laurée" : "50 francs or fr napoléon III tête laurée",
         "100 Corona" : '100 couronnes or françois joseph I',
         "4 Ducats" : '4 ducats or',
         "20 Pesos Or" : "20 pesos or",

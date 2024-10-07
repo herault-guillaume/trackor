@@ -11,10 +11,10 @@ coin_name = {
     "2,5 Pesos – Mexique | Or": "2 1/2 pesos or",
     "4 Florins / 10 Francs – Franz Joseph | Or": "4 florins 10 francs 1892 refrappe",
     "1 Ducat – Autriche | Or": "1 ducat or",
-    "40 Francs – Charles X | Or": "40 francs or charles X",  # This key doesn't exist, handle later
+    "40 Francs – Charles X | Or": "40 francs or fr charles X",  # This key doesn't exist, handle later
     "1/2 Souverain – Victoria (veuve) | Or": "1/2 souverain or victoria",
     "5 Roubles – Nicolas II | Or": "5 roubles or",  # This key doesn't exist, handle later
-    "40 Francs – Louis Philippe | Or": "40 francs or louis philippe",  # This key doesn't exist, handle later
+    "40 Francs – Louis Philippe | Or": "40 francs or fr louis philippe",  # This key doesn't exist, handle later
     "4 Ducats – Autriche | Or": "4 ducats or",
     "1/2 souverain – Edouard VII | Or": "1/2 souverain or georges V",  # Assuming typo, should be George V
     "10 Lire – Vittorio Emanuele | Or": "10 lire or vittorio emanuele II",  # Assuming it's a 20 Lire coin, clarify if needed
@@ -37,7 +37,7 @@ coin_name = {
     "Napoléon 20 Francs Coq Marianne | Or": "20 francs or coq marianne",
     "Napoléon 20 Francs | Or": "20 francs or napoléon III",
     "Demi Napoléon | Or": "10 francs or napoléon III",
-    "Croix Suisse 20 Francs | Or": "20 francs or vreneli croix suisse",
+    "Croix Suisse 20 Francs | Or": "20 francs or sui vreneli croix",
     "Lingotin 10 g | Or": "Lingot or 10 g LBMA",
     "Lingotin 20 g | Or": "Lingot or 20 g LBMA",
     "Lingotin 31,1 g | Or": "Lingot or 1 once LBMA",

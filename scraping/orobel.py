@@ -13,7 +13,7 @@ coin_name = {
     #"Queen’s Beast 2021 – 1 Oz (Edition Limitée)": 'souverain or elizabeth II',
     "20 Francs Napoléon": '20 francs or fr napoléon III',
     "20 Francs Marianne Coq": '20 francs or fr coq marianne',
-    "20 Francs Suisse (Vrenelis)": '20 francs or sui vreneli croix suisse',
+    "20 Francs Suisse (Vrenelis)": '20 francs or sui vreneli croix',
     "Krugerrand": '1 oz krugerrand',
     #"Krugerrand 1 Oz Or (2024)": '1 oz krugerrand',
     #"Swiss Bullion 1+ (1 Oz 999,9 ‰)": 'Lingot or 1 once LBMA',

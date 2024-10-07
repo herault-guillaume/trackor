@@ -6,16 +6,16 @@ from models.model import CoinPrice, poids_pieces_or
 from price_parser import Price
 import traceback
 
-coin_mapping_name = {'20 Francs Marianne Coq': '20 francs or coq marianne',
- '20 Francs Napoleon': '20 francs or',
+coin_mapping_name = {'20 Francs Marianne Coq': '20 francs or fr coq marianne',
+ '20 Francs Napoleon': '20 francs or fr',
  '50 Pesos': '50 pesos or',
- '10 Francs Marianne Coq': '10 francs or coq marianne',
- '10 Francs Napoleon': '10 francs or',
+ '10 Francs Marianne Coq': '10 francs or fr coq marianne',
+ '10 Francs Napoleon': '10 francs or fr',
  'Krugerrand': '1 oz krugerrand',
  'Souverain': 'souverain or',
  '1/2 Souverain': '1/2 souverain or',
  '20 Francs Union Latine': '20 francs or union latine',
- '20 Francs Croix Suisse': '20 francs or vreneli croix suisse',
+ '20 Francs Croix Suisse': '20 francs or sui vreneli croix',
  '20 Dollars': '20 dollars or',
  '10 Dollars': '10 dollars or liberté',
  '5 Dollars': '5 dollars or liberté',

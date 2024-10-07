@@ -161,27 +161,27 @@ poids_pieces_or  = {
                         '20 francs or fr': 5.805, # -> CPor
                         '20 francs or fr coq marianne': 5.805, # -> CPor
                         '20 francs or fr coq marianne refrappe pinay': 5.805, # -> CPor
-                        '20 francs or cérès': 5.805, # -> CPor
-                        '20 francs or génie debout': 5.805,
-                        '20 francs or confederatio suisse': 5.805, # -> CPor
+                        '20 francs or fr cérès': 5.805, # -> CPor
+                        '20 francs or fr génie debout': 5.805,
+                        '20 francs or sui confederatio suisse': 5.805, # -> CPor
                         '20 francs or bel leopold I': 5.805, # -> CPor
                         '20 francs or bel leopold II': 5.805, # -> CPor
                         '20 francs or bel albert I': 5.805, # -> CPor
-                        '20 francs or louis XVIII buste nu': 5.805, # -> CPor
-                        '20 francs or charles X': 5.805, # -> CPor
-                        '20 francs or louis XVIII buste habillé': 5.805, # -> CPor
-                        '20 francs or louis philippe laurée': 5.805, # -> CPor
-                        '20 francs or napoléon empereur': 5.805, # -> CPor
-                        '20 francs or napoléon empereur nue': 5.805, # -> CPor
-                        '20 francs or napoléon empereur laurée': 5.805, # -> CPor
-                        '20 francs or louis-napoléon bonaparte': 5.805, # -> CPor
-                        '20 francs or napoléon III': 5.805, # -> CPor
+                        '20 francs or fr louis XVIII buste nu': 5.805, # -> CPor
+                        '20 francs or fr charles X': 5.805, # -> CPor
+                        '20 francs or fr louis XVIII buste habillé': 5.805, # -> CPor
+                        '20 francs or fr louis philippe laurée': 5.805, # -> CPor
+                        '20 francs or fr napoléon empereur': 5.805, # -> CPor
+                        '20 francs or fr napoléon empereur nue': 5.805, # -> CPor
+                        '20 francs or fr napoléon empereur laurée': 5.805, # -> CPor
+                        '20 francs or fr louis-napoléon bonaparte': 5.805, # -> CPor
+                        '20 francs or fr napoléon III': 5.805, # -> CPor
                         '20 francs or tunisie': 5.805, # -> CPor
                         '20 francs or union latine': 5.805, # -> CPor
-                        '20 francs or suisse': 5.805, # -> CPor
-                        '20 francs or vreneli croix suisse': 5.805, # -> CPor
-                        '20 francs or vreneli croix suisse 1935L': 5.805, # -> CPor
-                        '20 francs or louis philippe I nu': 5.805, # -> CPor
+                        '20 francs or sui': 5.805, # -> CPor
+                        '20 francs or sui vreneli croix': 5.805, # -> CPor
+                        '20 francs or sui vreneli croix 1935L': 5.805, # -> CPor
+                        '20 francs or fr louis philippe I nu': 5.805, # -> CPor
                         '20 lire or umberto I': 5.805,
                         '20 lire or vittorio emanuele II': 5.805,
                         '20 mark or': 7.168, # -> CPor
@@ -190,24 +190,24 @@ poids_pieces_or  = {
                         '4 ducats or': 13.78,
                         '4 florins 10 francs 1892 refrappe': 2.9,
                         '40 francs or fr': 11.61,
-                        '40 francs or napoléon empereur laurée': 11.61,
-                        '40 francs or napoléon empereur non laurée': 11.61,
-                        '40 francs or napoléon premier consul': 11.61,
-                        '40 francs or louis XVIII': 11.61,
-                        '40 francs or louis philippe': 11.61,
-                        '40 francs or charles X': 11.61,
-                        '40 francs or louis philippe': 11.61,
+                        '40 francs or fr napoléon empereur laurée': 11.61,
+                        '40 francs or fr napoléon empereur non laurée': 11.61,
+                        '40 francs or fr napoléon premier consul': 11.61,
+                        '40 francs or fr louis XVIII': 11.61,
+                        '40 francs or fr ouis philippe': 11.61,
+                        '40 francs or fr charles X': 11.61,
+                        '40 francs or fr louis philippe': 11.61,
                         '5 dollars or liberté': 7.523, # -> CPor
                         '5 dollars or tête indien': 7.523, # -> CPor
                         '2.5 dollars or tête liberté': 3.762, # -> CPor
                         '2.5 dollars or tête indien': 3.762, # -> CPor
                         '5 dollars or liberté': 7.523, # -> CPor
-                        '5 francs or napoléon III': 1.452,
-                        '5 francs or napoléon III nue': 1.452,
+                        '5 francs or fr napoléon III': 1.452,
+                        '5 francs or fr napoléon III nue': 1.452,
                         '5 pesos or': 3.75,
                         '5 roubles or': 3.87,
-                        '50 francs or napoléon III tête nue': 14.51,
-                        '50 francs or napoléon III tête laurée': 14.51,
+                        '50 francs or fr napoléon III tête nue': 14.51,
+                        '50 francs or fr napoléon III tête laurée': 14.51,
                         '50 pesos or': 37.5, # -> CPor
                         '50 écus or charles quint': 15.552,
                         '8 florins 20 francs or franz joseph I': 5.805,
@@ -265,6 +265,6 @@ poids_pieces_argent = {
                     }
 
 # Configuration de la base de données
-engine = create_engine(r'sqlite:///C:\Users\Guillaume Hérault\PycharmProjects\trackor\models\pieces_or.db')
+engine = create_engine(r'sqlite:///C:\Users\guillaume.herault\PycharmProjects\trackor\models\pieces_or.db')
 Base.metadata.create_all(engine)
 Session = sessionmaker(bind=engine)

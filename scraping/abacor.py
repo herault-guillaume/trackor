@@ -32,7 +32,7 @@ def get_price_for(session,session_id,buy_price):
         'Lingotin Or 5 Gr': 'Lingot or 5 g LBMA',
         'Pièce d’Or 20 Francs Coq Marianne': '20 francs or fr coq marianne refrappe pinay',
         'Pièce d’Or 20 Francs Napoléon / Louis d’Or': '20 francs or fr napoléon empereur laurée', # Or '20 francs or fr louis XVIII buste nu' depending on the coin
-        'Pièce d’Or 20 Francs Suisse': '20 francs or sui vreneli croix suisse',
+        'Pièce d’Or 20 Francs Suisse': '20 francs or sui vreneli croix',
         'Union Latine Or': '20 francs or union latine',
         'Pièce d’Or Souverain': 'souverain or',
         'Pièce d’Or 20 Dollars US': '20 dollars or',
