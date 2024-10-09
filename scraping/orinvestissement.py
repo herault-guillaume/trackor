@@ -5,26 +5,26 @@ from price_parser import Price
 import traceback
 
 coin_name = {
-    "Pièce Or 20 Francs Marianne Coq": '20 francs or fr coq marianne',
-    "Pièce Or 20 Francs Napoléon III": '20 francs or fr napoléon III',
-    "Pièce Or 20 Francs Suisse": '20 francs or sui vreneli croix',  # Assuming "Suisse" refers to the Vreneli coin
-    "Pièce Or 10 Dollars US": '10 dollars or liberté',  # Assuming "Liberté" is the most common 10 dollar US gold coin
-    "Pièce Or 20 Dollars US": '20 dollars or',  # Similar assumption as above
-    "Pièce Or Union Latine": '20 francs or union latine',  # Assuming the most common Union Latine coin
-    "Pièce Or 50 Pesos": '50 pesos or',
-    "Pièce Or Souverain": 'souverain or elizabeth II',  # Assuming the most recent monarch
-    "Pièce Or Krugerrand": '1 oz krugerrand',
-    "Pièce Or 100 Francs Napoléon III": '100 francs or fr napoléon III tête nue',
-    "Pièce Or 50 Francs Napoléon III": '50 francs or fr napoléon III tête nue',
-    "Pièce Or 5 Dollars US": '5 dollars or liberté',  # Same assumption as for 10 dollars
-    "Pièce Or 20 Francs Génie": '20 francs or fr génie debout',
-    "Pièce Or 20 Mark Allemande": '20 mark or wilhelm II'
+    "Pièce Or 20 Francs Marianne Coq": 'or - 20 francs fr coq marianne',
+    "Pièce Or 20 Francs Napoléon III": 'or - 20 francs fr napoléon III',
+    "Pièce Or 20 Francs Suisse": 'or - 20 francs sui vreneli croix',  # Assuming "Suisse" refers to the Vreneli coin
+    "Pièce Or 10 Dollars US": 'or - 10 dollars liberté',  # Assuming "Liberté" is the most common 10 dollar US gold coin
+    "Pièce Or 20 Dollars US": 'or - 20 dollars',  # Similar assumption as above
+    "Pièce Or Union Latine": 'or - 20 francs union latine',  # Assuming the most common Union Latine coin
+    "Pièce Or 50 Pesos": 'or - 50 pesos',
+    "Pièce Or Souverain": 'or - 1 souverain elizabeth II',  # Assuming the most recent monarch
+    "Pièce Or Krugerrand": 'or - 1 oz krugerrand',
+    "Pièce Or 100 Francs Napoléon III": 'or - 100 francs fr napoléon III tête nue',
+    "Pièce Or 50 Francs Napoléon III": 'or - 50 francs fr napoléon III tête nue',
+    "Pièce Or 5 Dollars US": 'or - 5 dollars liberté',  # Same assumption as for 10 dollars
+    "Pièce Or 20 Francs Génie": 'or - 20 francs fr génie debout',
+    "Pièce Or 20 Mark Allemande": 'or - 20 mark wilhelm II'
 }
 
 # https://or-investissement.fr/information-or-investissement/1-livraison-achat-or-investissement
 def get_price_for(session,session_id,buy_price):
     """
-    Retrieves the '20 francs or coq marianne' coin purchase price from Or-Investissement using requests and BeautifulSoup.
+    Retrieves the 'or - 20 francs coq marianne' coin purchase price from Or-Investissement using requests and BeautifulSoup.
     """
     url = 'https://or-investissement.fr/12-achat-piece-or-investissement'
     print(url)
@@ -51,14 +51,14 @@ def get_price_for(session,session_id,buy_price):
 
             print(price,coin_name[name],url)
 
-            #price = float(price_text.replace('€', '').replace(',', '.'))
-            coin = CoinPrice(nom=coin_name[name],
-                             j_achete=price.amount_float,
-                             prime_achat_perso=((price.amount_float + 25.0) - (
-                                     buy_price * poids_pieces_or[coin_name[name]])) * 100.0 / (buy_price *
-                                               poids_pieces_or[coin_name[name]]),
-                             source=url,
-                             frais_port=25.0,session_id=session_id,metal='g')
+            if coin_name[name][:2] == 'or':
+                coin = CoinPrice(nom=coin_name[name],
+                                 j_achete=price.amount_float,
+                                 prime_achat_perso=((price.amount_float + 25.0) - (
+                                         buy_price * poids_pieces_or[coin_name[name]])) * 100.0 / (buy_price *
+                                                   poids_pieces_or[coin_name[name]]),
+                                 source=url,
+                                 frais_port=25.0,session_id=session_id,metal='g')
             session.add(coin)
             session.commit()
 

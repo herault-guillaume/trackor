@@ -55,14 +55,15 @@ def get_price_for(session,session_id,buy_price):
 
                 product_price = Price.fromstring(product.find('span','prixProduit').text)
                 print(product_price,product_name,source)
-                coin = CoinPrice(nom=product_name,
-                                 j_achete=product_price.amount_float,
-                                 source=source,
-                                 prime_achat_perso=((product_price.amount_float + get_delivery_price(product_price.amount_float)) - (
-                                             buy_price * poids_pieces_or[product_name])) * 100.0 / (buy_price *
-                                                   poids_pieces_or[product_name]),
+                if product_name[:2] == 'or':
+                    coin = CoinPrice(nom=product_name,
+                                     j_achete=product_price.amount_float,
+                                     source=source,
+                                     prime_achat_perso=((product_price.amount_float + get_delivery_price(product_price.amount_float)) - (
+                                                 buy_price * poids_pieces_or[product_name])) * 100.0 / (buy_price *
+                                                       poids_pieces_or[product_name]),
 
-                                 frais_port=get_delivery_price(product_price.amount_float), session_id=session_id,metal='g')
+                                     frais_port=get_delivery_price(product_price.amount_float), session_id=session_id,metal='g')
                 session.add(coin)
                 session.commit()
 

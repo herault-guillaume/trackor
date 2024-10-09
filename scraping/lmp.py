@@ -6,17 +6,17 @@ import traceback
 
 #frais de livraison via leur calculette en ligne
 coin_name = {
-    "Souverain": "souverain or elizabeth II",  # Assuming you want Elizabeth II
-    "Union Latine": "20 francs or union latine",
-    "20 Reichsmark": "20 mark or wilhelm II",
-    "20 francs Marianne Coq": "20 francs or fr coq marianne",
-    "Krugerrand": "1 oz krugerrand",
-    "50 pesos": "50 pesos or",
-    "20 francs Suisse": "20 francs or sui vreneli croix",  # Assuming Vreneli
-    "5 dollars US": "5 dollars or liberté",
-    "10 dollars US": "10 dollars or liberté",
-    "20 dollars US": "20 dollars or",
-    "20 francs Napoléon": "20 francs or fr napoléon III"
+    "Souverain": "or - 1 souverain elizabeth II",  # Assuming you want Elizabeth II
+    "Union Latine": "or - 20 francs union latine",
+    "20 Reichsmark": "or - 20 mark wilhelm II",
+    "20 francs Marianne Coq": "or - 20 francs fr coq marianne",
+    "Krugerrand": "or - 1 oz krugerrand",
+    "50 pesos": "or - 50 pesos",
+    "20 francs Suisse": "or - 20 francs sui vreneli croix",  # Assuming Vreneli
+    "5 dollars US": "or - 5 dollars liberté",
+    "10 dollars US": "or - 10 dollars liberté",
+    "20 dollars US": "or - 20 dollars",
+    "20 francs Napoléon": "or - 20 francs fr napoléon III"
 }
 def get_price_for(session,session_id,buy_price):
     url = 'https://www.lesmetauxprecieux.com/achat-vente-or/pieces-or/'
@@ -43,14 +43,14 @@ def get_price_for(session,session_id,buy_price):
             # Extract and clean:
             #price = float(price_text.replace('€', '').replace(',', '.'))
 
-            coin = CoinPrice(nom=coin_name[name],
-                             j_achete=price.amount_float,
-                             source=url,
-                             prime_achat_perso=((price.amount_float + 15.79) - (
-                                         buy_price * poids_pieces_or[coin_name[name]])) * 100.0 / (buy_price * poids_pieces_or[
-                                                   coin_name[name]]),
-
-                             frais_port=15.79,session_id=session_id,metal='g')
+            if coin_name[name][:2] == 'or':
+                coin = CoinPrice(nom=coin_name[name],
+                                 j_achete=price.amount_float,
+                                 source=url,
+                                 prime_achat_perso=((price.amount_float + 15.79) - (
+                                             buy_price * poids_pieces_or[coin_name[name]])) * 100.0 / (buy_price * poids_pieces_or[
+                                                       coin_name[name]]),
+                                 frais_port=15.79,session_id=session_id,metal='g')
             session.add(coin)
             session.commit()
 

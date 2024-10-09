@@ -8,25 +8,25 @@ from price_parser import Price
 import traceback
 
 coin_name_to_map = {
-    "20 $ US" :  '20 dollars or',
-    "10 $ US" : '10 dollars or liberté',
-    "5 $ US" :'5 dollars or liberté',
-    "Napoléon 20 Frs (Louis d'Or)" : '20 francs or fr coq marianne',
-    "Croix Suisse 20 Frs": '10 francs or sui vreneli croix suisse',
-    "50 Pesos": "50 pesos or",
-    "Krugerrand": '1 oz krugerrand',
-    "Souverain George V": 'souverain or georges V',
-    'Souverain (toutes effigies)': 'souverain or georges V',
-    "Elisabeth II": 'souverain or elizabeth II',
-    "Demi Napoléon / 10 Frs Napoléon": '10 francs or fr coq marianne',
-    "Demi Souverain": '1/2 souverain or victoria',
-    '20 francs Or (toutes effigies)': '20 francs or fr',
-    'Britannia 1 OZ Or': '1 oz britannia',
-    "10 Florins":'10 florins or wilhelmina', # ou '10 florins or willem III'
-    "20 Frs Tunisie": '20 francs or tunisie',
-    "20 francs Tunisie": '20 francs or tunisie',
-    "Union Latine": '20 francs or union latine',
-    "Reichsmark": '20 mark or wilhelm II',
+    "20 $ US" :  'or - 20 dollars',
+    "10 $ US" : 'or - 10 dollars liberté',
+    "5 $ US" :'or - 5 dollars liberté',
+    "Napoléon 20 Frs (Louis d'Or)" : 'or - 20 francs fr coq marianne',
+    "Croix Suisse 20 Frs": 'or - 10 francs sui vreneli croix',
+    "50 Pesos": "or - 50 pesos",
+    "Krugerrand": 'or - 1 oz krugerrand',
+    "Souverain George V": 'or - 1 souverain georges V',
+    'Souverain (toutes effigies)': 'or - 1 souverain georges V',
+    "Elisabeth II": 'or - 1 souverain elizabeth II',
+    "Demi Napoléon / 10 Frs Napoléon": 'or - 10 francs fr coq marianne',
+    "Demi Souverain": 'or - 1/2 souverain victoria',
+    '20 francs Or (toutes effigies)': 'or - 20 francs fr',
+    'Britannia 1 OZ Or': 'or - 1 oz britannia',
+    "10 Florins":'or - 10 florins wilhelmina', # ou 'or - 10 florins willem III'
+    "20 Frs Tunisie": 'or - 20 francs tunisie',
+    "20 francs Tunisie": 'or - 20 francs tunisie',
+    "Union Latine": 'or - 20 francs union latine',
+    "Reichsmark": 'or - 20 mark wilhelm II',
     # non côté
 }
 
@@ -52,14 +52,15 @@ def get_price_for(session, session_id,buy_price):
                     name = name_element.text.strip()
                     price = Price.fromstring(price_element.text)
                     print(price,coin_name_to_map[name],url)
-                    coin = CoinPrice(nom=coin_name_to_map[name],
-                                     j_achete=price.amount_float,
-                                     source=url,
-                                     prime_achat_perso=((price.amount_float + 30.0) - (buy_price * poids_pieces_or[
-                                         coin_name_to_map[name]])) * 100.0 / (buy_price * poids_pieces_or[coin_name_to_map[name]]),
+                    if coin_name_to_map[name][:2] == 'or':
+                        coin = CoinPrice(nom=coin_name_to_map[name],
+                                         j_achete=price.amount_float,
+                                         source=url,
+                                         prime_achat_perso=((price.amount_float + 30.0) - (buy_price * poids_pieces_or[
+                                             coin_name_to_map[name]])) * 100.0 / (buy_price * poids_pieces_or[coin_name_to_map[name]]),
 
-                                     frais_port=30.0,
-                                     session_id=session_id,metal='g')
+                                         frais_port=30.0,
+                                         session_id=session_id,metal='g')
                     session.add(coin)
                     session.commit()
 

@@ -91,7 +91,7 @@ def update_json_file(new_data,
         file_name: The name of the JSON file within the bucket.
         new_data: The new JSON data (Python dictionary or list) to write to the file.
     """
-    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = r"C:\Users\guillaume.herault\PycharmProjects\trackor\trackor-431010-1ff28b492956.json"
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = r"C:\Users\Guillaume Hérault\PycharmProjects\trackor\trackor-431010-1ff28b492956.json"
     storage_client = storage.Client()
     bucket = storage_client.bucket(bucket_name)
     blob = bucket.blob(filename)
@@ -237,12 +237,12 @@ def fetch_and_update_data():
 
             buy_price,sell_price = bullionvault.get(session,session_id)
 
-            # abacor.get_price_for(session,session_id,buy_price)
-            # acheterorargent.get_price_for(session,session_id,buy_price)
-            # achatoretargent.get_price_for(session,session_id,buy_price)
-            # aucoffre.get_price_for(session,session_id,buy_price)
-            # bdor.get_price_for(session,session_id,buy_price)
-            # bullionbypost.get_price_for(session,session_id,buy_price)
+            abacor.get_price_for(session,session_id,buy_price)
+            acheterorargent.get_price_for(session,session_id,buy_price)
+            achatoretargent.get_price_for(session,session_id,buy_price)
+            aucoffre.get_price_for(session,session_id,buy_price)
+            bdor.get_price_for(session,session_id,buy_price)
+            bullionbypost.get_price_for(session,session_id,buy_price)
             capornumismatique.get_price_for(session,session_id,buy_price)
             changedelabourse.get_price_for(session,session_id,buy_price)
             changerichelieu.get_price_for(session,session_id,buy_price)
@@ -266,49 +266,49 @@ def fetch_and_update_data():
             # pieceor.get(session,session_id)
 
             find_best_deals(session,session_id,num_deals=15)
-            calculate_and_store_coin_data(session, session_id, ['1 oz krugerrand'], './results/1_oz_krugerrand.json')
-            calculate_and_store_coin_data(session, session_id, ['20 francs or fr coq marianne',
-                                                                        '20 francs or fr cérès',
-                                                                        '20 francs or fr génie debout',
-                                                                        '20 francs or fr napoléon III',
-                                                                        '20 francs or fr louis XVIII buste nu',
-                                                                        '20 francs or fr charles X',
-                                                                        '20 francs or fr louis XVIII buste habillé',
-                                                                        '20 francs or fr louis philippe laurée',
-                                                                        '20 francs or fr napoléon empereur',
-                                                                        '20 francs or fr napoléon empereur laurée',
-                                                                        '20 francs or fr louis-napoléon bonaparte',
-                                                                        '20 francs or fr fr',
-                                                                        '20 francs or fr',
+            calculate_and_store_coin_data(session, session_id, ['or - 1 oz krugerrand'], './results/1_oz_krugerrand.json')
+            calculate_and_store_coin_data(session, session_id, ['or - 20 francs fr coq marianne',
+                                                                        'or - 20 francs fr cérès',
+                                                                        'or - 20 francs fr génie debout',
+                                                                        'or - 20 francs fr napoléon III',
+                                                                        'or - 20 francs fr louis XVIII buste nu',
+                                                                        'or - 20 francs fr charles X',
+                                                                        'or - 20 francs fr louis XVIII buste habillé',
+                                                                        'or - 20 francs fr louis philippe laurée',
+                                                                        'or - 20 francs fr napoléon empereur',
+                                                                        'or - 20 francs fr napoléon empereur laurée',
+                                                                        'or - 20 francs fr louis-napoléon bonaparte',
+                                                                        'or - 20 francs fr',
                                                                         ],
                                           './results/20_fr_france.json')
-            calculate_and_store_coin_data(session, session_id, ['20 francs or bel leopold I','20 francs or union latine',
-                                                                '20 lire or umberto I','20 lire or vittorio emanuele II'],
+            calculate_and_store_coin_data(session, session_id, ['or - 20 francs bel leopold I','or - 20 francs union latine',
+                                                                'or - 20 lire umberto I','or - 20 lire vittorio emanuele II'],
                                           './results/20_fr_union_latine.json')
             calculate_and_store_coin_data(session, session_id, [],
                                           './results/20_lires_italie.json')
-            calculate_and_store_coin_data(session, session_id, ['20 francs or sui vreneli croix',
-                                                                        '20 francs or confederatio suisse'],
+            calculate_and_store_coin_data(session, session_id, ['or - 20 francs sui vreneli croix',
+                                                                        'or - 20 francs confederatio suisse'],
                                           './results/20_fr_suisse.json')
-            calculate_and_store_coin_data(session, session_id, ['souverain or edouart VII',
-                                                                        'souverain or georges V',
-                                                                        'souverain or elizabeth II'
-                                                                        'souverain or victoria jubilee'],
+            calculate_and_store_coin_data(session, session_id, ['or - 1 souverain edouart VII',
+                                                                        'or - 1 souverain georges V',
+                                                                        'or - 1 souverain elizabeth II'
+                                                                        'or - 1 souverain victoria jubilee'],
                                           './results/1_souv_ru.json')
-            calculate_and_store_coin_data(session, session_id, ['1/2 souverain or georges V',
-                                                                        '1/2 souverain or victoria',
+            calculate_and_store_coin_data(session, session_id, ['or - 1/2 souverain georges V',
+                                                                        'or - 1/2 souverain victoria',
                                                                 ],
                                           './results/1_2_souv_ru.json')
-            calculate_and_store_coin_data(session, session_id, ['50 pesos or'], './results/50_pesos_mex.json')
-            calculate_and_store_coin_data(session, session_id, ['20 mark or wilhelm II'], './results/20_mark_all.json')
-            calculate_and_store_coin_data(session, session_id, ['5 dollars or liberté','5 dollars or tête indien'],
+            calculate_and_store_coin_data(session, session_id, ['or - 50 pesos'], './results/50_pesos_mex.json')
+            calculate_and_store_coin_data(session, session_id, ['or - 20 mark wilhelm II'], './results/20_mark_all.json')
+            calculate_and_store_coin_data(session, session_id, ['or - 5 dollars liberté','or - 5 dollars tête indien'],
                                           './results/5_dol_usa.json')
-            calculate_and_store_coin_data(session, session_id, ['20 dollars or liberté longacre','20 dollars or liberté st gaudens','20 dollars or tete indien','20 dollars or'], './results/20_dol_usa.json')
-            calculate_and_store_coin_data(session, session_id, ['10 dollars or liberté','10 dollars or tête indien'],
+            calculate_and_store_coin_data(session, session_id, ['or - 20 dollars liberté longacre','or - 20 dollars liberté st gaudens','or - 20 dollars tete indien','or - 20 dollars'], './results/20_dol_usa.json')
+            calculate_and_store_coin_data(session, session_id, ['or - 10 dollars liberté','or - 10 dollars tête indien'],
                                           './results/10_dol_usa.json')
-            calculate_and_store_coin_data(session, session_id, ['10 francs or coq marianne',
-                                                                        '10 francs or cérès 1850-1851',
-                                                                        '10 francs or napoléon III'],
+            calculate_and_store_coin_data(session, session_id, ['or - 10 francs fr',
+                                                                        'or - 10 francs fr coq marianne',
+                                                                        'or - 10 francs fr cérès 1850-1851',
+                                                                        'or - 10 francs fr napoléon III'],
                                           './results/10_fr_france.json')
             print("--- %s seconds ---" % (time.time() - start_time))
             return  # Sortir de la fonction si la mise à jour est réussie

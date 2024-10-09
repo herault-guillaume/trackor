@@ -6,23 +6,23 @@ from models.model import CoinPrice, poids_pieces_or
 from price_parser import Price
 import traceback
 
-coin_mapping_name = {'20 Francs Marianne Coq': '20 francs or fr coq marianne',
- '20 Francs Napoleon': '20 francs or fr',
- '50 Pesos': '50 pesos or',
- '10 Francs Marianne Coq': '10 francs or fr coq marianne',
- '10 Francs Napoleon': '10 francs or fr',
- 'Krugerrand': '1 oz krugerrand',
- 'Souverain': 'souverain or',
- '1/2 Souverain': '1/2 souverain or',
- '20 Francs Union Latine': '20 francs or union latine',
- '20 Francs Croix Suisse': '20 francs or sui vreneli croix',
- '20 Dollars': '20 dollars or',
- '10 Dollars': '10 dollars or liberté',
- '5 Dollars': '5 dollars or liberté',
- '10 Florins': '10 florins or',
- '20 DeutschMarks': '20 mark or',
- '20 Francs Tunisie': '20 francs or tunisie',
- '5 Roubles': '5 roubles or'}
+coin_mapping_name = {'20 Francs Marianne Coq': 'or - 20 francs fr coq marianne',
+ '20 Francs Napoleon': 'or - 20 francs fr',
+ '50 Pesos': 'or - 50 pesos',
+ '10 Francs Marianne Coq': 'or - 10 francs fr coq marianne',
+ '10 Francs Napoleon': 'or - 10 francs fr',
+ 'Krugerrand': 'or - 1 oz krugerrand',
+ 'Souverain': 'or - 1 souverain',
+ '1/2 Souverain': 'or - 1/2 souverain',
+ '20 Francs Union Latine': 'or - 20 francs union latine',
+ '20 Francs Croix Suisse': 'or - 20 francs sui vreneli croix',
+ '20 Dollars': 'or - 20 dollars',
+ '10 Dollars': 'or - 10 dollars liberté',
+ '5 Dollars': 'or - 5 dollars liberté',
+ '10 Florins': 'or - 10 florins',
+ '20 DeutschMarks': 'or - 20 mark',
+ '20 Francs Tunisie': 'or - 20 francs tunisie',
+ '5 Roubles': 'or - 5 roubles'}
 def get_delivery_price(price):
     if 0 <= price <= 600:
         return 10.0
@@ -45,7 +45,7 @@ def get_delivery_price(price):
 
 def get_price_for(session,session_id,buy_price):
     """
-    Retrieves the '20 francs or coq marianne' coin purchase price from Change de la Bourse using requests and BeautifulSoup.
+    Retrieves the 'or - 20 francs coq marianne' coin purchase price from Change de la Bourse using requests and BeautifulSoup.
     """
     print('https://capornumismatique.com/produits/or/or-bourse')
     headers = {
@@ -85,14 +85,14 @@ def get_price_for(session,session_id,buy_price):
 
                 # More robust price cleaning: handle variations in formatting
                 #price = float(price_text.replace('€', '').replace(' ', '').replace(',', '.'))
-
-                coin = CoinPrice(nom=coin_mapping_name[product_name],
-                                 j_achete=price.amount_float,
-                                 source='https://capornumismatique.com'+url,
-                                 prime_achat_perso=((price.amount_float + get_delivery_price(price.amount_float)) - (
-                                             buy_price * poids_pieces_or[ coin_mapping_name[product_name]])) * 100.0 / (buy_price *
-                                                   poids_pieces_or[coin_mapping_name[product_name]]),
-                                 frais_port=get_delivery_price(price.amount_float),session_id=session_id,metal='g')
+                if coin_mapping_name[product_name][:2] == 'or':
+                    coin = CoinPrice(nom=coin_mapping_name[product_name],
+                                     j_achete=price.amount_float,
+                                     source='https://capornumismatique.com'+url,
+                                     prime_achat_perso=((price.amount_float + get_delivery_price(price.amount_float)) - (
+                                                 buy_price * poids_pieces_or[ coin_mapping_name[product_name]])) * 100.0 / (buy_price *
+                                                       poids_pieces_or[coin_mapping_name[product_name]]),
+                                     frais_port=get_delivery_price(price.amount_float),session_id=session_id,metal='g')
                 session.add(coin)
                 session.commit()
 

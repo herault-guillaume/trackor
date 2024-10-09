@@ -11,26 +11,26 @@ import traceback
 from scraping.changedelabourse import coin_mapping_name
 
 coin_mapping_name = {
-    '20 Francs Marianne Coq': '20 francs or fr coq marianne',
-    '10 Francs Napoléon': '10 francs or fr',
-    '50 Pesos Or': '50 pesos or',
-    "Louis d'Or - 20 Francs Or": '20 francs or fr',
-    '20 Francs Napoléon': '20 francs or fr',
-    'Krugerrand': '1 oz krugerrand',
-    'Souverain': 'souverain or',  # No exact match for "Souverain"
-    'Union Latine': '20 francs or union latine',
-    '20 Francs Suisse': '20 francs or sui vreneli croix',
-    '20 Dollars US': '20 dollars or',
-    '10 Dollars US': '10 dollars or liberté',
-    '5 Dollars US Or': '5 dollars or liberté',
-    '10 Florins Or': '10 florins or',
-    '20 Reichsmarks': '20 mark or wilhelm II',
-    '1 Ducat Or Francois-Joseph 1915': '1 ducat or',
+    '20 Francs Marianne Coq': 'or - 20 francs fr coq marianne',
+    '10 Francs Napoléon': 'or - 10 francs fr',
+    '50 Pesos Or': 'or - 50 pesos',
+    "Louis d'Or - 20 Francs Or": 'or - 20 francs fr',
+    '20 Francs Napoléon': 'or - 20 francs fr',
+    'Krugerrand': 'or - 1 oz krugerrand',
+    'Souverain': 'or - 1 souverain',  # No exact match for "Souverain"
+    'Union Latine': 'or - 20 francs union latine',
+    '20 Francs Suisse': 'or - 20 francs sui vreneli croix',
+    '20 Dollars US': 'or - 20 dollars',
+    '10 Dollars US': 'or - 10 dollars liberté',
+    '5 Dollars US Or': 'or - 5 dollars liberté',
+    '10 Florins Or': 'or - 10 florins',
+    '20 Reichsmarks': 'or - 20 mark wilhelm II',
+    '1 Ducat Or Francois-Joseph 1915': 'or - 1 ducat',
     #'Set 5 pièces 20 Fr Or Marianne Coq': None,  # No exact match
-    #'Set 5 Pièces 20 Francs Or': '20 francs or',
-    '4 Ducats Or': '4 ducats or',
-    '20 Francs Tunisie': '20 francs or tunisie',
-    'Demi Souverain': '1/2 souverain or'
+    #'Set 5 Pièces 20 Francs Or': 'or - 20 francs',
+    '4 Ducats Or': 'or - 4 ducats',
+    '20 Francs Tunisie': 'or - 20 francs tunisie',
+    'Demi Souverain': 'or - 1/2 souverain'
 }
 
 def get_delivery_price(price):
@@ -103,15 +103,17 @@ def get_price_for(session, session_id, buy_price):
                 price = Price.fromstring(row_price.text)
 
             print(price,coin_mapping_name[product_name],source)
-            coin = CoinPrice(nom=coin_mapping_name[product_name],
-                             j_achete=price.amount_float,
-                             source=source,
-                             prime_achat_perso=((price.amount_float + get_delivery_price(price.amount_float)) - (
-                                     buy_price * poids_pieces_or[coin_mapping_name[product_name]])) * 100.0 / (buy_price *
-                                                                                         poids_pieces_or[
-                                                                                             coin_mapping_name[product_name]]),
 
-                             frais_port=get_delivery_price(price.amount_float), session_id=session_id,metal='g')
+            if coin_mapping_name[product_name][:2] == 'or':
+                coin = CoinPrice(nom=coin_mapping_name[product_name],
+                                 j_achete=price.amount_float,
+                                 source=source,
+                                 prime_achat_perso=((price.amount_float + get_delivery_price(price.amount_float)) - (
+                                         buy_price * poids_pieces_or[coin_mapping_name[product_name]])) * 100.0 / (buy_price *
+                                                                                             poids_pieces_or[
+                                                                                                 coin_mapping_name[product_name]]),
+
+                                 frais_port=get_delivery_price(price.amount_float), session_id=session_id,metal='g')
             session.add(coin)
             session.commit()
 

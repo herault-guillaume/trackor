@@ -7,30 +7,30 @@ from price_parser import Price
 import traceback
 
 coin_name = {
-    "10 Francs Français – Marianne Coq": '10 francs or fr coq marianne',
-    #"MapleGram25 2021 (25 x 1g) Or  – Edition Limitée": 'Lingot or 25 g LBMA',
-    #"50 Dollars Eagle 2022 (1Oz)": '1 oz american eagle',
-    #"Queen’s Beast 2021 – 1 Oz (Edition Limitée)": 'souverain or elizabeth II',
-    "20 Francs Napoléon": '20 francs or fr napoléon III',
-    "20 Francs Marianne Coq": '20 francs or fr coq marianne',
-    "20 Francs Suisse (Vrenelis)": '20 francs or sui vreneli croix',
-    "Krugerrand": '1 oz krugerrand',
-    #"Krugerrand 1 Oz Or (2024)": '1 oz krugerrand',
-    #"Swiss Bullion 1+ (1 Oz 999,9 ‰)": 'Lingot or 1 once LBMA',
-    "Maple Leaf": '1 oz maple leaf',
-    "Australian Nugget": '1 oz nugget / kangourou',
-    "Louis Belge": '20 francs or union latine',
-    "Souverain": 'souverain or elizabeth II',
+    "10 Francs Français – Marianne Coq": 'or - 10 francs fr coq marianne',
+    #"MapleGram25 2021 (25 x 1g) Or  – Edition Limitée": 'or - lingot 25 g LBMA',
+    #"50 Dollars Eagle 2022 (1Oz)": 'or - 1 oz american eagle',
+    #"Queen’s Beast 2021 – 1 Oz (Edition Limitée)": 'or - 1 souverain elizabeth II',
+    "20 Francs Napoléon": 'or - 20 francs fr napoléon III',
+    "20 Francs Marianne Coq": 'or - 20 francs fr coq marianne',
+    "20 Francs Suisse (Vrenelis)": 'or - 20 francs sui vreneli croix',
+    "Krugerrand": 'or - 1 oz krugerrand',
+    #"Krugerrand 1 Oz Or (2024)": 'or - 1 oz krugerrand',
+    #"Swiss Bullion 1+ (1 Oz 999,9 ‰)": 'or - lingot 1 once LBMA',
+    "Maple Leaf": 'or - 1 oz maple leaf',
+    "Australian Nugget": 'or - 1 oz nugget / kangourou',
+    "Louis Belge": 'or - 20 francs union latine',
+    "Souverain": 'or - 1 souverain elizabeth II',
     #"Souverain Or 2023 – Roi Charles": 'souverain or elizabeth II',
-    "50 Pesos Mexique": '50 pesos or',
-    "American Buffalo": '1 oz buffalo',
-    "50 dollars eagle": '1 oz american eagle',
-    "Demi-souverain": '1/2 souverain or georges V',
-    "4 Ducats": '4 ducats or',
-    "20 Dollars Eagle (US)": '20 dollars or liberté',
-    "50 ECU": '50 écus or charles quint',
-    #"Chien Lunar 2018 1 once": 'Lingot or 1 once LBMA',
-    "10 Francs Français": '10 francs or fr'
+    "50 Pesos Mexique": 'or - 50 pesos',
+    "American Buffalo": 'or - 1 oz buffalo',
+    "50 dollars eagle": 'or - 1 oz american eagle',
+    "Demi-souverain": 'or - 1/2 souverain georges V',
+    "4 Ducats": 'or - 4 ducats',
+    "20 Dollars Eagle (US)": 'or - 20 dollars liberté',
+    "50 ECU": 'or - 50 écus charles quint',
+    #"Chien Lunar 2018 1 once": 'or - lingot 1 once LBMA',
+    "10 Francs Français": 'or - 10 francs fr'
 }
 
 def get_delivery_price(price):
@@ -103,7 +103,7 @@ def get_price_for(session, session_id,buy_price):
                 print(price,coin_name[name],url)
 
                 # Check if the name is in your coin_name dictionary
-                if name in coin_name:
+                if coin_name[name][:2] == 'or':
                     coin = CoinPrice(
                         nom=coin_name[name],
                         j_achete=price.amount_float,
@@ -112,8 +112,8 @@ def get_price_for(session, session_id,buy_price):
                                 buy_price * poids_pieces_or[coin_name[name]])) * 100.0 / (buy_price * poids_pieces_or[coin_name[name]]),
                         frais_port=get_delivery_price(price.amount_float),
                         session_id=session_id,metal='g')
-                    session.add(coin)
-                    session.commit()
+                session.add(coin)
+                session.commit()
 
             except Exception as e:
                 pass

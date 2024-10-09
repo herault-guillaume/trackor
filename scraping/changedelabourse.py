@@ -5,21 +5,21 @@ from price_parser import Price
 import traceback
 
 coin_mapping_name = {
-    "Napoléon Or 20 Francs": "20 francs or fr",  # Assuming a standard 20 Francs gold coin
-    "50 Pesos": "50 pesos or",
-    "Souverain": "souverain or",  # Assuming a modern Sovereign
-    "20 Dollars US": "20 dollars or",
-    "10 Francs Napoléon": "10 francs or fr",
-    "20 Francs Suisse": "20 francs or sui vreneli croix",
-    "10 Dollars US": "10 dollars or liberté",
-    "5 Dollars US": "5 dollars or liberté",
-    "Krugerrand": "1 oz krugerrand",
-    "10 Florins": "10 florins or",  # Assuming Wilhelmina reign
-    "20 Reichsmarks": "20 mark or",
-    "Union Latine": "20 francs or union latine",
-    "20 Francs Tunisie": "20 francs or tunisie",
-    "Demi Souverain": "1/2 souverain or",  # Assuming a George V half Sovereign
-    "1 Ducat Francois-Joseph 1915 Or": "1 ducat or"
+    "Napoléon Or 20 Francs": "or - 20 francs fr",  # Assuming a standard 20 Francs gold coin
+    "50 Pesos": "or - 50 pesos",
+    "Souverain": "or - 1 souverain",  # Assuming a modern Sovereign
+    "20 Dollars US": "or - 20 dollars",
+    "10 Francs Napoléon": "or - 10 francs fr",
+    "20 Francs Suisse": "or - 20 francs sui vreneli croix",
+    "10 Dollars US": "or - 10 dollars liberté",
+    "5 Dollars US": "or - 5 dollars liberté",
+    "Krugerrand": "or - 1 oz krugerrand",
+    "10 Florins": "or - 10 florins",  # Assuming Wilhelmina reign
+    "20 Reichsmarks": "or - 20 mark",
+    "Union Latine": "or - 20 francs union latine",
+    "20 Francs Tunisie": "or - 20 francs tunisie",
+    "Demi Souverain": "or - 1/2 souverain",  # Assuming a George V half Sovereign
+    "1 Ducat Francois-Joseph 1915 Or": "or - 1 ducat"
 }
 def get_delivery_price(price):
     if 0 <= price <= 600:
@@ -39,7 +39,7 @@ def get_delivery_price(price):
 
 def get_price_for(session,session_id,buy_price):
     """
-    Retrieves the '20 francs or coq marianne' coin purchase price from Change de la Bourse using requests and BeautifulSoup.
+    Retrieves the 'or - 20 francs coq marianne' coin purchase price from Change de la Bourse using requests and BeautifulSoup.
     """
     print('https://www.changedelabourse.com/or/pieces-d-or-d-investissement')
     headers = {
@@ -73,14 +73,14 @@ def get_price_for(session,session_id,buy_price):
 
                 # More robust price cleaning: handle variations in formatting
                 #price = float(price_text.replace('€', '').replace(' ', '').replace(',', '.'))
-
-                coin = CoinPrice(nom=coin_mapping_name[product_name],
-                                 j_achete=price.amount_float,
-                                 source=url,
-                                 prime_achat_perso=((price.amount_float + get_delivery_price(price.amount_float)) - (
-                                             buy_price * poids_pieces_or[ coin_mapping_name[product_name]])) * 100.0 / (buy_price *
-                                                   poids_pieces_or[coin_mapping_name[product_name]]),
-                                 frais_port=get_delivery_price(price.amount_float),session_id=session_id,metal='g')
+                if coin_mapping_name[product_name][:2] == 'or':
+                    coin = CoinPrice(nom=coin_mapping_name[product_name],
+                                     j_achete=price.amount_float,
+                                     source=url,
+                                     prime_achat_perso=((price.amount_float + get_delivery_price(price.amount_float)) - (
+                                                 buy_price * poids_pieces_or[ coin_mapping_name[product_name]])) * 100.0 / (buy_price *
+                                                       poids_pieces_or[coin_mapping_name[product_name]]),
+                                     frais_port=get_delivery_price(price.amount_float),session_id=session_id,metal='g')
                 session.add(coin)
                 session.commit()
 

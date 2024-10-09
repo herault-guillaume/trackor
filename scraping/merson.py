@@ -5,32 +5,32 @@ from price_parser import Price
 import traceback
 
 coin_name = {
-    "20 Francs Or Napoléon type Coq": '20 francs or fr coq marianne',
-    "Souverain Or Georges": 'souverain or georges V',
-    "50 Pesos Or Mexique": '50 pesos or',
-    "Krugerrand Or Afrique du Sud": '1 oz krugerrand',
-    "20 Francs Or Suisse": '20 francs or sui vreneli croix',
-    "20 Dollars Or": '20 dollars or liberté longacre',
-    "10 Dollars Or": '10 dollars or liberté',
-    "10 Francs Or": '10 francs or fr coq marianne',
-    "20 Francs Union Latine Or": '20 francs or union latine',
-    "10 Florins Or Hollandais": '10 florins or wilhelmina', # or '10 florins or willem III' depending on the specific coin
-    "20 Francs Or Tunisie": '20 francs or tunisie',
-    "Souverain Elisabeth  II Or": 'souverain or elizabeth II',
-    "1/2 Souverain Or": '1/2 souverain or georges V', # or '1/2 souverain or victoria' depending on the specific coin
-    "5 Dollars Or": '5 dollars or liberté',
-    "20 Marks Or": '20 mark or wilhelm II',
-    "Lingot Or 1 kg": 'Lingot or 1 kg LBMA',
-    "Lingotin Or 500 grammes": 'Lingot or 500 g LBMA',
-    "Lingotin Or  250 grammes": 'Lingot or 250 g LBMA',
-    "Lingotin Or 100 grammes": 'Lingot or 100 g LBMA',
-    "Lingotin Or 50 grammes": 'Lingot or 50 g LBMA',
-    "Lingotin Or 20 grammes": 'Lingot or 20 g LBMA',
-    "Lingotin Or 10 grammes": 'Lingot or 10 g LBMA',
-    "Lingotin Or 5 grammes": 'Lingot or 5 g LBMA',
-    "Lingotin Once Or": 'Lingot or 1 once LBMA',
-    "Lingotin Or 2 Grammes": "Lingot or 2 g", # Assuming this is the intended match, adjust if needed
-    "Lingotin Or 1 Gramme": "Lingot or 1 g"
+    "20 Francs Or Napoléon type Coq": 'or - 20 francs fr coq marianne',
+    "Souverain Or Georges": 'or - 1 souverain georges V',
+    "50 Pesos Or Mexique": 'or - 50 pesos',
+    "Krugerrand Or Afrique du Sud": 'or - 1 oz krugerrand',
+    "20 Francs Or Suisse": 'or - 20 francs sui vreneli croix',
+    "20 Dollars Or": 'or - 20 dollars liberté longacre',
+    "10 Dollars Or": 'or - 10 dollars liberté',
+    "10 Francs Or": 'or - 10 francs fr coq marianne',
+    "20 Francs Union Latine Or": 'or - 20 francs union latine',
+    "10 Florins Or Hollandais": 'or - 10 florins wilhelmina', # or 'or - 10 florins willem III' depending on the specific coin
+    "20 Francs Or Tunisie": 'or - 20 francs tunisie',
+    "Souverain Elisabeth  II Or": 'or - 1 souverain elizabeth II',
+    "1/2 Souverain Or": 'or - 1/2 souverain georges V', # or 'or - 1/2 souverain victoria' depending on the specific coin
+    "5 Dollars Or": 'or - 5 dollars liberté',
+    "20 Marks Or": 'or - 20 mark wilhelm II',
+    "Lingot Or 1 kg": 'or - lingot 1 kg LBMA',
+    "Lingotin Or 500 grammes": 'or - lingot 500 g LBMA',
+    "Lingotin Or  250 grammes": 'or - lingot 250 g LBMA',
+    "Lingotin Or 100 grammes": 'or - lingot 100 g LBMA',
+    "Lingotin Or 50 grammes": 'or - lingot 50 g LBMA',
+    "Lingotin Or 20 grammes": 'or - lingot 20 g LBMA',
+    "Lingotin Or 10 grammes": 'or - lingot 10 g LBMA',
+    "Lingotin Or 5 grammes": 'or - lingot 5 g LBMA',
+    "Lingotin Once Or": 'or - lingot 1 once LBMA',
+    "Lingotin Or 2 Grammes": "or - lingot 2 g", # Assuming this is the intended match, adjust if needed
+    "Lingotin Or 1 Gramme": "or - lingot 1 g"
 }
 
 def get_delivery_price(price):
@@ -43,7 +43,7 @@ def get_delivery_price(price):
 # https://www.merson.fr/fr/content/1-livraison
 def get_price_for(session,session_id,buy_price):
     """
-    Retrieves the '20 francs or coq marianne' coin purchase price from Oretchange using requests and BeautifulSoup.
+    Retrieves the 'or - 20 francs coq marianne' coin purchase price from Oretchange using requests and BeautifulSoup.
     """
     url = "https://www.merson.fr/fr/18-achat-or-investissement"
     print(url)
@@ -67,15 +67,15 @@ def get_price_for(session,session_id,buy_price):
             url = name_title.find('a')['href']
             print(price,coin_name[name],url)
 
-            #price = float(price_text.replace('€', '').replace(',', '.'))
-            coin = CoinPrice(nom=coin_name[name],
-                             j_achete=price.amount_float,
-                             prime_achat_perso=((price.amount_float + get_delivery_price(price.amount_float)) - (
-                                         buy_price * poids_pieces_or[coin_name[name]])) * 100.0 / (buy_price * poids_pieces_or[
-                                                   coin_name[name]]),
+            if coin_name[name][:2] == 'or':
+                coin = CoinPrice(nom=coin_name[name],
+                                 j_achete=price.amount_float,
+                                 prime_achat_perso=((price.amount_float + get_delivery_price(price.amount_float)) - (
+                                             buy_price * poids_pieces_or[coin_name[name]])) * 100.0 / (buy_price * poids_pieces_or[
+                                                       coin_name[name]]),
 
-                             source=url,
-                             frais_port=get_delivery_price(price.amount_float),session_id=session_id,metal='g')
+                                 source=url,
+                                 frais_port=get_delivery_price(price.amount_float),session_id=session_id,metal='g')
             session.add(coin)
             session.commit()
 

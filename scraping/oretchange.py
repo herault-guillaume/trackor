@@ -6,23 +6,23 @@ import traceback
 
 # https://www.oretchange.com/content/1-livraison
 coin_name = {
-    "20 Francs Coq Or": '20 francs or fr coq marianne',
-    "20 Francs Napoléon Or": '20 francs or fr napoléon III',
-    "Souverain Or Victoria ou Edouard VII ou George V": 'souverain or georges V',
-    "20 Francs Suisse Vrénéli ou Confédération": '20 francs or sui suisse',
-    "20 Francs Union Latine": '20 francs or union latine',
-    "50 Pesos Mexique": '50 pesos or',
-    "Krugerrand Or": '1 oz krugerrand',
-    "20 Dollars Or": '20 dollars or',
-    "10 Dollars Or Liberté ou Tête d’indien": '10 dollars or liberté',
-    "5 Dollars Or Liberté ou Tête d'indien": '5 dollars or liberté',
-    "10 Francs Napoléon III": '10 francs or fr napoléon III',
-    "Demi-souverain Or Victoria, Edouard VII ou George V": '1/2 souverain or georges V'
+    "20 Francs Coq Or": 'or - 20 francs fr coq marianne',
+    "20 Francs Napoléon Or": 'or - 20 francs fr napoléon III',
+    "Souverain Or Victoria ou Edouard VII ou George V": 'or - 1 souverain georges V',
+    "20 Francs Suisse Vrénéli ou Confédération": 'or - 20 francs sui',
+    "20 Francs Union Latine": 'or - 20 francs union latine',
+    "50 Pesos Mexique": 'or - 50 pesos',
+    "Krugerrand Or": 'or - 1 oz krugerrand',
+    "20 Dollars Or": 'or - 20 dollars',
+    "10 Dollars Or Liberté ou Tête d’indien": 'or - 10 dollars liberté',
+    "5 Dollars Or Liberté ou Tête d'indien": 'or - 5 dollars liberté',
+    "10 Francs Napoléon III": 'or - 10 francs fr napoléon III',
+    "Demi-souverain Or Victoria, Edouard VII ou George V": 'or - 1/2 souverain georges V'
 }
 
 def get_price_for(session,session_id,buy_price):
     """
-    Retrieves the '20 francs or coq marianne' coin purchase price from Oretchange using requests and BeautifulSoup.
+    Retrieves the 'or - 20 francs coq marianne' coin purchase price from Oretchange using requests and BeautifulSoup.
     """
     url = "https://www.oretchange.com/15-pieces-or"
     print(url)
@@ -57,12 +57,12 @@ def get_price_for(session,session_id,buy_price):
 
             print(price,coin_name[name],url)
 
-            #price = float(price_text.replace('€', '').replace(',', '.'))
-            coin = CoinPrice(nom=coin_name[name],
-                             j_achete=price.amount_float,
-                             source=url,
-                             prime_achat_perso=((price.amount_float + 0.0) - (buy_price * poids_pieces_or[coin_name[name]])) * 100.0 / (buy_price * poids_pieces_or[coin_name[name]]),
-                             frais_port=0.0,session_id=session_id,metal='g')
+            if coin_name[name][:2] == 'or':
+                coin = CoinPrice(nom=coin_name[name],
+                                 j_achete=price.amount_float,
+                                 source=url,
+                                 prime_achat_perso=((price.amount_float + 0.0) - (buy_price * poids_pieces_or[coin_name[name]])) * 100.0 / (buy_price * poids_pieces_or[coin_name[name]]),
+                                 frais_port=0.0,session_id=session_id,metal='g')
             session.add(coin)
             session.commit()
 
