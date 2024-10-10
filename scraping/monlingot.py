@@ -1,6 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
-from models.model import CoinPrice, poids_pieces_or
+from models.model import CoinPrice, poids_pieces
 from price_parser import Price
 import traceback
 
@@ -48,7 +48,7 @@ def get_delivery_price(price):
         return 0.0
 
 #https://monlingot.fr/conseil/livraison
-def get_price_for(session,session_id,buy_price):
+def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
     """
     Retrieves the 'or - 20 francs coq marianne' coin purchase price from Goldforex using requests and BeautifulSoup.
     """
@@ -83,7 +83,7 @@ def get_price_for(session,session_id,buy_price):
                                  j_achete=price.amount_float,
                                  source=url,
                                  prime_achat_perso=((price.amount_float + get_delivery_price(price.amount_float)) - (
-                                         buy_price * poids_pieces_or[coin_name])) * 100.0 / (buy_price *poids_pieces_or[coin_name]),
+                                         buy_price * poids_pieces[coin_name])) * 100.0 / (buy_price *poids_pieces[coin_name]),
                                  frais_port=get_delivery_price(price.amount_float),session_id=session_id,metal='g')
             session.add(coin)
             session.commit()

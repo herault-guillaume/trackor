@@ -1,10 +1,10 @@
 import requests
 from bs4 import BeautifulSoup
-from models.model import CoinPrice, poids_pieces_or
+from models.model import CoinPrice, poids_pieces
 from price_parser import Price
 import traceback
 
-coin_mapping_name = {
+CMN = {
     "Napoléon Or 20 Francs": "or - 20 francs fr",  # Assuming a standard 20 Francs gold coin
     "50 Pesos": "or - 50 pesos",
     "Souverain": "or - 1 souverain",  # Assuming a modern Sovereign
@@ -37,7 +37,7 @@ def get_delivery_price(price):
     else:  # price > 15000.01
         return 0.0  # Free delivery
 
-def get_price_for(session,session_id,buy_price):
+def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
     """
     Retrieves the 'or - 20 francs coq marianne' coin purchase price from Change de la Bourse using requests and BeautifulSoup.
     """
@@ -67,19 +67,19 @@ def get_price_for(session,session_id,buy_price):
             product_name = product_name_link.text.strip()
             url = product_name_link['href']
 
-            print(price,coin_mapping_name[product_name], url)
+            print(price,CMN[product_name], url)
 
             if price:
 
                 # More robust price cleaning: handle variations in formatting
                 #price = float(price_text.replace('€', '').replace(' ', '').replace(',', '.'))
-                if coin_mapping_name[product_name][:2] == 'or':
-                    coin = CoinPrice(nom=coin_mapping_name[product_name],
+                if CMN[product_name][:2] == 'or':
+                    coin = CoinPrice(nom=CMN[product_name],
                                      j_achete=price.amount_float,
                                      source=url,
                                      prime_achat_perso=((price.amount_float + get_delivery_price(price.amount_float)) - (
-                                                 buy_price * poids_pieces_or[ coin_mapping_name[product_name]])) * 100.0 / (buy_price *
-                                                       poids_pieces_or[coin_mapping_name[product_name]]),
+                                                 buy_price * poids_pieces[ CMN[product_name]])) * 100.0 / (buy_price *
+                                                       poids_pieces[CMN[product_name]]),
                                      frais_port=get_delivery_price(price.amount_float),session_id=session_id,metal='g')
                 session.add(coin)
                 session.commit()

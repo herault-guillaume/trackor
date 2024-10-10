@@ -1,10 +1,10 @@
 import requests
 from bs4 import BeautifulSoup
-from models.model import CoinPrice, poids_pieces_or
+from models.model import CoinPrice, poids_pieces
 from price_parser import Price
 import traceback
 
-coin_to_name = {
+CMN = {
     "20 Francs Or Coq": 'or - 20 francs fr coq marianne',
     "20 Francs Or Napoléon III": 'or - 20 francs fr napoléon III',
     "20 Francs Or Génie": 'or - 20 francs fr génie debout',
@@ -27,7 +27,7 @@ coin_to_name = {
 }
 
 #via panier
-def get_price_for(session,session_id,buy_price):
+def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
     url = 'https://lcdor.fr/achat-or/pieces-dor/'
     print(url)
 
@@ -47,16 +47,16 @@ def get_price_for(session,session_id,buy_price):
             name_title = product.find("h3","wd-entities-title")
             name = name_title.text
             url = name_title.find('a')['href']
-            print( price,coin_to_name[name],url)
+            print( price,CMN[name],url)
             #price = float(price_text.replace('€', '').replace(',', '.'))
 
-            if coin_to_name[name][:2] == 'or':
-                coin = CoinPrice(nom=coin_to_name[name],
+            if CMN[name][:2] == 'or':
+                coin = CoinPrice(nom=CMN[name],
                                  j_achete=price.amount_float,
                                  source=url,
                                  prime_achat_perso=((price.amount_float + 7.0) - (
-                                             buy_price * poids_pieces_or[coin_to_name[name]])) * 100.0 / (buy_price * poids_pieces_or[
-                                                       coin_to_name[name]]),
+                                             buy_price * poids_pieces[CMN[name]])) * 100.0 / (buy_price * poids_pieces[
+                                                       CMN[name]]),
                                  frais_port=7.0,session_id=session_id,metal='g')
             session.add(coin)
             session.commit()

@@ -37,6 +37,14 @@ def get(session,session_id):
                 EC.visibility_of_element_located((By.ID, "sellGOLDPrice"))
             )
 
+            WebDriverWait(driver, 0.5).until(
+                EC.visibility_of_element_located((By.ID, "buySILVERPrice"))
+            )
+
+            WebDriverWait(driver, 0.5).until(
+                EC.visibility_of_element_located((By.ID, "sellSILVERPrice"))
+            )
+
         except Exception as e:
             print(e)
 
@@ -45,22 +53,41 @@ def get(session,session_id):
         buy_price_text = buy_price_element.text.strip()
 
         # Clean the text and convert to a float
-        buy_price_eur = float(buy_price_text.split('€')[0].replace('\xa0', '').replace(',', '.').replace(' ',''))/1000.0  # Remove € and nbsp
+        g_buy_price_eur = float(buy_price_text.split('€')[0].replace('\xa0', '').replace(',', '.').replace(' ',''))/1000.0  # Remove € and nbsp
 
         # Extract the price from the span
         sell_price_element = driver.find_element(By.CSS_SELECTOR, '#sellGOLDPrice span.EUR')
         sell_price_text = sell_price_element.text.strip()
 
         # Clean the text and convert to a float
-        sell_price_eur = float(sell_price_text.split('€')[0].replace('\xa0', '').replace(',', '.').replace(' ',''))/1000.0  # Remove € and nbsp
+        g_sell_price_eur = float(sell_price_text.split('€')[0].replace('\xa0', '').replace(',', '.').replace(' ',''))/1000.0  # Remove € and nbsp
 
 
         # Create GoldPrice object and add to session
-        gold_price = MetalPrice(buy_price=buy_price_eur, sell_price=sell_price_eur, session_id=session_id, metal='g')
+        gold_price = MetalPrice(buy_price=g_buy_price_eur, sell_price=g_sell_price_eur, session_id=session_id, metal='g')
         session.add(gold_price)
         session.commit()
 
-        return buy_price_eur,sell_price_eur
+        # Extract the price from the span
+        buy_price_element = driver.find_element(By.CSS_SELECTOR, '#buySILVERPrice span.EUR')
+        buy_price_text = buy_price_element.text.strip()
+
+        # Clean the text and convert to a float
+        s_buy_price_eur = float(buy_price_text.split('€')[0].replace('\xa0', '').replace(',', '.').replace(' ',''))/1000.0  # Remove € and nbsp
+
+        # Extract the price from the span
+        sell_price_element = driver.find_element(By.CSS_SELECTOR, '#sellSILVERPrice span.EUR')
+        sell_price_text = sell_price_element.text.strip()
+
+        # Clean the text and convert to a float
+        s_sell_price_eur = float(sell_price_text.split('€')[0].replace('\xa0', '').replace(',', '.').replace(' ',''))/1000.0  # Remove € and nbsp
+
+        # Create GoldPrice object and add to session
+        silver_price = MetalPrice(buy_price=s_buy_price_eur, sell_price=s_sell_price_eur, session_id=session_id, metal='s')
+        session.add(silver_price)
+        session.commit()
+
+        return g_buy_price_eur,g_sell_price_eur,s_buy_price_eur,s_sell_price_eur
 
     except Exception as e:
         print(f"Error scraping BullionVault: {e}",url)

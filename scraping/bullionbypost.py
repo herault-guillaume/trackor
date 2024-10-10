@@ -4,7 +4,7 @@ import time
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from models.model import CoinPrice, poids_pieces_or
+from models.model import CoinPrice, poids_pieces
 from seleniumbase import Driver
 
 from price_parser import Price
@@ -51,7 +51,7 @@ urls = {
     "or - 4 ducats": "https://www.bullionbypost.fr/pieces-du-monde/pieces-autrichiennes/4-ducats-autriche-or/",
     "or - 1 ducat": "https://www.bullionbypost.fr/pieces-du-monde/pieces-autrichiennes/1-ducat-autriche-or/",
     "or - 5 dollars liberté": "https://www.bullionbypost.fr/pieces-du-monde/pieces-americaines/demi-eagle-americain-or-5-dollars-tete-liberte-/",
-    "or - 10 dollars tete liberté": "https://www.bullionbypost.fr/pieces-du-monde/pieces-americaines/eagle-americain-or-10-dollars-tete-liberte/",
+    "or - 10 dollars liberté": "https://www.bullionbypost.fr/pieces-du-monde/pieces-americaines/eagle-americain-or-10-dollars-tete-liberte/",
     "or - 10 florins wilhelmina": "https://www.bullionbypost.fr/pieces-du-monde/pieces-hollandaises/10-florins-neerlandais-notre-choix/",
     "or - 20 mark wilhelm II": "https://www.bullionbypost.fr/pieces-du-monde/pieces-allemandes/20-mark-allemand-meilleur-rapport-qualite-prix/",
     "or - 20 lire vittorio emanuele II": "https://www.bullionbypost.fr/pieces-du-monde/pieces-italiennes/20-lires-italiennes-or-emmanuel-II/",
@@ -59,7 +59,7 @@ urls = {
     "or - 10 pesos": "https://www.bullionbypost.fr/pieces-du-monde/pieces-mexicaines/10-pesos-mexicains-en-or/",
     "or - 5 pesos": "https://www.bullionbypost.fr/pieces-du-monde/pieces-mexicaines/5-pesos-mexicains-en-or/",
 }
-def get_price_for(session,session_id,buy_price):
+def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
     print("https://www.bullionbypost.fr/")
     driver = Driver(uc=True, headless=True)
 
@@ -82,7 +82,7 @@ def get_price_for(session,session_id,buy_price):
                                      j_achete=price.amount_float,
                                      source=url,
                                      prime_achat_perso=((price.amount_float + 0.0) - (
-                                                 buy_price * poids_pieces_or[coin_name])) * 100.0 / (buy_price * poids_pieces_or[
+                                                 buy_price * poids_pieces[coin_name])) * 100.0 / (buy_price * poids_pieces[
                                                            coin_name]),
 
                                      frais_port=0.0,session_id=session_id,metal='g')

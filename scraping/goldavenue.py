@@ -3,7 +3,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-from models.model import CoinPrice, poids_pieces_or
+from models.model import CoinPrice, poids_pieces
 from price_parser import Price
 import traceback
 
@@ -38,7 +38,7 @@ urls = {
 
 
 
-def get_price_delivery_for(session,session_id,buy_price):
+def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
     # Set up headless Chrome
     driver = Driver(uc=True, headless=True)
 
@@ -47,12 +47,19 @@ def get_price_delivery_for(session,session_id,buy_price):
             driver.get(url)  # Load the page
             # Locate the price element by its unique combination of classes
             # Wait for the span element to be present (adjust timeout as needed)
-            span_price = WebDriverWait(driver, 7).until(
-                EC.presence_of_all_elements_located((By.XPATH, "//span[@color='primary' and .//p[@display='inline']]"))
-            )
-            span_discount = WebDriverWait(driver, 2).until(
-                EC.presence_of_all_elements_located((By.XPATH, "//span[@color='danger' and .//p[@display='inline']]"))
-            )
+            span_discount = None
+            span_price = None
+            try :
+                span_discount = WebDriverWait(driver, 7).until(
+                    EC.presence_of_all_elements_located((By.XPATH, "//p[@color='danger' and @display='inline']"))
+                )
+            except Exception:
+                span_price = WebDriverWait(driver, 7).until(
+                    EC.presence_of_all_elements_located(
+                        (By.XPATH, "//span[@color='primary' and .//p[@display='inline']]"))
+                )
+                pass
+
             price = ''
             if span_discount:
                 price = Price.fromstring("".join(span_discount[1].text))
@@ -65,18 +72,17 @@ def get_price_delivery_for(session,session_id,buy_price):
             delivery_elements = WebDriverWait(driver, 7).until(
                 EC.presence_of_all_elements_located((By.XPATH, "//p[@text-decoration='underline' and @font-style='italic']"))
             )
-
+            print(price,coin_name,url)
             # Find the span element within the p element
             span_element = delivery_elements[1].find_element(By.XPATH, ".//span[@font-style='italic']")
             delivery_fee = Price.fromstring(span_element.text)
 
-            print(price,coin_name,url)
             if coin_name[:2] == 'or':
                 coin = CoinPrice(nom=coin_name,
                                  j_achete=price.amount_float,
                                  source=url,
                                  prime_achat_perso=((price.amount_float + delivery_fee.amount_float) - (
-                                             buy_price * poids_pieces_or[coin_name])) * 100.0 / (buy_price * poids_pieces_or[
+                                             buy_price * poids_pieces[coin_name])) * 100.0 / (buy_price * poids_pieces[
                                                        coin_name]),
 
                                  frais_port=delivery_fee.amount_float,session_id=session_id,metal='g')

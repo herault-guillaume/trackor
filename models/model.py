@@ -34,13 +34,12 @@ class MetalPrice(Base):
     session_id = Column(UUID(as_uuid=True))
     metal = Column(String,nullable=True)
 
-poids_pieces_or  = {
+poids_pieces  = {
                         'or - 1 ducat': 3.44,
                         'or - 1 oz' : 31.103,
                         'or - 1 oz buffalo': 31.103,
                         'or - 1 oz krugerrand': 31.103,# -> CPor
                         'or - 1 oz nugget / kangourou': 31.103,
-                        'or - 1 oz philharmonique': 31.103,
                         'or - 1 oz philharmonique': 31.103,
                         'or - 1 oz britannia' : 31.103,
                         'or - 1 oz dragon chinois 2024' : 31.103,
@@ -88,6 +87,7 @@ poids_pieces_or  = {
                         'or - 1/10 oz chien 2018 Lunar II': 3.11,
                         'or - 1/10 oz lapin 2023 lunar III': 3.11,
                         'or - 1/10 oz britannia 2024': 3.11,
+                        'or - 1/10 oz britannia': 3.11,
                         'or - 1/10 oz britannia charles III 2023': 3.11,
                         'or - 1/10 oz american eagle 2024': 3.11,
                         'or - 1/10 oz couronnement charles III 2023': 3.11,
@@ -101,7 +101,9 @@ poids_pieces_or  = {
                         'or - 1/2 oz lapin 2023 lunar III': 15.552,
                         'or - 1/2 oz american eagle 2024': 15.552,  # -> CPor
                         'or - 1/2 oz britannia 2024': 15.552,
+                        'or - 1/2 oz britannia': 15.552,
                         'or - 1/2 oz philharmonique 2024': 15.552,
+                        'or - 1/2 oz philharmonique': 15.552,
                         'or - 1/2 souverain': 3.661, # -> CPor
                         'or - 1/2 souverain georges V': 3.661, # -> CPor
                         'or - 1/2 souverain victoria': 3.661, # -> CPor
@@ -123,6 +125,7 @@ poids_pieces_or  = {
                         'or - 1/4 oz dragon tudor beasts 2024': 7.776,
                         'or - 1/4 oz st george et le dragon 2024': 7.776,
                         'or - 1/4 oz britannia 2024': 7.776,
+                        'or - 1/4 oz britannia': 7.776,
                         'or - 1/4 oz american eagle 2024': 7.776,
                         'or - 1/4 oz souris 2020 Lunar III': 7.776,
                         'or - 1/4 oz britannia charles III 2023': 7.776,
@@ -248,22 +251,22 @@ poids_pieces_or  = {
                         'or - 1/4 souverain 2024 charles III': 1.83, # -> CPor
                         'or - 2 souverain 2024 charles III': 14.64, # -> CPor
                         'or - 2 souverain 2022 charles III': 14.64, # -> CPor
-                    }
 
-poids_pieces_argent = {
-                        # France
-                        '50 Francs Argent Hercule (1974-1980)': 30.0 * 0.900,  
-                        '10 Francs Argent Hercule (1965-1973)': 10.0 * 0.900,
-                        '5 Francs Argent Semeuse (différentes années)': 12.0 * 0.835,
-                        '2 Francs Argent Semeuse (différentes années)': 10.0 * 0.835,
-                        '1 Franc Argent Semeuse (différentes années)': 5 * 0.835,
-                        '50 Centimes Argent Semeuse (différentes années)': 2.5 * 0.835,
-                        '100 Francs Argent Génie (1878-1914)': 32.258 * 0.900,  
-                        '100 Francs Argent Panthéon': 15.0 * 0.900,
-                        '20 Francs Argent Turin (1860-1928)': 20.0 * 0.680,
-                        '10 Francs Argent Turin (1860-1928)': 10.0 * 0.680,
-                        '5 Francs Argent Ecu (1854-1860)': 25.0 * 0.900,
-
+                        # Argent
+                        'ar - lingot 5 kg' : 1000.0,
+                        'ar - 50 francs fr hercule (1974-1980)': 30.0 * 0.900,
+                        'ar - 10 francs fr hercule (1965-1973)': 10.0 * 0.900,
+                        'ar - 5 francs fr semeuse (1959-1969)': 12.0 * 0.835,
+                        'ar - 2 francs fr semeuse': 10.0 * 0.835,
+                        'ar - 1 franc fr semeuse': 5 * 0.835,
+                        'ar - 50 centimes francs fr semeuse': 2.5 * 0.835,
+                        'ar - 100 francs fr génie (1878-1914)': 32.258 * 0.900,
+                        'ar - 100 francs fr panthéon': 15.0 * 0.900,
+                        'ar - 100 francs fr': 15.0 * 0.900,
+                        'ar - 20 francs fr turin (1860-1928)': 20.0 * 0.680,
+                        'ar - 20 francs fr turin (1929-1939)': 20.0 * 0.680,
+                        'ar - 10 francs fr turin (1860-1928)': 10.0 * 0.680,
+                        'ar - 5 francs fr ecu (1854-1860)': 25.0 * 0.900,
                     }
 
 # Configuration de la base de données

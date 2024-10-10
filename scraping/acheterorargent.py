@@ -1,6 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
-from models.model import CoinPrice, poids_pieces_or
+from models.model import CoinPrice, poids_pieces
 from datetime import datetime
 import traceback
 from price_parser import Price
@@ -36,7 +36,7 @@ def get_delivery_price(price):
     else:
         return 0.0
 
-def get_price_for(session,session_id,buy_price):
+def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
 
     urls = ['https://www.acheter-or-argent.fr/?fond=rubrique&id_rubrique=2&page={i}&nouveaute=&promo='.format(i=i) for i in range(1,9)]
     for url in urls :
@@ -60,8 +60,8 @@ def get_price_for(session,session_id,buy_price):
                                      j_achete=product_price.amount_float,
                                      source=source,
                                      prime_achat_perso=((product_price.amount_float + get_delivery_price(product_price.amount_float)) - (
-                                                 buy_price * poids_pieces_or[product_name])) * 100.0 / (buy_price *
-                                                       poids_pieces_or[product_name]),
+                                                 buy_price * poids_pieces[product_name])) * 100.0 / (buy_price *
+                                                       poids_pieces[product_name]),
 
                                      frais_port=get_delivery_price(product_price.amount_float), session_id=session_id,metal='g')
                 session.add(coin)

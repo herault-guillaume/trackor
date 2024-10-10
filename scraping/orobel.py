@@ -2,7 +2,7 @@ from seleniumbase import Driver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from models.model import CoinPrice, poids_pieces_or
+from models.model import CoinPrice, poids_pieces
 from price_parser import Price
 import traceback
 
@@ -54,7 +54,7 @@ def get_delivery_price(price):
     else :
         return 300.0
 
-def get_price_for(session, session_id,buy_price):
+def get_price_for(session, session_id,buy_price_gold,buy_price_silver):
     """
     Retrieves coin purchase prices from Orobel using Selenium.
     """
@@ -109,7 +109,7 @@ def get_price_for(session, session_id,buy_price):
                         j_achete=price.amount_float,
                         source=url,
                         prime_achat_perso=((price.amount_float + get_delivery_price(price.amount_float)) - (
-                                buy_price * poids_pieces_or[coin_name[name]])) * 100.0 / (buy_price * poids_pieces_or[coin_name[name]]),
+                                buy_price * poids_pieces[coin_name[name]])) * 100.0 / (buy_price * poids_pieces[coin_name[name]]),
                         frais_port=get_delivery_price(price.amount_float),
                         session_id=session_id,metal='g')
                 session.add(coin)

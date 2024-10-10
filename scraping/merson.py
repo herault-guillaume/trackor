@@ -1,6 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
-from models.model import CoinPrice, poids_pieces_or
+from models.model import CoinPrice, poids_pieces
 from price_parser import Price
 import traceback
 
@@ -41,7 +41,7 @@ def get_delivery_price(price):
 
 
 # https://www.merson.fr/fr/content/1-livraison
-def get_price_for(session,session_id,buy_price):
+def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
     """
     Retrieves the 'or - 20 francs coq marianne' coin purchase price from Oretchange using requests and BeautifulSoup.
     """
@@ -71,7 +71,7 @@ def get_price_for(session,session_id,buy_price):
                 coin = CoinPrice(nom=coin_name[name],
                                  j_achete=price.amount_float,
                                  prime_achat_perso=((price.amount_float + get_delivery_price(price.amount_float)) - (
-                                             buy_price * poids_pieces_or[coin_name[name]])) * 100.0 / (buy_price * poids_pieces_or[
+                                             buy_price * poids_pieces[coin_name[name]])) * 100.0 / (buy_price * poids_pieces[
                                                        coin_name[name]]),
 
                                  source=url,

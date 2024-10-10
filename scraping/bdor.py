@@ -4,7 +4,7 @@ from seleniumbase import Driver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from models.model import CoinPrice, poids_pieces_or
+from models.model import CoinPrice, poids_pieces
 from price_parser import Price
 import traceback
 
@@ -49,7 +49,7 @@ table_lookup = {
         "100 Corona" : 'or - 100 couronnes françois joseph I',
         "4 Ducats" : 'or - 4 ducats',
         "20 Pesos Or" : "or - 20 pesos",
-        "2,5 Dollars Or" : "or - or - 2.5 dollars tête indien",
+        "2,5 Dollars Or" : "or - 2.5 dollars tête indien",
         "5 Roubles" : "or - 5 roubles",
 }
 
@@ -60,7 +60,7 @@ def get_delivery_price(price):
     else :
         return 0.0
 
-def get_price_for(session,session_id,buy_price):
+def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
     driver = Driver(uc=True, headless=True)
     url = "https://www.bdor.fr/achat-or-en-ligne"
     print(url)
@@ -116,8 +116,8 @@ def get_price_for(session,session_id,buy_price):
                                      j_achete=price.amount_float,
                                      source=source,
                                      prime_achat_perso=((price.amount_float + get_delivery_price(price.amount_float)) - (
-                                                 buy_price * poids_pieces_or[product_name])) * 100.0 / (buy_price *
-                                                       poids_pieces_or[product_name]),
+                                                 buy_price * poids_pieces[product_name])) * 100.0 / (buy_price *
+                                                       poids_pieces[product_name]),
 
                                      frais_port=get_delivery_price(price.amount_float),
                                      session_id=session_id,metal='g')

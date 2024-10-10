@@ -2,7 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 from models.model import CoinPrice
 from price_parser import Price
-from models.model import CoinPrice, poids_pieces_or
+from models.model import CoinPrice, poids_pieces
 
 from price_parser import Price
 import traceback
@@ -34,7 +34,7 @@ def get_delivery_price(price):
     pass
 #https://www.gold.fr/informations-sur-l-or/nous-connaitre/conditions-generales-dutilisation#frais-et-commissions
 
-def get_price_for(session, session_id,buy_price):
+def get_price_for(session, session_id,buy_price_gold,buy_price_silver):
     url = "https://www.gold.fr/achat-piece-or/"
     response = requests.get(url)
     response.raise_for_status()  # Check for HTTP errors
@@ -56,8 +56,8 @@ def get_price_for(session, session_id,buy_price):
                         coin = CoinPrice(nom=coin_name_to_map[name],
                                          j_achete=price.amount_float,
                                          source=url,
-                                         prime_achat_perso=((price.amount_float + 30.0) - (buy_price * poids_pieces_or[
-                                             coin_name_to_map[name]])) * 100.0 / (buy_price * poids_pieces_or[coin_name_to_map[name]]),
+                                         prime_achat_perso=((price.amount_float + 30.0) - (buy_price * poids_pieces[
+                                             coin_name_to_map[name]])) * 100.0 / (buy_price * poids_pieces[coin_name_to_map[name]]),
 
                                          frais_port=30.0,
                                          session_id=session_id,metal='g')

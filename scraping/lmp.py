@@ -1,6 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
-from models.model import CoinPrice, poids_pieces_or
+from models.model import CoinPrice, poids_pieces
 from price_parser import Price
 import traceback
 
@@ -18,7 +18,7 @@ coin_name = {
     "20 dollars US": "or - 20 dollars",
     "20 francs Napoléon": "or - 20 francs fr napoléon III"
 }
-def get_price_for(session,session_id,buy_price):
+def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
     url = 'https://www.lesmetauxprecieux.com/achat-vente-or/pieces-or/'
     print(url)
     headers = {'User-Agent': 'Mozilla/5.0'}  # Mimic browser behavior
@@ -48,7 +48,7 @@ def get_price_for(session,session_id,buy_price):
                                  j_achete=price.amount_float,
                                  source=url,
                                  prime_achat_perso=((price.amount_float + 15.79) - (
-                                             buy_price * poids_pieces_or[coin_name[name]])) * 100.0 / (buy_price * poids_pieces_or[
+                                             buy_price * poids_pieces[coin_name[name]])) * 100.0 / (buy_price * poids_pieces[
                                                        coin_name[name]]),
                                  frais_port=15.79,session_id=session_id,metal='g')
             session.add(coin)

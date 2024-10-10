@@ -1,6 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
-from models.model import CoinPrice, poids_pieces_or
+from models.model import CoinPrice, poids_pieces
 from price_parser import Price
 import traceback
 
@@ -22,7 +22,7 @@ coin_name = {
 }
 
 # https://or-investissement.fr/information-or-investissement/1-livraison-achat-or-investissement
-def get_price_for(session,session_id,buy_price):
+def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
     """
     Retrieves the 'or - 20 francs coq marianne' coin purchase price from Or-Investissement using requests and BeautifulSoup.
     """
@@ -55,8 +55,8 @@ def get_price_for(session,session_id,buy_price):
                 coin = CoinPrice(nom=coin_name[name],
                                  j_achete=price.amount_float,
                                  prime_achat_perso=((price.amount_float + 25.0) - (
-                                         buy_price * poids_pieces_or[coin_name[name]])) * 100.0 / (buy_price *
-                                                   poids_pieces_or[coin_name[name]]),
+                                         buy_price * poids_pieces[coin_name[name]])) * 100.0 / (buy_price *
+                                                   poids_pieces[coin_name[name]]),
                                  source=url,
                                  frais_port=25.0,session_id=session_id,metal='g')
             session.add(coin)
