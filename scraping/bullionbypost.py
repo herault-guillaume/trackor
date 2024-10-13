@@ -4,7 +4,7 @@ import time
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from models.model import CoinPrice, poids_pieces
+from models.model import Item, poids_pieces
 from seleniumbase import Driver
 
 from price_parser import Price
@@ -69,31 +69,44 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
             driver.get(url)  # Load the page
             time.sleep(random.randint(5,10))
             # Locate the price element by its text content
-            price_element = WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located((By.XPATH, "//p[strong[text()='Prix: ']]"))  # Use XPath for text-based search
+            # price_element = WebDriverWait(driver, 10).until(
+            #     EC.presence_of_element_located((By.XPATH, "//p[strong[text()='Prix: ']]"))  # Use XPath for text-based search
+            # )
+            pricing_table  = WebDriverWait(driver, 10).until(
+                 EC.presence_of_all_elements_located((By.CLASS_NAME, "pricing-table"))  # Use XPath for text-based search
             )
-            price_text = price_element.text.strip()
-            price = Price.fromstring(price_text)
+            # Get all rows from the table body
+            rows = pricing_table[1].find_elements(By.CSS_SELECTOR, "tbody tr")
 
-            print(price,coin_name,url)
-            try :
-                if coin_name[:2] == 'or':
-                    coin = CoinPrice(nom=coin_name,
-                                     j_achete=price.amount_float,
-                                     source=url,
-                                     prime_achat_perso=((price.amount_float + 0.0) - (
-                                                 buy_price * poids_pieces[coin_name])) * 100.0 / (buy_price * poids_pieces[
-                                                           coin_name]),
 
-                                     frais_port=0.0,session_id=session_id,metal='g')
-                session.add(coin)
-                session.commit()
-            except Exception as e:
-                print(f"Failed to convert price text '{price_text}' to float", url)
-                print(traceback.format_exc())
-                pass
+            if coin_name[:2] == 'or':
+                buy_price = buy_price_gold
+            else :
+                buy_price = buy_price_silver
 
-        except ValueError:
-            print(f"Failed to convert price text '{price_text}' to float",url)
+            # Extract "Prix Net" (Net par Unité) for each row
+            prix_net_values = []
+            for row in rows:
+
+                # Assuming "Prix Net" is always the second column (index 1)
+                minimum = int(row.find_elements(By.TAG_NAME, "td")[0].text.replace('+',''))
+                price = Price.fromstring(row.find_elements(By.TAG_NAME, "td")[3].text)
+
+                print(price, coin_name, url)
+                coin = Item(name=coin_name,
+                            buy=price.amount_float,
+                            source=url,
+                            buy_premium=((price.amount_float + 0.0) - (buy_price * poids_pieces[coin_name])) * 100.0 / (buy_price * poids_pieces[coin_name]),
+                            delivery_fee=0.0,
+                            session_id=session_id,
+                            bullion_type=coin_name[:2],
+                            minimum=minimum)
+
+            session.add(coin)
+            session.commit()
+
+        except Exception:
             print(traceback.format_exc())
             pass
+
+    driver.quit()

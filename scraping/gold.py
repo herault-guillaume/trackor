@@ -1,8 +1,8 @@
 import requests
 from bs4 import BeautifulSoup
-from models.model import CoinPrice
+from models.model import Item
 from price_parser import Price
-from models.model import CoinPrice, poids_pieces
+from models.model import Item, poids_pieces
 
 from price_parser import Price
 import traceback
@@ -53,14 +53,14 @@ def get_price_for(session, session_id,buy_price_gold,buy_price_silver):
                     price = Price.fromstring(price_element.text)
                     print(price,coin_name_to_map[name],url)
                     if coin_name_to_map[name][:2] == 'or':
-                        coin = CoinPrice(nom=coin_name_to_map[name],
-                                         j_achete=price.amount_float,
-                                         source=url,
-                                         prime_achat_perso=((price.amount_float + 30.0) - (buy_price * poids_pieces[
+                        coin = Item(name=coin_name_to_map[name],
+                                    buy=price.amount_float,
+                                    source=url,
+                                    buy_premium=((price.amount_float + 30.0) - (buy_price * poids_pieces[
                                              coin_name_to_map[name]])) * 100.0 / (buy_price * poids_pieces[coin_name_to_map[name]]),
 
-                                         frais_port=30.0,
-                                         session_id=session_id,metal='g')
+                                    delivery_fee=30.0,
+                                    session_id=session_id, bullion_type='g')
                     session.add(coin)
                     session.commit()
 

@@ -3,7 +3,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-from models.model import CoinPrice, poids_pieces
+from models.model import Item, poids_pieces
 from price_parser import Price
 import traceback
 
@@ -78,14 +78,14 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
             delivery_fee = Price.fromstring(span_element.text)
 
             if coin_name[:2] == 'or':
-                coin = CoinPrice(nom=coin_name,
-                                 j_achete=price.amount_float,
-                                 source=url,
-                                 prime_achat_perso=((price.amount_float + delivery_fee.amount_float) - (
+                coin = Item(name=coin_name,
+                            buy=price.amount_float,
+                            source=url,
+                            buy_premium=((price.amount_float + delivery_fee.amount_float) - (
                                              buy_price * poids_pieces[coin_name])) * 100.0 / (buy_price * poids_pieces[
                                                        coin_name]),
 
-                                 frais_port=delivery_fee.amount_float,session_id=session_id,metal='g')
+                            delivery_fee=delivery_fee.amount_float, session_id=session_id, bullion_type='g')
             session.add(coin)
             session.commit()
 

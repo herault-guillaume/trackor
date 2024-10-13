@@ -64,7 +64,7 @@ def get(session,session_id):
 
 
         # Create GoldPrice object and add to session
-        gold_price = MetalPrice(buy_price=g_buy_price_eur, sell_price=g_sell_price_eur, session_id=session_id, metal='g')
+        gold_price = MetalPrice(buy_price=g_buy_price_eur, sell_price=g_sell_price_eur, session_id=session_id, bullion_type='or')
         session.add(gold_price)
         session.commit()
 
@@ -83,10 +83,10 @@ def get(session,session_id):
         s_sell_price_eur = float(sell_price_text.split('€')[0].replace('\xa0', '').replace(',', '.').replace(' ',''))/1000.0  # Remove € and nbsp
 
         # Create GoldPrice object and add to session
-        silver_price = MetalPrice(buy_price=s_buy_price_eur, sell_price=s_sell_price_eur, session_id=session_id, metal='s')
+        silver_price = MetalPrice(buy_price=s_buy_price_eur, sell_price=s_sell_price_eur, session_id=session_id, bullion_type='ar')
         session.add(silver_price)
         session.commit()
-
+        print(g_buy_price_eur,g_sell_price_eur,s_buy_price_eur,s_sell_price_eur)
         return g_buy_price_eur,g_sell_price_eur,s_buy_price_eur,s_sell_price_eur
 
     except Exception as e:

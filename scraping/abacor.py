@@ -1,6 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
-from models.model import CoinPrice, poids_pieces
+from models.model import Item, poids_pieces
 from price_parser import Price
 import traceback
 
@@ -86,17 +86,15 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
                 print(price,CMN[product_name],source)
 
                 if CMN[product_name][:2] == 'or':
-                    metal ='g'
                     buy_price = buy_price_gold
                 else :
-                    metal = 's'
                     buy_price = buy_price_silver
 
-                coin = CoinPrice(nom=CMN[product_name],
-                                 j_achete=price.amount_float,
-                                 frais_port=get_delivery_price(price.amount_float),
-                                 prime_achat_perso=((price.amount_float+get_delivery_price(price.amount_float))-(buy_price*poids_pieces[CMN[product_name]]))*100.0/(buy_price*poids_pieces[CMN[product_name]]),
-                                 source=source,session_id=session_id,metal=metal)
+                coin = Item(name=CMN[product_name],
+                            buy=price.amount_float,
+                            delivery_fee=get_delivery_price(price.amount_float),
+                            buy_premium=((price.amount_float+get_delivery_price(price.amount_float))-(buy_price*poids_pieces[CMN[product_name]]))*100.0/(buy_price*poids_pieces[CMN[product_name]]),
+                            source=source, session_id=session_id, bullion_type=CMN[product_name][:2])
                 session.add(coin)
                 session.commit()
 

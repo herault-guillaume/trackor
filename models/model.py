@@ -7,23 +7,22 @@ import pytz
 
 Base = declarative_base()
 
-class CoinPrice(Base):
-    __tablename__ = 'coin_price'
+class Item(Base):
+    __tablename__ = 'item'
 
     id = Column(Integer, primary_key=True)
-    nom = Column(String,nullable=True,index=True)
-    j_achete = Column(Float,nullable=True)
-    je_vend = Column(Float,nullable=True)
-    cotation_francaise = Column(Float,nullable=True)
-    prime_achat_vendeur = Column(Float,nullable=True)
-    prime_vente_vendeur = Column(Float,nullable=True)
-    prime_achat_perso = Column(Float,nullable=True)
-    prime_vente_perso = Column(Float,nullable=True)
-    frais_port = Column(Float,nullable=True)
+    name = Column(String, nullable=True, index=True)
+    buy = Column(Float, nullable=True)
+    sell = Column(Float, nullable=True)
+    quantity = Column(Integer, nullable=False)
+    minimum = Column(Integer, nullable=True)
+    buy_premium = Column(Float, nullable=True)
+    sell_premium = Column(Float, nullable=True)
+    delivery_fee = Column(Float, nullable=True)
     source = Column(String,nullable=False)
     timestamp = Column(DateTime, default=lambda: datetime.now(pytz.timezone('CET')))
     session_id = Column(UUID(as_uuid=True))
-    metal = Column(String,nullable=True)
+    bullion_type = Column(String,nullable=True)
 
 class MetalPrice(Base):
     __tablename__ = 'metal_price'
@@ -32,7 +31,7 @@ class MetalPrice(Base):
     sell_price = Column(Float,nullable=True)
     timestamp = Column(DateTime, default=lambda: datetime.now(pytz.timezone('CET')))
     session_id = Column(UUID(as_uuid=True))
-    metal = Column(String,nullable=True)
+    bullion_type = Column(String,nullable=True)
 
 poids_pieces  = {
                         'or - 1 ducat': 3.44,
@@ -266,7 +265,33 @@ poids_pieces  = {
                         'ar - 20 francs fr turin (1860-1928)': 20.0 * 0.680,
                         'ar - 20 francs fr turin (1929-1939)': 20.0 * 0.680,
                         'ar - 10 francs fr turin (1860-1928)': 10.0 * 0.680,
-                        'ar - 5 francs fr ecu (1854-1860)': 25.0 * 0.900,
+                        'ar - 5 francs fr ecu (1854-1860)' : 25.0 * 0.900,
+                        'ar - 1 oz  fr ecu (1854-1860)': 25.0 * 0.900,
+                        'ar - 1 oz' : 31.103,
+                        'ar - 1 oz buffalo': 31.103,
+                        'ar - 1 oz krugerrand': 31.103,
+                        'ar - 1 oz nugget / kangourou': 31.103,
+                        'ar - 1 oz philharmonique': 31.103,
+                        'ar - 1 oz britannia' : 31.103,
+                        'ar - 1 oz dragon chinois 2024' : 31.103,
+                        'ar - 1 oz kangourou 2024' : 31.103,
+                        'ar - 1 oz cygne 2024' : 31.103,
+                        'ar - 1 oz dragon et koï 2024' : 31.103,
+                        'ar - 1 oz 125e anniv perth mint 2024' : 31.103,
+                        'ar - 1 oz koala 2024 RAM' : 31.103,
+                        'ar - 1 oz dragon 2024 lunar III' : 31.103,
+                        'ar - 1 oz dragon chinois 2018' : 31.103,
+                        'ar - 1 oz dragon chinois 2022' : 31.103,
+                        'ar - 1 oz dragon chinois 2023' : 31.103,
+                        'ar - 1 oz dragon tudor beasts 2024' : 31.103,
+                        'ar - 1 oz st george et le dragon 2024' : 31.103,
+                        'ar - 1 oz britannia 2022' : 31.103,
+                        'ar - 1 oz buffalo 2024' : 31.103,
+                        'ar - 1 oz american eagle' : 31.103,
+                        'ar - 1 oz britannia 2024' : 31.103,
+                        'ar - 1 oz maple leaf 2024' : 31.103,
+                        'ar - 1 oz maple leaf' : 31.103,
+                        'ar - 1 oz silver eagle' : 31.103,
                     }
 
 # Configuration de la base de données

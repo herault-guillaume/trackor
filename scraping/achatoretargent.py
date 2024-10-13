@@ -4,9 +4,10 @@ from seleniumbase import Driver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from models.model import CoinPrice, poids_pieces
+from models.model import Item, poids_pieces
 from price_parser import Price
 import traceback
+import re
 
 from scraping.changedelabourse import CMN
 
@@ -26,8 +27,8 @@ CMN = {
     '10 Florins Or': 'or - 10 florins',
     '20 Reichsmarks': 'or - 20 mark wilhelm II',
     '1 Ducat Or Francois-Joseph 1915': 'or - 1 ducat',
-    #'Set 5 pièces 20 Fr Or Marianne Coq': None,  # No exact match
-    #'Set 5 Pièces 20 Francs Or': 'or - 20 francs',
+    'Set 5 pièces 20 Fr Or Marianne Coq': ('or - 20 francs fr coq marianne',5),  # No exact match
+    'Set 5 Pièces 20 Francs Or': ('or - 20 francs fr',5),
     '4 Ducats Or': 'or - 4 ducats',
     '20 Francs Tunisie': 'or - 20 francs tunisie',
     'Demi Souverain': 'or - 1/2 souverain',
@@ -69,11 +70,23 @@ CMN = {
     'Ecu 5 Francs': 'ar - 5 francs fr ecu (1854-1860)',
     '2 Francs Semeuse 1898 - 1920': 'ar - 2 francs fr semeuse',
     '1 Franc Semeuse 1898 - 1920': 'ar - 1 franc fr semeuse',
-    '50 Cts Semeuse 1897 - 1920': 'ar - 50 centimes francs fr semeuse',
+    '50 Cts Semeuse 1897 - 1920': ('ar - 50 centimes francs fr semeuse',10),
     '100 Francs Argent 1982 - 2002': 'ar - 100 francs fr',
     '20 Francs Turin 1929 - 1939': 'ar - 20 francs fr turin (1929-1939)',
     '50 Francs Hercule 1974 - 1980': 'ar - 50 francs fr hercule (1974-1980)',
     '10 Francs Hercule 1964 - 1973': 'ar - 10 francs fr hercule (1965-1973)',
+
+    'Boite 250 pièces Nugget': ('ar - 1 oz nugget / kangourou',250),
+    'Boite 500 Pièces Britannia': ('ar - 1 oz britannia',500),
+    'Boite 500 Pièces Krugerrand': ('ar - 1 oz krugerrand',500),
+    'Boite 500 Pièces Maple Leaf': ('ar - 1 oz maple leaf',500),
+    'Boite 500 Pièces Silver Eagle': ('ar - 1 oz silver eagle',500),
+    'Boite 500 Pièces Philharmonique': ('ar - 1 oz philharmonique',500),
+    '1 Kilo Argent Fin: sachet 20 Francs Turin': ('ar - 20 francs fr turin (1929-1939)',74),
+    'Sachet Scellé 1000 Pièces 5 Francs Semeuse': ('ar - 5 francs fr semeuse (1959-1969)',1000),
+    'Sachet Scellé 100 Pièces 5 Francs Semeuse': ('ar - 5 francs fr semeuse (1959-1969)',100),
+    '1 Kilo Argent Fin: sachet 10 Francs Turin': ('ar - 10 francs fr turin (1860-1928)',148),
+    "Sachet Scellé 45 pièces d'Ecu 5 Francs" : ('ar - 5 francs fr ecu (1854-1860)',45),
 }
 
 def get_delivery_price(price):
@@ -93,28 +106,35 @@ def get_delivery_price(price):
         return 0.0  # Free delivery
 
 def get_price_for(session, session_id, buy_price_gold,buy_price_silver):
-    """Retrieves coin purchase prices using SeleniumBase."""
-    print("https://www.achat-or-et-argent.fr/")
 
-    for url in ["https://www.achat-or-et-argent.fr/or/2/pieces-d-or-d-investissement",
-                'https://www.achat-or-et-argent.fr/or/4/pieces-modernes',
-                'https://www.achat-or-et-argent.fr/argent/5/pieces-francaises']:
+    base_url = "https://www.achat-or-et-argent.fr"
+    print(base_url)
+
+    # URLs to scrape
+    urls = [
+        f"{base_url}/or/2/pieces-d-or-d-investissement",
+        f"{base_url}/or/4/pieces-modernes",
+        f"{base_url}/argent/5/pieces-francaises",
+        f"{base_url}/argent/80/gros-volume-argent"
+    ]
+
+    for url in urls:
 
         driver = Driver(uc=True, headless=True)
         driver.get(url)
 
         # Explicitly wait for the target element to be present
-        wait = WebDriverWait(driver, 5)  # Adjust timeout as needed
+        wait = WebDriverWait(driver, 15)  # Adjust timeout as needed
         tableau = wait.until(EC.presence_of_element_located((By.ID, "contentCategVitrine")))
-        wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "div.row.BStooltip.align-items-center")))
+        wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, "div.row.BStooltip.align-items-center")))
 
         # Use find_elements to get a list of matching elements
         rows = tableau.find_elements(By.CSS_SELECTOR, "div[id*='prod']")
+
         for row in rows:
             try:
 
-                # Wait for the 'a' tag to be present within the row
-                WebDriverWait(driver, 10).until(
+                WebDriverWait(driver, 15).until(
                     EC.presence_of_element_located((By.TAG_NAME, "a"))
                 )
 
@@ -129,45 +149,83 @@ def get_price_for(session, session_id, buy_price_gold,buy_price_silver):
 
                 span_elem = row_soup.find('span')
                 product_name = span_elem.text.strip()
-                price = None
 
+                item_data = CMN[product_name]
+                if isinstance(item_data,tuple):
+                    name = item_data[0]
+                    quantity = item_data[1]
+                    bullion_type = item_data[0][:2]
+                else :
+                    name=item_data
+                    quantity = 1
+                    bullion_type = item_data[:2]
+
+                if bullion_type == 'or':
+                    buy_price = buy_price_gold
+                else :
+                    buy_price = buy_price_silver
+
+                price = None
                 row_price = row_soup.find('div',class_="row BStooltip align-items-center")
+
                 if row_price :
+
                     data_content = row_price["data-original-title"]
 
-
                     inner_soup = BeautifulSoup(data_content, 'html.parser')
-                    target_cells = inner_soup.find_all('div', class_='col-6 text-left selected h5')
 
+                    quantity_divs = inner_soup.find_all("div", class_="col-6 text-left selected h5") + inner_soup.find_all("div", class_="col-6 text-left h5")  # Get divs with quantity text
+                    price_divs = inner_soup.find_all("div", class_="col-6 text-right h5")  # Get divs with price text
 
-                    for cell in target_cells:
-                        if '€' in cell.find_next_sibling('div').text:
-                            price = Price.fromstring(cell.find_next_sibling('div').text.strip())
-                            break  # Exit loop once price is found
+                    for qty_div, price_div in zip(quantity_divs,price_divs):  # Skip the first qty div ("Vous achetez")
+                        minimum = int(re.search(r"\d+", qty_div.get_text(strip=True)).group())
+                        price = Price.fromstring(price_div.get_text(strip=True))
 
+                        print(price, name, source,quantity)
+                        if name == 'ar - 50 centimes francs fr semeuse':
+                            price= Price.fromstring(str(Price.price.amount_float * quantity) + '€')
+                            minimum = quantity
+
+                        coin = Item(name=name,
+                                    buy=price.amount_float,
+                                    source=source,
+                                    buy_premium=(((price.amount_float + get_delivery_price(price.amount_float*minimum)/minimum)/float(quantity)) - (
+                                        buy_price * poids_pieces[name])) * 100.0 / (buy_price * poids_pieces[name]),
+                                    delivery_fee=get_delivery_price(price.amount_float),
+                                    session_id=session_id,
+                                    bullion_type=bullion_type,
+                                    quantity=quantity,
+                                    minimum=minimum)
+
+                        session.add(coin)
+                        session.commit()
 
                 else:
                     row_price = row_soup.find('del', class_="small text-dark").parent
                     price = Price.fromstring(row_price.text)
 
-                print(price,CMN[product_name],source)
+                    print(price,name,source)
+                    minimum = 1
 
-                if CMN[product_name][:2] == 'or':
-                    metal ='g'
-                    buy_price = buy_price_gold
-                else :
-                    metal = 's'
-                    buy_price = buy_price_silver
-                coin = CoinPrice(nom=CMN[product_name],
-                                 j_achete=price.amount_float,
-                                 source=source,
-                                 prime_achat_perso=((price.amount_float + get_delivery_price(price.amount_float)) - (
-                                         buy_price * poids_pieces[CMN[product_name]])) * 100.0 / (buy_price *poids_pieces[CMN[product_name]]),
+                    if name == 'ar - 50 centimes francs fr semeuse':
+                        price = Price.fromstring(str(price.amount_float * quantity)+'€')
+                        minimum = quantity
 
-                                 frais_port=get_delivery_price(price.amount_float), session_id=session_id,metal='g')
-                session.add(coin)
-                session.commit()
+                    coin = Item(name=name,
+                                buy=price.amount_float,
+                                source=source,
+                                buy_premium=(((price.amount_float + get_delivery_price(price.amount_float))/float(quantity)) - (
+                                             buy_price * poids_pieces[name])) * 100.0 / (buy_price *poids_pieces[name]),
+                                delivery_fee=get_delivery_price(price.amount_float),
+                                session_id=session_id,
+                                bullion_type=bullion_type,
+                                quantity=quantity,
+                                minimum=minimum)
 
+                    session.add(coin)
+                    session.commit()
             except Exception as e:
-                #print(f"An error occurred while processing {url}: {e}")
+                print(f"An error occurred while processing : {e}")
                 traceback.print_exc()
+
+    driver.quit()

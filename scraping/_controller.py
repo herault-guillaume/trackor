@@ -1,6 +1,6 @@
 import pathlib
 
-from models.model import CoinPrice, Session, poids_pieces
+from models.model import Item, Session, poids_pieces
 from sqlalchemy import func, asc
 from sqlalchemy.sql.expression import and_
 import json
@@ -121,23 +121,23 @@ def find_best_deals(session, session_id, num_deals=50,filename='./results/best_d
 
     results = (
         session.query(
-            CoinPrice.nom,
-            CoinPrice.j_achete,
-            CoinPrice.prime_achat_perso,
-            CoinPrice.source,
-            CoinPrice.timestamp
+            Item.name,
+            Item.buy,
+            Item.buy_premium,
+            Item.source,
+            Item.timestamp
         )
-        .filter(CoinPrice.session_id == session_id )
+        .filter(Item.session_id == session_id)
         .all()
     )
 
     deals = []
 
     for row in results:
-        if row.nom in poids_pieces and not 'lingot' in str(row.nom).lower():
+        if row.name in poids_pieces and not 'lingot' in str(row.name).lower():
             deals.append({
-                "name": row.nom[5:],
-                "prime": "{:.1f}".format(row.prime_achat_perso),
+                "name": row.name[5:],
+                "prime": "{:.1f}".format(row.buy_premium),
                 "source": row.source,
                 "last_updated": format_date_to_french_quarterly_hour(row.timestamp)
             })
@@ -158,7 +158,7 @@ def find_best_deals(session, session_id, num_deals=50,filename='./results/best_d
 
 def calculate_and_store_coin_data(session, session_id, coin_names, filename):
     """
-    Calcule le total (j_achete + frais_port) pour chaque pièce,
+    Calcule le total (j_achete + delivery_fee) pour chaque pièce,
     garde une seule pièce par source avec le prix le plus bas,
     trie par ordre croissant, et stocke les résultats dans un fichier JSON.
     Le diff est calculé par rapport à la médiane de toutes les pièces sélectionnées.
@@ -173,13 +173,13 @@ def calculate_and_store_coin_data(session, session_id, coin_names, filename):
     # Première requête pour obtenir tous les résultats avec les noms de pièces spécifiés
     all_results = (
         session.query(
-            CoinPrice.nom,
-            CoinPrice.prime_achat_perso,
-            CoinPrice.source,
-            CoinPrice.timestamp
+            Item.name,
+            Item.buy_premium,
+            Item.source,
+            Item.timestamp
         )
-        .filter(CoinPrice.nom.in_(coin_names))
-        .filter(CoinPrice.session_id == session_id)
+        .filter(Item.name.in_(coin_names))
+        .filter(Item.session_id == session_id)
         .all()
     )
 
@@ -194,16 +194,16 @@ def calculate_and_store_coin_data(session, session_id, coin_names, filename):
         if domain not in seen_domains:
             cheapest_coin = min(
                 (r for r in all_results if source_domains[r] == domain),
-                key=lambda x: x.prime_achat_perso
+                key=lambda x: x.buy_premium
             )
             unique_results.append(cheapest_coin)
             seen_domains.add(domain)
 
     # Trier les résultats par prix total croissant
-    unique_results.sort(key=lambda x: x.prime_achat_perso)
+    unique_results.sort(key=lambda x: x.buy_premium)
 
     # Calcul de la médiane de tous les prix
-    all_totals = [row.prime_achat_perso for row in unique_results]
+    all_totals = [row.buy_premium for row in unique_results]
     # if all_totals:
     #     median_total = statistics.median(all_totals)
     # else:
@@ -214,7 +214,7 @@ def calculate_and_store_coin_data(session, session_id, coin_names, filename):
     for i, row in enumerate(unique_results):
         row_data = {
             "source": row.source,
-            "prime": "{:.1f}".format(row.prime_achat_perso),
+            "prime": "{:.1f}".format(row.buy_premium),
             "last_updated": format_date_to_french_quarterly_hour(row.timestamp)
         }
         data.append(row_data)

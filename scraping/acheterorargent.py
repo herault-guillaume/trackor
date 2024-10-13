@@ -1,17 +1,14 @@
 import requests
 from bs4 import BeautifulSoup
-from models.model import CoinPrice, poids_pieces
+from models.model import Item, poids_pieces
 from datetime import datetime
 import traceback
 from price_parser import Price
 
 header_achat_or_argent_map_model = {
-    'Nom': 'nom',
-    'AchatVous vendez': 'je_vend',
-    'VenteVous achetez': 'j_achete',
-    'Cotation française': 'cotation_francaise',
-    'Prime achat': 'prime_achat_vendeur',
-    'Prime vente': 'prime_vente_vendeur',
+    'Nom': 'name',
+    'AchatVous vendez': 'sell',
+    'VenteVous achetez': 'buy',
 }
 
 def get_delivery_price(price):
@@ -56,14 +53,14 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
                 product_price = Price.fromstring(product.find('span','prixProduit').text)
                 print(product_price,product_name,source)
                 if product_name[:2] == 'or':
-                    coin = CoinPrice(nom=product_name,
-                                     j_achete=product_price.amount_float,
-                                     source=source,
-                                     prime_achat_perso=((product_price.amount_float + get_delivery_price(product_price.amount_float)) - (
+                    coin = Item(name=product_name,
+                                buy=product_price.amount_float,
+                                source=source,
+                                buy_premium=((product_price.amount_float + get_delivery_price(product_price.amount_float)) - (
                                                  buy_price * poids_pieces[product_name])) * 100.0 / (buy_price *
                                                        poids_pieces[product_name]),
 
-                                     frais_port=get_delivery_price(product_price.amount_float), session_id=session_id,metal='g')
+                                delivery_fee=get_delivery_price(product_price.amount_float), session_id=session_id, bullion_type='g')
                 session.add(coin)
                 session.commit()
 

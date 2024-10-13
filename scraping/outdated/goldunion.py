@@ -1,6 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
-from models.model import CoinPrice, poids_pieces
+from models.model import Item, poids_pieces
 
 #gold union faq combien coute une expédition
 
@@ -30,12 +30,12 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
                 # Clean the price text
                 try:
                     price = float(price_text.replace('€', '').replace(',', '.'))
-                    coin = CoinPrice(nom="or - 20 francs coq marianne",
-                                     j_achete=price,
-                                     source='https://goldunion.fr/products/20-francs-coq',
-                                     prime_achat_perso=((price.amount_float + get_delivery_price(price.amount_float)) - (buy_price * poids_pieces[coin_name])) * 100.0 / (buy_price * poids_pieces[coin_name]),
+                    coin = Item(name="or - 20 francs coq marianne",
+                                buy=price,
+                                source='https://goldunion.fr/products/20-francs-coq',
+                                buy_premium=((price.amount_float + get_delivery_price(price.amount_float)) - (buy_price * poids_pieces[coin_name])) * 100.0 / (buy_price * poids_pieces[coin_name]),
 
-                                     frais_port=20.0,session_id=session_id,metal='g')
+                                delivery_fee=20.0, session_id=session_id, bullion_type='g')
                     session.add(coin)
                     session.commit()
 

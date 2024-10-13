@@ -2,7 +2,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from models.model import CoinPrice
+from models.model import Item
 
 def get(session):
     options = webdriver.ChromeOptions()
@@ -18,7 +18,7 @@ def get(session):
     # Clean the price text and convert to float
     price = float(span_element.text.replace('€', '').replace(',', '.'))
 
-    coin = CoinPrice(nom="or - 20 francs coq marianne", j_achete=price, source='achatoretargent')
+    coin = Item(name="or - 20 francs coq marianne", buy=price, source='achatoretargent')
     session.add(coin)
     session.commit()
 

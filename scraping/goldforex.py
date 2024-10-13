@@ -1,6 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
-from models.model import CoinPrice, poids_pieces
+from models.model import Item, poids_pieces
 from price_parser import Price
 import traceback
 
@@ -87,14 +87,14 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
 
             print(coin_label,price,url)
             #price = float(price_text.replace('€', '').replace(',', '.'))
-            coin = CoinPrice(nom=coin_name[coin_label],
-                             j_achete=price.amount_float,
-                             source=url,
-                             prime_achat_perso=((price.amount_float + 35.0) - (
+            coin = Item(name=coin_name[coin_label],
+                        buy=price.amount_float,
+                        source=url,
+                        buy_premium=((price.amount_float + 35.0) - (
                                          buy_price * poids_pieces[coin_name[coin_label]])) * 100.0 / (buy_price * poids_pieces[
                                                    coin_name[coin_label]]),
 
-                             frais_port=35.0,session_id=session_id,metal='g')
+                        delivery_fee=35.0, session_id=session_id, bullion_type='g')
             session.add(coin)
             session.commit()
         except Exception as e:
