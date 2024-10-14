@@ -3,8 +3,9 @@ from bs4 import BeautifulSoup
 from models.model import Item, poids_pieces
 from price_parser import Price
 import traceback
+import re
 
-coin_mapping = {
+CMN = {
     "20 Francs Napoléon": "or - 20 francs fr",
     "20 Francs Suisse": "or - 20 francs sui vreneli croix",
     "Union Latine": "or - 20 francs union latine",
@@ -26,6 +27,24 @@ coin_mapping = {
     '20 Francs Marianne...' : 'or - 20 francs fr coq marianne',
     '10 Francs Napoléon...' : 'or - 10 francs',
     'Britannia 1 OZ Or' : 'or - 1 oz britannia',
+
+    "5 Francs semeuse": "ar - 5 francs fr semeuse (1959-1969)",
+    "10 Francs Hercule": "ar - 10 francs fr hercule (1965-1973)",
+    "2 Francs Semeuse": "ar - 2 francs fr semeuse",
+    "1 Franc Semeuse": "ar - 1 franc fr semeuse",
+    "50 Cts Semeuse": "ar - 50 centimes francs fr semeuse",
+    "Ecu 5 Francs": "ar - 5 francs fr ecu (1854-1860)",
+    "100 Francs Argent": "ar - 100 francs fr",
+    "20 Francs Turin": "ar - 20 francs fr turin (1929-1939)",
+    "10 Francs Turin": "ar - 10 francs fr turin (1860-1928)",
+    "SILVER EAGLE 1 OZ": "ar - 1 oz silver eagle",
+    "Kangourou 1 OZ Argent": "ar - 1 oz nugget / kangourou",
+    "Maple Leaf 1 Argent OZ": "ar - 1 oz maple leaf",
+    "Philharmonique 1 OZ A...": "ar - 1 oz philharmonique",
+    "Britannia 1 Oz Argent": "ar - 1 oz britannia",
+    "Boite 500 Pièces Brit...": ("ar - 1 oz britannia", 500),
+    "50 Francs Hercule": "ar - 50 francs fr hercule (1974-1980)",
+    "PANDA ARGENT 30 GRAMMES": "ar - 10 yuan panda 30g",
 }
 def get_delivery_price(price):
     #https://www.changerichelieu.fr/livraison
@@ -62,6 +81,7 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
 
     for div in target_divs:
         try :
+
             # Extract price
             price_element = div.find('p', class_='price product-price')
             price = Price.fromstring(price_element.text.strip())
@@ -71,20 +91,75 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
             product_name = product_name_element.text.strip()
             source = product_name_element['href']
 
-            print(price,coin_mapping[product_name],url)
-            # Clean the price text
-            #price = float(price_text.replace('€', '').replace(',', '.').replace('net',''))
-            if coin_mapping[product_name][:2] == 'or':
-                coin = Item(name=coin_mapping[product_name],
+            item_data = CMN[product_name]
+            quantity = 1
+            if isinstance(item_data, tuple):
+                name = item_data[0]
+                quantity = item_data[1]
+                bullion_type = item_data[0][:2]
+            else:
+                name = item_data
+                bullion_type = item_data[:2]
+                min_text = div.find('p', class_='alqty hidden').text
+                if min_text:
+                    quantity = int(re.search(r"\d+", min_text).group())
+
+            if bullion_type == 'or':
+                buy_price = buy_price_gold
+            else:
+                buy_price = buy_price_silver
+
+            print(price,CMN[product_name], source)
+
+            qty = div.find_all('li',class_='left')
+            prices = div.find_all('li',class_='right')
+
+            if len(qty>1) and len(prices>1):
+                for q,p in zip(qty[1:],prices[1:]):
+
+                    min = int(re.search(r"\d+", q.text).group())
+                    if min > minimum:
+                        minimum = min
+
+                    coin = Item(name=name,
+                                buy=price.amount_float,
+                                source=source,
+                                buy_premium=(((price.amount_float + get_delivery_price(
+                                    price.amount_float * minimum) / minimum) / float(quantity)) - (
+                                                     buy_price * poids_pieces[name])) * 100.0 / (
+                                                        buy_price * poids_pieces[name]),
+
+                                delivery_fee=get_delivery_price(price.amount_float),
+                                session_id=session_id,
+                                bullion_type=bullion_type,
+                                quantity=quantity,
+                                minimum=minimum)
+
+                    session.add(coin)
+                    session.commit()
+
+            else :
+                # Extract price
+                price_element = div.find('p', class_='price product-price')
+                price = Price.fromstring(price_element.text.strip())
+
+                coin = Item(name=name,
                             buy=price.amount_float,
                             source=source,
-                            buy_premium=((price.amount_float + get_delivery_price(price.amount_float)) - (
-                                             buy_price * poids_pieces[ coin_mapping[product_name]])) * 100.0 / (buy_price * poids_pieces[
-                                                       coin_mapping[product_name]]),
+                            buy_premium=(((price.amount_float + get_delivery_price(
+                                price.amount_float * minimum) / minimum) / float(quantity)) - (
+                                                 buy_price * poids_pieces[name])) * 100.0 / (
+                                                buy_price * poids_pieces[name]),
 
-                            delivery_fee=get_delivery_price(price.amount_float), session_id=session_id, bullion_type='g')
-            session.add(coin)
-            session.commit()
+                            delivery_fee=get_delivery_price(price.amount_float),
+                            session_id=session_id,
+                            bullion_type=bullion_type,
+                            quantity=quantity,
+                            minimum=minimum)
+
+                session.add(coin)
+                session.commit()
+
 
 
         except Exception as e:

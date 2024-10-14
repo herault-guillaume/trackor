@@ -283,6 +283,7 @@ poids_pieces  = {
                         'ar - 1 oz dragon et koï 2024' : 31.103,
                         'ar - 1 oz 125e anniv perth mint 2024' : 31.103,
                         'ar - 1 oz koala 2024 RAM' : 31.103,
+                        'ar - 1 oz koala' : 31.103,
                         'ar - 1 oz dragon 2024 lunar III' : 31.103,
                         'ar - 1 oz dragon chinois 2018' : 31.103,
                         'ar - 1 oz dragon chinois 2022' : 31.103,
