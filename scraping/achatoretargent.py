@@ -151,13 +151,13 @@ def get_price_for(session, session_id, buy_price_gold,buy_price_silver):
                 product_name = span_elem.text.strip()
 
                 item_data = CMN[product_name]
+                quantity = 1
                 if isinstance(item_data,tuple):
                     name = item_data[0]
                     quantity = item_data[1]
                     bullion_type = item_data[0][:2]
                 else :
                     name=item_data
-                    quantity = 1
                     bullion_type = item_data[:2]
 
                 if bullion_type == 'or':

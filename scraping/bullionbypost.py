@@ -57,7 +57,15 @@ urls = {
     "or - 20 lire vittorio emanuele II": "https://www.bullionbypost.fr/pieces-du-monde/pieces-italiennes/20-lires-italiennes-or-emmanuel-II/",
     "or - 50 pesos": "https://www.bullionbypost.fr/pieces-du-monde/pieces-mexicaines/50-pesos-mexicains-or/",
     "or - 10 pesos": "https://www.bullionbypost.fr/pieces-du-monde/pieces-mexicaines/10-pesos-mexicains-en-or/",
-    "or - 5 pesos": "https://www.bullionbypost.fr/pieces-du-monde/pieces-mexicaines/5-pesos-mexicains-en-or/",
+
+    "ar - 1 oz britannia": "https://www.bullionbypost.fr/pieces-argent/britannia-argent/piece-argent-britannia-notre-choix/",
+    "ar - 1 oz maple leaf": "https://www.bullionbypost.fr/pieces-argent/maple-canadienne-argent/piece-maple-leaf-argent-1-once-notre-choix/",
+    "ar - 1 oz philharmonique": "https://www.bullionbypost.fr/pieces-argent/1-once-piece-argent-philharmonique-vienne/",
+    "ar - 1 oz silver eagle": "https://www.bullionbypost.fr/pieces-argent/eagle-americain-argent/piece-eagle-americain-argent-1-once-notre-choix/",
+    "ar - 1 oz krugerrand": "https://www.bullionbypost.fr/pieces-argent/krugerrand/piece-krugerrand-argent-1-once-notre-choix/",
+    "ar - 1 oz nugget / kangourou": "https://www.bullionbypost.fr/pieces-argent/kangourou-argent/kangourou-argent-1-once-2024/",
+    "ar - 10 yuan panda 30g": "https://www.bullionbypost.fr/pieces-argent/panda-argent/piece-30g-panda-chinois-argent-notre-choix/",
+    "ar - 1 oz": "https://www.bullionbypost.fr/pieces-argent/pieces-argent-1-once-notre-choix/piece-argent-1-once-meilleure-offreb/",
 }
 def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
     print("https://www.bullionbypost.fr/")

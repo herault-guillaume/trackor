@@ -36,6 +36,7 @@ class MetalPrice(Base):
 poids_pieces  = {
                         'or - 1 ducat': 3.44,
                         'or - 1 oz' : 31.103,
+                        'or - 1 oz EpargnOr' : 31.103,
                         'or - 1 oz buffalo': 31.103,
                         'or - 1 oz krugerrand': 31.103,# -> CPor
                         'or - 1 oz nugget / kangourou': 31.103,
@@ -90,6 +91,7 @@ poids_pieces  = {
                         'or - 1/10 oz britannia charles III 2023': 3.11,
                         'or - 1/10 oz american eagle 2024': 3.11,
                         'or - 1/10 oz couronnement charles III 2023': 3.11,
+                        'or - 1/10 oz EpargnOr': 3.11,
                         'or - 1/2 oz': 15.552,
                         'or - 1/2 oz american eagle': 15.552,
                         'or - 1/2 oz krugerrand': 15.55,
@@ -216,6 +218,7 @@ poids_pieces  = {
                         'or - 8 florins 20 francs franz joseph I': 5.805,
                         'or - 500 yuan panda 2010 1 oz': 31.103,
                         'or - 500 yuan panda 2024 30g': 30.0,
+                        'or - 500 yuan panda 30g': 30.0,
                         'or - 200 yuan panda 2024 15g': 15.0,
                         'or - 200 yuan panda 2010 1/2 oz': 15.552,
                         'or - 100 yuan panda 2024 8g': 8.0,
@@ -268,6 +271,7 @@ poids_pieces  = {
                         'ar - 5 francs fr ecu (1854-1860)' : 25.0 * 0.900,
                         'ar - 1 oz  fr ecu (1854-1860)': 25.0 * 0.900,
                         'ar - 1 oz' : 31.103,
+                        'ar - 10 yuan panda 30g' : 31.103,
                         'ar - 1 oz buffalo': 31.103,
                         'ar - 1 oz krugerrand': 31.103,
                         'ar - 1 oz nugget / kangourou': 31.103,
