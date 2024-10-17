@@ -22,7 +22,7 @@ coin_name = {
     "Louis Belge": 'or - 20 francs union latine',
     "Souverain": 'or - 1 souverain elizabeth II',
     #"Souverain Or 2023 – Roi Charles": 'souverain or elizabeth II',
-    "50 Pesos Mexique": 'or - 50 pesos',
+    "50 Pesos Mexique": 'or - 50 pesos mex',
     "American Buffalo": 'or - 1 oz buffalo',
     "50 dollars eagle": 'or - 1 oz american eagle',
     "Demi-souverain": 'or - 1/2 souverain georges V',

@@ -6,9 +6,9 @@ from price_parser import Price
 import traceback
 
 coin_name = {
-    "20 Pesos – Mexique | Or": "or - 20 pesos",
+    "20 Pesos – Mexique | Or": "or - 20 pesos mex",
     "20 Francs Napoléon – Premier Empire | Or": "or - 20 francs fr napoléon empereur laurée",  # Assuming this is the "tête laurée" type, most common for First Empire
-    "2,5 Pesos – Mexique | Or": "or - 2.5 pesos",
+    "2,5 Pesos – Mexique | Or": "or - 2.5 pesos mex",
     "4 Florins / 10 Francs – Franz Joseph | Or": "or - 4 florins 10 francs 1892 refrappe",
     "1 Ducat – Autriche | Or": "or - 1 ducat",
     "40 Francs – Charles X | Or": "or - 40 francs fr charles X",  # This key doesn't exist, handle later
@@ -52,7 +52,7 @@ coin_name = {
     "10 Florins | Or": "or - 10 florins wilhelmina",  # Assuming Wilhelmina, clarify if needed
     "Lingotin 500 g | Or": "or - lingot 500 g LBMA",
     "Lingot 1 kg | Or": "or - lingot 1 kg LBMA",
-    "50 Pesos | Or": "or - 50 pesos",
+    "50 Pesos | Or": "or - 50 pesos mex",
     "20 Francs Tunisie | Or": "or - 20 francs tunisie",
     "American Eagle 1 Once | Or": "or - 1 oz american eagle",
     "Krugerrand 1/10 Once | Or": "or - 1/10 oz krugerrand",
@@ -63,8 +63,8 @@ coin_name = {
     "10 dollars Liberty": "or - 10 dollars liberté",
     "5 dollars indien": "or - 5 dollars tête indien",
     "5 dollars Liberty": "or - 5 dollars liberté",
-    "2 Pesos – Mexique | Or": "or - 2 pesos",
-    "2 Pesos – Mexique | Or": "or - 2 pesos",
+    "2 Pesos – Mexique | Or": "or - 2 pesos mex",
+    "2 Pesos – Mexique | Or": "or - 2 pesos mex",
 }
 
 def get_delivery_price(price):

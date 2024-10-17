@@ -28,11 +28,11 @@ coin_name = {
     "Pièce d'or Vreneli 20 francs suisse": "or - 20 francs sui vreneli croix",
     "Pièce d'or Leopold II 20 francs": "or - 20 francs union latine",  # Assuming Leopold II is part of the Latin Monetary Union
     "Pièce d'or Souverain Nouveau Elisabeth 2": "or - 1 souverain elizabeth II",
-    "Pièce d'or 50 pesos mexicain": "or - 50 pesos",
+    "Pièce d'or 50 pesos mexicain": "or - 50 pesos mex",
     "1 Ducat Autriche": "or - 1 ducat",
     "20 Tunis Or": "or - 20 francs tunisie",
-    "20 Pesos Mexicains": "or - 20 pesos",
-    "10 Pesos Mexicains": "or - 10 pesos",
+    "20 Pesos Mexicains": "or - 20 pesos mex",
+    "10 Pesos Mexicains": "or - 10 pesos mex",
     "Pièce d'or 20 dollars Liberty": "or - 20 dollars liberté longacre",
     "Pièce d'or 10 dollars Indien": "or - 10 dollars tête indien",
     "Pièce d'or 10 dollars Liberty": "or - 10 dollars liberté",
@@ -46,8 +46,8 @@ coin_name = {
     "Pièce d'or Tientjes 10 Gulden": "or - 10 florins wilhelmina",
     "Pièce d'or Britannia 1 once": "or - 1 oz britannia",
     "100 Piastres Turc": "or - 100 piastres turc",
-    "2,5 Pesos Mexicains": "or - 2.5 pesos",
-    "2,5 Pesos Mexicains": "or - 2.5 pesos",
+    "2,5 Pesos Mexicains": "or - 2.5 pesos mex",
+    "2,5 Pesos Mexicains": "or - 2.5 pesos mex",
     "Pièce d'or 20 dollars St Gaudens": 'or - 20 dollars liberté st gaudens',
 }
 

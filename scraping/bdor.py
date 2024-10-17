@@ -20,7 +20,7 @@ table_lookup = {
         "10 Fr Or Vreneli" : "or - 10 francs sui vreneli croix",
         "20 Dollars Or St Gaudens" : "or - 20 dollars liberté st gaudens",
         "20 Dollars Or Liberty" : "or - 20 dollars liberté longacre",
-        "50 Pesos Or" : "or - 50 pesos",
+        "50 Pesos Or" : "or - CMN",
         "Krugerrand" : "or - 1 oz krugerrand",
         "10 Gulden Or" : "or - 10 florins wilhelmina",
         "20 Fr Or Italie" : "or - 20 lire umberto I",
@@ -48,7 +48,7 @@ table_lookup = {
         "50 Frs Tête Laurée" : "or - 50 francs fr napoléon III tête laurée",
         "100 Corona" : 'or - 100 couronnes françois joseph I',
         "4 Ducats" : 'or - 4 ducats',
-        "20 Pesos Or" : "or - 20 pesos",
+        "20 Pesos Or" : "or - 20 pesos mex",
         "2,5 Dollars Or" : "or - 2.5 dollars tête indien",
         "5 Roubles" : "or - 5 roubles",
 }

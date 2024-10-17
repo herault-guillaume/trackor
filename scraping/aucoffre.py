@@ -31,7 +31,7 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
         'or - 100 francs fr napoléon III tête laurée': ["https://www.aucoffre.com/recherche/marketing_list-5/stype-13/produit", "napoleon-100f-napoleon-iii-tete-lauree"],
         'or - 100 francs fr génie LEF': ["https://www.aucoffre.com/recherche/marketing_list-5/stype-13/produit","napoleon-100f-genie-iiieme-republique-lef"],
         'or - 100 francs fr génie DPF': ["https://www.aucoffre.com/recherche/marketing_list-5/stype-13/produit","napoleon-100f-genie-iiieme-republique-dpf"],
-        'or - 20 francs sui vreneli croix 1935L': ["https://www.aucoffre.com/recherche/marketing_list-6/stype-180/produit","20-francs-suisse-vreneli"],
+        'or - 20 couronnes françois joseph I': ["https://www.aucoffre.com/recherche/marketing_list-6/stype-180/produit","20-francs-suisse-vreneli"],
         'or - 20 francs union latine': ["https://www.aucoffre.com/recherche/stype-51/produit","union-latine"],
         'or - 20 dollars liberté longacre': ["https://www.aucoffre.com/recherche/metal-1/marketing_list-9/stype-8/produit","20-dollars-us-double-eagle-liberty-de-longacre"],
         'or - 20 dollars liberté st gaudens': ["https://www.aucoffre.com/recherche/metal-1/marketing_list-9/stype-8/produit","20-dollars-us-double-eagle-liberty-de-saint-gaudens"],
@@ -46,11 +46,11 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
         'or - 1 oz krugerrand': ["https://www.aucoffre.com/recherche/marketing_list-7/stype-2/produit","krugerrand-1-once"],
         'or - 1 oz buffalo': ["https://www.aucoffre.com/recherche/marketing_list-10/stype-131/produit","buffalo-1-once-50-dollars-us"],
         'or - 1 oz nugget / kangourou': ["https://www.aucoffre.com/recherche/marketing_list-13/stype-21/produit","australian-nugget-1-once"],
-        "or - 50 pesos": ["https://www.aucoffre.com/recherche/marketing_list-11/stype-9/produit","50-pesos"],  # Approximatif
-        "or - 20 pesos": ["https://www.aucoffre.com/recherche/marketing_list-11/stype-84/produit","20-pesos"],  # Approximatif
-        "or - 10 pesos": ["https://www.aucoffre.com/recherche/marketing_list-11/stype-68/produit","10-pesos"],  # Approximatif
-        "or - 5 pesos": ["https://www.aucoffre.com/recherche/stype-67/produit","5-pesos"],  # Approximatif
-        "or - 2.5 pesos": ["https://www.aucoffre.com/recherche/marketing_list-11/stype-66/produit","2-1-2-pesos"],  # Approximatif
+        "or - 50 pesos mex": ["https://www.aucoffre.com/recherche/marketing_list-11/stype-9/produit","50-pesos"],  # Approximatif
+        "or - 20 pesos mex": ["https://www.aucoffre.com/recherche/marketing_list-11/stype-84/produit","20-pesos"],  # Approximatif
+        "or - 10 pesos mex": ["https://www.aucoffre.com/recherche/marketing_list-11/stype-68/produit","10-pesos"],  # Approximatif
+        "or - 5 pesos mex": ["https://www.aucoffre.com/recherche/stype-67/produit","5-pesos"],  # Approximatif
+        "or - 2.5 pesos mex": ["https://www.aucoffre.com/recherche/marketing_list-11/stype-66/produit","2-1-2-pesos"],  # Approximatif
         'or - 1/2 oz maple leaf': ["https://www.aucoffre.com/recherche/marketing_list-12/stype-33/produit","maple-leaf-1-2-once"],
         'or - 1/4 oz maple leaf': ["https://www.aucoffre.com/recherche/marketing_list-12/stype-32/produit","maple-leaf-1-4-once"],
         'or - 1/10 oz maple leaf': ["https://www.aucoffre.com/recherche/marketing_list-12/stype-31/produit","maple-leaf-1-10-once"],

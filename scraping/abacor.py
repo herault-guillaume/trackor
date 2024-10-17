@@ -38,7 +38,7 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
         'Pièce d’Or 20 Dollars US': 'or - 20 dollars',
         'Pièce d’Or 10 Dollars Liberty': 'or - 10 dollars liberté',
         'Pièce d’Or 10 Dollars Tête d’Indien': 'or - 10 dollars tête indien',
-        'Pièce d’Or 50 Pesos Mexicain': 'or - 50 pesos',
+        'Pièce d’Or 50 Pesos Mexicain': 'or - 50 pesos mex',
         'Pièce d’Or 10 Florins – 10 Gulden': 'or - 10 florins wilhelmina',
         'Pièce d’Or Krugerrand': 'or - 1 oz krugerrand',
         'Pièce d’Or 10 Francs Napoléon': 'or - 10 francs fr napoléon III laurée',

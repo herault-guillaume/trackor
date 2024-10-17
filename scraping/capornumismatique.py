@@ -8,7 +8,7 @@ import traceback
 
 CMN = {'20 Francs Marianne Coq': 'or - 20 francs fr coq marianne',
  '20 Francs Napoleon': 'or - 20 francs fr',
- '50 Pesos': 'or - 50 pesos',
+ '50 Pesos': 'or - 50 pesos mex',
  '10 Francs Marianne Coq': 'or - 10 francs fr coq marianne',
  '10 Francs Napoleon': 'or - 10 francs fr',
  'Krugerrand': 'or - 1 oz krugerrand',

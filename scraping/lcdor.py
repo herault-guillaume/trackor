@@ -15,7 +15,7 @@ CMN = {
     "Krugerrand Or": 'or - 1 oz krugerrand',
     "Maple Leaf Or": 'or - 1 oz maple leaf',
     "Philharmonique Or": 'or - 1 oz philharmonique',
-    "50 Pesos Or": 'or - 50 pesos',
+    "50 Pesos Or": 'or - 50 pesos mex',
     "20 Dollars Or Liberty": 'or - 20 dollars liberté longacre',
     "20 Dollars Or St Gaudens": 'or - 20 dollars liberté st gaudens', # Assuming St Gaudens is similar to Liberty
     "10 Dollars Or Liberty": 'or - 10 dollars liberté',
@@ -48,16 +48,34 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
             name = name_title.text
             url = name_title.find('a')['href']
             print( price,CMN[name],url)
-            #price = float(price_text.replace('€', '').replace(',', '.'))
 
-            if CMN[name][:2] == 'or':
-                coin = Item(name=CMN[name],
-                            buy=price.amount_float,
-                            source=url,
-                            buy_premium=((price.amount_float + 7.0) - (
-                                             buy_price * poids_pieces[CMN[name]])) * 100.0 / (buy_price * poids_pieces[
-                                                       CMN[name]]),
-                            delivery_fee=7.0, session_id=session_id, bullion_type='g')
+            minimum = 1
+            quantity = 1
+            item_data = CMN[name]
+            if isinstance(item_data, tuple):
+                name = item_data[0]
+                quantity = item_data[1]
+                bullion_type = item_data[0][:2]
+            else:
+                name = item_data
+                bullion_type = item_data[:2]
+
+            if bullion_type == 'or':
+                buy_price = buy_price_gold
+            else:
+                buy_price = buy_price_silver
+
+            coin = Item(name=name,
+                        buy=price.amount_float,
+                        source=url,
+                        buy_premium=((price.amount_float + 7.0) - (
+                                         buy_price * poids_pieces[name])) * 100.0 / (buy_price * poids_pieces[
+                                                   name]),
+                        delivery_fee=7.0,
+                        session_id=session_id,
+                        bullion_type=bullion_type,
+                        minimum=minimum,
+                        quantity=quantity)
             session.add(coin)
             session.commit()
 

@@ -7,7 +7,7 @@ import re
 
 CMN = {
     "Napoléon Or 20 Francs": "or - 20 francs fr",  # Assuming a standard 20 Francs gold coin
-    "50 Pesos": "or - 50 pesos",
+    "50 Pesos": "or - 50 pesos mex",
     "Souverain": "or - 1 souverain",  # Assuming a modern Sovereign
     "20 Dollars US": "or - 20 dollars",
     "10 Francs Napoléon": "or - 10 francs fr",
@@ -26,7 +26,7 @@ CMN = {
     "Philharmonique 1 OZ": "or - 1 oz philharmonique",
     "Britannia 1 OZ Or": "or - 1 oz britannia",
     "Nugget 1 OZ": "or - 1 oz nugget / kangourou",
-    "PANDA OR 30 GRAMMES": "or - 500 yuan panda 30g",
+    "PANDA OR 30 GRAMMES": "or - 500 yuan panda",
     "EpargnOr 1/10 Oz": "or - 1/10 oz EpargnOr",
     "1 Ducat Francois-Joseph 1915 Or": "or - 1 ducat",
 
@@ -89,21 +89,22 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
         # Iterate over each 'li' within the 'ul'
         for product_item in product_list.find_all('li'):
             try:
-                # Extract the price
-                price_span = product_item.find('span', class_='price product-price')
-                price = Price.fromstring(price_span.text.strip())
 
                 # Extract the product name
                 product_name_link = product_item.find('a', class_='product-name')
                 product_name = product_name_link.text.strip()
                 url = product_name_link['href']
+                item_data = CMN[product_name]
+
+                # Extract the price
+                price_span = product_item.find('span', class_='price product-price')
+                price = Price.fromstring(price_span.text.strip())
 
                 minimum=1
-                min_text = product_item.find('p', class_='alqty').text
-                if min_text:
-                    minimum = int(re.search(r"\d+", min_text).group())
+                min_p = product_item.find('p', class_='alqty')
+                if min_p:
+                    minimum = int(re.search(r"\d+", min_p.text).group())
 
-                item_data = CMN[product_name]
                 quantity = 1
                 if isinstance(item_data,tuple):
                     name = item_data[0]
@@ -128,7 +129,7 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
                                 buy=price.amount_float,
                                 source=url,
                                 buy_premium=(((price.amount_float + get_delivery_price(
-                                    price.amount_float * minimum) / minimum) / float(quantity)) - (
+                                    price.amount_float) / minimum) / float(quantity)) - (
                                                      buy_price * poids_pieces[name])) * 100.0 / (
                                                         buy_price * poids_pieces[name]),
 
@@ -140,7 +141,6 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
                     session.add(coin)
                     session.commit()
 
-            except (requests.exceptions.RequestException, ValueError) as e:
-                print(f"Error retrieving or parsing price: {e}",url)
+            except Exception as e:
                 print(traceback.format_exc())
                 pass

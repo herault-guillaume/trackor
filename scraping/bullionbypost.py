@@ -55,8 +55,8 @@ urls = {
     "or - 10 florins wilhelmina": "https://www.bullionbypost.fr/pieces-du-monde/pieces-hollandaises/10-florins-neerlandais-notre-choix/",
     "or - 20 mark wilhelm II": "https://www.bullionbypost.fr/pieces-du-monde/pieces-allemandes/20-mark-allemand-meilleur-rapport-qualite-prix/",
     "or - 20 lire vittorio emanuele II": "https://www.bullionbypost.fr/pieces-du-monde/pieces-italiennes/20-lires-italiennes-or-emmanuel-II/",
-    "or - 50 pesos": "https://www.bullionbypost.fr/pieces-du-monde/pieces-mexicaines/50-pesos-mexicains-or/",
-    "or - 10 pesos": "https://www.bullionbypost.fr/pieces-du-monde/pieces-mexicaines/10-pesos-mexicains-en-or/",
+    "or - 50 pesos mex": "https://www.bullionbypost.fr/pieces-du-monde/pieces-mexicaines/50-pesos-mexicains-or/",
+    "or - 10 pesos mex": "https://www.bullionbypost.fr/pieces-du-monde/pieces-mexicaines/10-pesos-mexicains-en-or/",
 
     "ar - 1 oz britannia": "https://www.bullionbypost.fr/pieces-argent/britannia-argent/piece-argent-britannia-notre-choix/",
     "ar - 1 oz maple leaf": "https://www.bullionbypost.fr/pieces-argent/maple-canadienne-argent/piece-maple-leaf-argent-1-once-notre-choix/",

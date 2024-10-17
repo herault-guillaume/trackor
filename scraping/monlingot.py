@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 from models.model import Item, poids_pieces
 from price_parser import Price
 import traceback
+import re
 
 urls = {
     "https://monlingot.fr/or/achat-piece-or-20-francs-napoleon": 'or - 20 francs fr napoléon III',
@@ -22,7 +23,7 @@ urls = {
     "https://monlingot.fr/or/achat-piece-or-demi-souverain": 'or - 1/2 souverain georges V',  # Assuming Georges V based on your data
     "https://monlingot.fr/pieces-or-modernes/nugget-1-once-d-or": 'or - 1 oz nugget / kangourou',
     "https://monlingot.fr/or/achat-lingotin-or-100-grammes": 'or - lingot 100 g LBMA',
-    "https://monlingot.fr/or/achat-piece-or-50-pesos": 'or - 50 pesos',
+    "https://monlingot.fr/or/achat-piece-or-50-pesos": 'or - 50 pesos mex',
     "https://monlingot.fr/or/lingot-or-500-grammes": 'or - lingot 500 g LBMA',
     "https://monlingot.fr/or/achat-piece-or-souverain": 'or - 1 souverain elizabeth II',  # Assuming Elizabeth II based on your data
     "https://monlingot.fr/or/achat-lingot-or-1-Kilo": 'or - lingot 1 kg LBMA',
@@ -33,9 +34,21 @@ urls = {
     "https://monlingot.fr/or/achat-piece-or-20-francs-suisse": 'or - 20 francs sui confederatio',
     "https://monlingot.fr/or/achat-piece-or-krugerrand-1-once": 'or - 1 oz krugerrand',
     "https://monlingot.fr/or/achat-piece-or-20-francs-coq-marianne": 'or - 20 francs fr coq marianne',
-    "https://monlingot.fr/or/achat-piece-or-britannia-1-once" : 'or - 1 oz britannia',  # Assuming this is the intended mapping
-    #"https://monlingot.fr/or/achat-piece-or-leon-1-once": None,  # No direct match in your original data
-    #"Lhttps://monlingot.fr/or/achat-piece-or-leon-1-10-once": None   # No direct match in your original data
+
+    "https://monlingot.fr/piece-argent-Francaise/achat-piece-investissement-argent-10-francs-hercule" : 'ar - 10 francs fr hercule (1965-1973)',  # Assuming this is the intended mapping
+    "https://monlingot.fr/piece-argent-Francaise/achat-piece-investissement-argent-5-francs-semeuse" : 'ar - 5 francs fr semeuse (1959-1969)',  # Assuming this is the intended mapping
+    "https://monlingot.fr/piece-argent-Francaise/achat-piece-investissement-argent-2-francs-semeuse" : 'ar - 2 francs fr semeuse',  # Assuming this is the intended mapping
+    "https://monlingot.fr/piece-argent-Francaise/achat-piece-investissement-argent-1-franc-semeuse" : 'ar - 1 franc fr semeuse',  # Assuming this is the intended mapping
+    "https://monlingot.fr/argent/achat-piece-argent-20-francs-turin" : 'ar - 20 francs fr turin (1929-1939)',  # Assuming this is the intended mapping
+    "https://monlingot.fr/argent/achat-piece-argent-silver-eagle-1-once" : 'ar - 1 oz silver eagle',  # Assuming this is the intended mapping
+    "https://monlingot.fr/argent/achat-piece-argent-maple-leaf-1-once" : 'ar - 1 oz maple leaf',  # Assuming this is the intended mapping
+    "https://monlingot.fr/argent/achat-piece-argent-philharmonique-1-once" : 'ar - 1 oz philharmonique',  # Assuming this is the intended mapping
+    "https://monlingot.fr/piece-argent-Francaise/Piece-investissement-Argent-50-Francs-Hercule" : 'ar - 50 francs fr hercule (1974-1980)',  # Assuming this is the intended mapping
+    "https://monlingot.fr/piece-argent-Francaise/Piece-investissement-Argent-50-Centimes-Semeuse" : 'ar - 50 centimes francs fr semeuse',  # Assuming this is the intended mapping
+    "https://monlingot.fr/argent/achat-piece-argent-100-francs" : 'ar - 100 francs fr',  # Assuming this is the intended mapping
+    "https://monlingot.fr/argent/achat-boite-piece-argent-500-silver-eagle-1-once" : ('ar - 1 oz silver eagle',500),  # Assuming this is the intended mapping
+    "https://monlingot.fr/argent/achat-boite-piece-argent-500-maple-leaf-1-once" : ('ar - 1 oz maple leaf',500),  # Assuming this is the intended mapping
+    "https://monlingot.fr/piece-argent-Francaise/achat-piece-investissement-argent-5-francs-ecu" : 'ar - 5 francs fr ecu (1854-1860)',  # Assuming this is the intended mapping
 }
 
 def get_delivery_price(price):
@@ -43,7 +56,7 @@ def get_delivery_price(price):
     if price < 2500 :
         return 9.90 # Not available for higher values
     elif 2500 <= price < 20000 :
-        return 19.90
+        return 39.90
     else:
         return 0.0
 
@@ -58,36 +71,65 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
 
     }
 
-    for url, coin_name in urls.items() :
+    for url, item_data in urls.items() :
         try:
             response = requests.get(url, headers=headers)
             response.raise_for_status()
 
             soup = BeautifulSoup(response.content, 'html.parser')
-            products_div = soup.find_all("article")
+            products_table = soup.find('table',class_='table-product-discounts')
+            products_tbody = products_table.find('tbody')
+
+            quantity = 1
+
+            if isinstance(item_data, tuple):
+                name = item_data[0]
+                quantity = item_data[1]
+                bullion_type = item_data[0][:2]
+            else:
+                name = item_data
+                bullion_type = item_data[:2]
+
+            if bullion_type == 'or':
+                buy_price = buy_price_gold
+            else:
+                buy_price = buy_price_silver
+
             # Find the tr element based on its attributes
-            tr_element = soup.find('tr', {'data-discount-type': 'percentage', 'data-discount': '0',
-                                          'data-discount-quantity': '1'})
-
+            tr_elements = products_tbody.find_all('tr')
+            for tr in tr_elements:
             # Extract all td elements within the tr
-            td_elements = tr_element.find_all('td')
 
-            # Get the second td (index 1)
-            second_td = td_elements[1]
+                td_elements = tr.find_all('td')
+                minimum = int(re.search(r"\d+", td_elements[0].text).group())
 
-            price = Price.fromstring(second_td.text)
-            print(price,coin_name,url)
+                min_p = int(soup.find('input', id='quantity_wanted')['min'])
+                if min_p>minimum:
+                    minimum = min_p
 
-            if coin_name[:2] == 'or':
-                coin = Item(name=coin_name,
+                current_price = Price.fromstring(soup.find('div',class_='current-price').text)
+                discount_price = Price.fromstring(td_elements[1].text)
+                if current_price.amount_float < discount_price.amount_float and soup.find('div',class_='discount-block').find('span',class_='discount') :
+                    price = current_price
+                else :
+                    price = discount_price
+                print(price, name, url)
+                coin = Item(name=name,
                             buy=price.amount_float,
                             source=url,
-                            buy_premium=((price.amount_float + get_delivery_price(price.amount_float)) - (
-                                         buy_price * poids_pieces[coin_name])) * 100.0 / (buy_price *poids_pieces[coin_name]),
-                            delivery_fee=get_delivery_price(price.amount_float), session_id=session_id, bullion_type='g')
-            session.add(coin)
-            session.commit()
+                            buy_premium=(((price.amount_float + get_delivery_price(
+                                price.amount_float) / minimum) / float(quantity)) - (
+                                                 buy_price * poids_pieces[name])) * 100.0 / (
+                                                buy_price * poids_pieces[name]),
 
+                            delivery_fee=get_delivery_price(price.amount_float),
+                            session_id=session_id,
+                            bullion_type=bullion_type,
+                            quantity=quantity,
+                            minimum=minimum)
+
+                session.add(coin)
+                session.commit()
 
         except Exception as e:
             print(traceback.format_exc())

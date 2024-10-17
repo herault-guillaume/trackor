@@ -4,10 +4,10 @@ from models.model import Item, poids_pieces
 from price_parser import Price
 import traceback
 
-coin_name = {
+CMN = {
     "20 Francs Or Napoléon type Coq": 'or - 20 francs fr coq marianne',
     "Souverain Or Georges": 'or - 1 souverain georges V',
-    "50 Pesos Or Mexique": 'or - 50 pesos',
+    "50 Pesos Or Mexique": 'or - 50 pesos mex',
     "Krugerrand Or Afrique du Sud": 'or - 1 oz krugerrand',
     "20 Francs Or Suisse": 'or - 20 francs sui vreneli croix',
     "20 Dollars Or": 'or - 20 dollars liberté longacre',
@@ -30,7 +30,23 @@ coin_name = {
     "Lingotin Or 5 grammes": 'or - lingot 5 g LBMA',
     "Lingotin Once Or": 'or - lingot 1 once LBMA',
     "Lingotin Or 2 Grammes": "or - lingot 2 g", # Assuming this is the intended match, adjust if needed
-    "Lingotin Or 1 Gramme": "or - lingot 1 g"
+    "Lingotin Or 1 Gramme": "or - lingot 1 g",
+    "5 R. Nicolas II": "or - 5 roubles",
+
+    "50 Francs Hercule Argent": "ar - 50 francs fr hercule (1974-1980)",
+    "10 Francs Hercule Argent": "ar - 10 francs fr hercule (1965-1973)",
+    "5 Francs Semeuse": "5 francs fr semeuse (1959-1969)",
+    "2 Francs Semeuse": "ar - 2 francs fr semeuse",
+    "1 Franc Semeuse": "ar - 1 franc fr semeuse",
+    "50 Centimes Semeuse": "ar - 50 centimes francs fr semeuse",
+    "5 Francs Ecu 3 Têtes": "ar - 5 francs fr ecu (1854-1860)",
+    "20 Francs Turin Argent": "ar - 20 francs fr turin (1860-1928)",
+    "10 Francs Turin Argent": "ar - 10 francs fr turin (1860-1928)",
+    "100 Francs Argent tous modèles": "ar - 100 francs fr",
+    "Once D'Argent USA": "ar - 1 oz silver eagle",
+    "Once Argent Autriche": "ar - 1 oz philharmonique",
+    "Once Argent Chine Panda": "ar - 10 yuan panda 30g",
+    "Once Argent Maple Leaf Canada": "ar - 1 oz maple leaf",
 }
 
 def get_delivery_price(price):
@@ -39,45 +55,56 @@ def get_delivery_price(price):
     elif price > 2000.0 :
         return 18.90
 
-
 # https://www.merson.fr/fr/content/1-livraison
 def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
     """
     Retrieves the 'or - 20 francs coq marianne' coin purchase price from Oretchange using requests and BeautifulSoup.
     """
-    url = "https://www.merson.fr/fr/18-achat-or-investissement"
-    print(url)
+    urls = ["https://www.merson.fr/fr/18-achat-or-investissement","https://www.merson.fr/fr/21-argent-achat"]
+
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
     }
+    for url in urls :
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
 
-    response = requests.get(url, headers=headers)
-    response.raise_for_status()
+        soup = BeautifulSoup(response.content, 'html.parser')
 
-    soup = BeautifulSoup(response.content, 'html.parser')
+        # Find the span element with class "result2"
+        products_div = soup.find_all("div",'product-container')
 
-    # Find the span element with class "result2"
-    products_div = soup.find_all("div",'product-container')
+        for product in products_div:
+            try:
+                price = Price.fromstring(product.find("span", "price product-price").text)
+                name_title = product.find("h5", "product-name")
+                name = name_title.text.strip()
+                url = name_title.find('a')['href']
+                print(price,CMN[name],url)
 
-    for product in products_div:
-        try:
-            price = Price.fromstring(product.find("span", "price product-price").text)
-            name_title = product.find("h5", "product-name")
-            name = name_title.text.strip()
-            url = name_title.find('a')['href']
-            print(price,coin_name[name],url)
+                bullion_type = CMN[name][:2]
+                # Extract and clean:
+                #price = float(price_text.replace('€', '').replace(',', '.'))
+                if bullion_type == 'or':
+                    buy_price = buy_price_gold
+                else:
+                    buy_price = buy_price_silver
+                    
+                if CMN[name][:2] == 'or':
+                    coin = Item(name=CMN[name],
+                                buy=price.amount_float,
+                                buy_premium=((price.amount_float + get_delivery_price(price.amount_float)) - (
+                                                 buy_price * poids_pieces[CMN[name]])) * 100.0 / (buy_price * poids_pieces[
+                                                           CMN[name]]),
 
-            if coin_name[name][:2] == 'or':
-                coin = Item(name=coin_name[name],
-                            buy=price.amount_float,
-                            buy_premium=((price.amount_float + get_delivery_price(price.amount_float)) - (
-                                             buy_price * poids_pieces[coin_name[name]])) * 100.0 / (buy_price * poids_pieces[
-                                                       coin_name[name]]),
+                                source=url,
+                                delivery_fee=get_delivery_price(price.amount_float),
+                                session_id=session_id,
+                                bullion_type=bullion_type,
+                                quantity=1,
+                                minimum=1)
+                session.add(coin)
+                session.commit()
 
-                            source=url,
-                            delivery_fee=get_delivery_price(price.amount_float), session_id=session_id, bullion_type='g')
-            session.add(coin)
-            session.commit()
-
-        except Exception as e:
-            print(traceback.format_exc())
+            except Exception as e:
+                print(traceback.format_exc())

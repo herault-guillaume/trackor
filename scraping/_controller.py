@@ -238,8 +238,8 @@ def fetch_and_update_data():
             buy_price_gold,g_sell_price_eur,buy_price_silver,s_sell_price_eur = bullionvault.get(session,session_id)
 
             # abacor.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
-            # acheterorargent.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
-            achatoretargent.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
+            acheterorargent.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
+            # achatoretargent.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
             # aucoffre.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
             # bdor.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
             # bullionbypost.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
@@ -297,7 +297,7 @@ def fetch_and_update_data():
                                                                         'or - 1/2 souverain victoria',
                                                                 ],
                                           './results/1_2_souv_ru.json')
-            calculate_and_store_coin_data(session, session_id, ['or - 50 pesos'], './results/50_pesos_mex.json')
+            calculate_and_store_coin_data(session, session_id, ['or - 50 pesos mex'], './results/50_pesos_mex.json')
             calculate_and_store_coin_data(session, session_id, ['or - 20 mark wilhelm II'], './results/20_mark_all.json')
             calculate_and_store_coin_data(session, session_id, ['or - 5 dollars liberté','or - 5 dollars tête indien'],
                                           './results/5_dol_usa.json')
@@ -318,7 +318,11 @@ def fetch_and_update_data():
             time.sleep(5)  # Attendre 5 secondes avant de réessayer
 
 scheduler = BackgroundScheduler()
-fetch_and_update_data()
+try :
+    fetch_and_update_data()
+except Exception as e :
+    print(traceback.format_exc())
+quit()
 # Schedule the jobs at 11 AM and 7 PM with randomization
 scheduler.add_job(
     fetch_and_update_data,

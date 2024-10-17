@@ -13,7 +13,7 @@ coin_name_to_map = {
     "5 $ US" :'or - 5 dollars liberté',
     "Napoléon 20 Frs (Louis d'Or)" : 'or - 20 francs fr coq marianne',
     "Croix Suisse 20 Frs": 'or - 10 francs sui vreneli croix',
-    "50 Pesos": "or - 50 pesos",
+    "50 Pesos": "or - 50 pesos mex",
     "Krugerrand": 'or - 1 oz krugerrand',
     "Souverain George V": 'or - 1 souverain georges V',
     'Souverain (toutes effigies)': 'or - 1 souverain georges V',
