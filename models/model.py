@@ -112,6 +112,7 @@ poids_pieces  = {
                         'or - 1/2 oz philharmonique 2024': 15.552,
                         'or - 1/2 oz philharmonique': 15.552,
                         'or - 1/2 souverain': 3.661, # -> CPor
+                        'or - 1/2 souverain elizabeth II': 3.661, # -> CPor
                         'or - 1/2 souverain georges V': 3.661, # -> CPor
                         'or - 1/2 souverain edouart VII': 3.661, # -> CPor
                         'or - 1/2 souverain edouart VII': 3.661, # -> CPor

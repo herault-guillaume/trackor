@@ -30,6 +30,7 @@ CMN = {
     'souverain or victoria jeune': 'or - 1 souverain victoria jeune',
     'souverain or victoria jeune armoiries': 'or - 1 souverain victoria jeune armoiries',
     'demi souverain or georges V': 'or - 1/2 souverain georges V',
+    'demi souverain or elizabeth II': 'or - 1/2 souverain elizabeth II',
     'demi souverain or edouard VII': 'or - 1/2 souverain edouart VII',
     'demi souverain or victoria voilée': 'or - 1/2 souverain victoria voilée',
     '1/2 souverain or victoria jubilee arm.': 'or - 1/2 souverain victoria jubilee arm.',
@@ -55,8 +56,8 @@ CMN = {
     '10 florins or wilhelmina': 'or - 10 florins wilhelmina',
     '10 florins or willem III': 'or - 10 florins willem III',
     '50 pesos mex or': 'or - 50 pesos mex',
-    '20 pesos or': '3,66',
-    '10 pesos mex or': 'or - 10 pesos mex',
+    '20 pesos or': 'or - 20 pesos mex',
+    '10 pesos or': 'or - 10 pesos mex',
     '5 pesos or': 'or - 5 pesos mex',
     '2,5 pesos or': 'or - 2.5 pesos mex',
     '1 oz maple leaf': 'or - 1 oz maple leaf',
@@ -106,6 +107,7 @@ CMN = {
     '10 mark or wilhelm I': 'or - 10 mark wilhelm I',
     '100 pesos or liberté': 'or - 100 pesos liberté chili',
     '50 pesos or liberté': 'or - 50 pesos liberté chili',
+    '50 pesos or mex': 'or - 50 pesos mex',
     '5 roubles nicolas II': 'or - 5 roubles nicolas II',
     '10 roubles nicolas II 2e choix': 'or - 10 roubles nicolas II',
     '10 roubles chervonetz': 'or - 10 roubles chervonetz',
@@ -229,37 +231,47 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
 
                 product_name = product.find('h2',class_='woocommerce-loop-product__title').text
                 source = product.find('a',class_='woocommerce-LoopProduct-link')['href']
+                span_price = product.find('span',class_='price').find_all('span',class_='woocommerce-Price-amount')
 
-                product_price = Price.fromstring(product.find('span',class_='woocommerce-Price-amount').text)
-                #print(product_price,product_name,source)
-                print(product_name)
-                #
-                # minimum = 1
-                # quantity = 1
-                #
-                # if isinstance(item_data, tuple):
-                #     name = item_data[0]
-                #     quantity = item_data[1]
-                #     bullion_type = item_data[0][:2]
-                # else:
-                #     name = item_data
-                #     bullion_type = item_data[:2]
-                #
-                # if bullion_type == 'or':
-                #     buy_price = buy_price_gold
-                # else:
-                #     buy_price = buy_price_silver
-                #
-                # coin = Item(name=product_name,
-                #             buy=product_price.amount_float,
-                #             source=source,
-                #             buy_premium=((product_price.amount_float + get_delivery_price(product_price.amount_float)) - (
-                #                              buy_price * poids_pieces[product_name])) * 100.0 / (buy_price *
-                #                                    poids_pieces[product_name]),
-                #
-                #             delivery_fee=get_delivery_price(product_price.amount_float), session_id=session_id, bullion_type='g')
-                # session.add(coin)
-                # session.commit()
+                if len(span_price)>1:
+                    price = Price.fromstring(span_price[1].text)
+                else:
+                    price = Price.fromstring(span_price[0].text)
+
+                item_data = CMN[product_name]
+
+                minimum = 1
+                quantity = 1
+
+                if isinstance(item_data, tuple):
+                    name = item_data[0]
+                    quantity = item_data[1]
+                    bullion_type = item_data[0][:2]
+                else:
+                    name = item_data
+                    bullion_type = item_data[:2]
+
+                if bullion_type == 'or':
+                    buy_price = buy_price_gold
+                else:
+                    buy_price = buy_price_silver
+
+                print(price,name,source)
+
+                coin = Item(name=name,
+                            buy=price.amount_float,
+                            source=source,
+                            buy_premium=(((price.amount_float + get_delivery_price(
+                                price.amount_float * minimum) / minimum) / float(quantity)) - (
+                                                 buy_price * poids_pieces[name])) * 100.0 / (
+                                                    buy_price * poids_pieces[name]),
+                            delivery_fee=get_delivery_price(price.amount_float),
+                            session_id=session_id,
+                            bullion_type=bullion_type,
+                            quantity=quantity,
+                            minimum=minimum)
+                session.add(coin)
+                session.commit()
 
             except :
                 print(traceback.format_exc())
