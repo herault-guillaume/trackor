@@ -4,7 +4,7 @@ from models.model import Item, poids_pieces
 from price_parser import Price
 import traceback
 
-coin_name = {
+CMN = {
     "Napoléon 20 francs": "or - 20 francs fr napoléon III",
     "Pièce d'or Krugerrand 1 once": "or - 1 oz krugerrand",
     "Lingot d'or 1 kg": "or - lingot 1 kg LBMA",
@@ -84,17 +84,36 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
             price_span = div.find('div', class_='product-sell').find('span', class_='product-price')
             price = Price.fromstring(price_span.text)
 
+            item_data = CMN[coin_label]
+            minimum = 1
+            quantity = 1
+            if isinstance(item_data, tuple):
+                name = item_data[0]
+                quantity = item_data[1]
+                bullion_type = item_data[0][:2]
+            else:
+                name = item_data
+                bullion_type = item_data[:2]
+
+            if bullion_type == 'or':
+                buy_price = buy_price_gold
+            else:
+                buy_price = buy_price_silver
 
             print(coin_label,price,url)
             #price = float(price_text.replace('€', '').replace(',', '.'))
-            coin = Item(name=coin_name[coin_label],
+            coin = Item(name=CMN[coin_label],
                         buy=price.amount_float,
                         source=url,
                         buy_premium=((price.amount_float + 35.0) - (
-                                         buy_price * poids_pieces[coin_name[coin_label]])) * 100.0 / (buy_price * poids_pieces[
-                                                   coin_name[coin_label]]),
+                                         buy_price * poids_pieces[name])) * 100.0 / (buy_price * poids_pieces[name]),
 
-                        delivery_fee=35.0, session_id=session_id, bullion_type='g')
+                        delivery_fee=35.0,
+                        session_id=session_id,
+                        bullion_type=bullion_type,
+                        quantity=quantity,
+                        minimum=minimum)
+
             session.add(coin)
             session.commit()
         except Exception as e:

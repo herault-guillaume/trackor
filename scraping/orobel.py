@@ -6,7 +6,7 @@ from models.model import Item, poids_pieces
 from price_parser import Price
 import traceback
 
-coin_name = {
+CMN = {
     "10 Francs Français – Marianne Coq": 'or - 10 francs fr coq marianne',
     #"MapleGram25 2021 (25 x 1g) Or  – Edition Limitée": 'or - lingot 25 g LBMA',
     #"50 Dollars Eagle 2022 (1Oz)": 'or - 1 oz american eagle',
@@ -100,16 +100,16 @@ def get_price_for(session, session_id,buy_price_gold,buy_price_silver):
                 url = name_title.find_element(By.TAG_NAME, 'a').get_attribute('href')
                 name = name_title.text.strip()
 
-                print(price,coin_name[name],url)
+                print(price,CMN[name],url)
 
-                # Check if the name is in your coin_name dictionary
-                if coin_name[name][:2] == 'or':
+                # Check if the name is in your CMN dictionary
+                if CMN[name][:2] == 'or':
                     coin = Item(
-                        name=coin_name[name],
+                        name=CMN[name],
                         buy=price.amount_float,
                         source=url,
                         buy_premium=((price.amount_float + get_delivery_price(price.amount_float)) - (
-                                buy_price * poids_pieces[coin_name[name]])) * 100.0 / (buy_price * poids_pieces[coin_name[name]]),
+                                buy_price * poids_pieces[CMN[name]])) * 100.0 / (buy_price * poids_pieces[CMN[name]]),
                         delivery_fee=get_delivery_price(price.amount_float),
                         session_id=session_id,bullion_type='g')
                 session.add(coin)

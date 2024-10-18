@@ -118,6 +118,7 @@ poids_pieces  = {
                         'or - 1/2 souverain edouart VII': 3.661, # -> CPor
                         'or - 1/2 souverain victoria jubilee arm.': 3.661, # -> CPor
                         'or - 1/2 souverain victoria voilée': 3.661, # -> CPor
+                        'or - 1/2 souverain victoria': 3.661, # -> CPor
                         'or - 1/10 oz koala 2023': 3.11, # -> CPor
                         'or - 1/20 oz': 1.55,
                         'or - 1/20 lunar': 1.55,
@@ -174,6 +175,7 @@ poids_pieces  = {
                         'or - 100 francs fr génie DPF': 29.02,
                         'or - 100 francs fr génie LEF': 29.02,
                         'or - 100 francs fr génie LEF': 29.02,
+                        'or - 100 francs bel albert I': 29.02,
                         'or - 100 lires carl albert': 29.02,
                         'or - 100 piastres turc': 6.61,
                         'or - 100 pesos liberté chili': 16.47,
@@ -241,8 +243,8 @@ poids_pieces  = {
                         'or - 40 francs fr louis philippe': 11.61,
                         'or - 40 francs fr charles X': 11.61,
                         'or - 40 francs fr louis philippe': 11.61,
-                        '40 lire or napoléon I': 11.61,
-                        '40 lire or maria luigia': 11.61,
+                        'or - 40 lire napoléon I': 11.61,
+                        'or - 40 lire maria luigia': 11.61,
                         'or - 5 dollars liberté': 7.523, # -> CPor
                         'or - 5 dollars tête indien': 7.523, # -> CPor
                         'or - 2.5 dollars liberté': 3.762, # -> CPor
@@ -314,15 +316,14 @@ poids_pieces  = {
                         'ar - 100 francs fr génie (1878-1914)': 32.258 * 0.900,
                         'ar - 100 francs fr panthéon': 15.0 * 0.900,
                         'ar - 100 francs fr': 15.0 * 0.900,
-                        'ar - 100 francs bel albert I': 15.0 * 0.900,
-                        'ar - 100 francs bel albert I': 15.0 * 0.900,
+
                         'ar - 250 francs baudouin roi des belges': 25.0 * 0.835,
                         'ar - 20 francs fr turin (1860-1928)': 20.0 * 0.680,
                         'ar - 20 francs fr turin (1929-1939)': 20.0 * 0.680,
                         'ar - 20 francs bel mercure': 6.68,
                         'ar - 10 francs fr turin (1860-1928)': 10.0 * 0.680,
-                        'ar - 5 francs  ecu (1854-1860)' : 25.0 * 0.900,
-                        'ar - 1 oz  fr ecu (1854-1860)': 25.0 * 0.900,
+                        'ar - 5 francs fr ecu (1854-1860)' : 25.0 * 0.900,
+                        'ar - 1 oz fr ecu (1854-1860)': 25.0 * 0.900,
                         'ar - 1 oz' : 31.103,
                         'ar - 10 yuan panda 30g' : 31.103,
                         'ar - 1 oz buffalo': 31.103,
@@ -332,6 +333,7 @@ poids_pieces  = {
                         'ar - 1 oz britannia' : 31.103,
                         'ar - 1 oz dragon chinois 2024' : 31.103,
                         'ar - 1 oz kangourou 2024' : 31.103,
+                        'ar - 1 oz kangourou' : 31.103,
                         'ar - 1 oz cygne 2024' : 31.103,
                         'ar - 1 oz dragon et koï 2024' : 31.103,
                         'ar - 1 oz 125e anniv perth mint 2024' : 31.103,
@@ -384,6 +386,6 @@ poids_pieces  = {
                     }
 
 # Configuration de la base de données
-engine = create_engine(r'sqlite:///C:\Users\Guillaume Hérault\PycharmProjects\trackor\models\pieces_or.db')
+engine = create_engine(r'sqlite:///C:\Users\guillaume.herault\PycharmProjects\trackor\models\pieces_or.db')
 Base.metadata.create_all(engine)
 Session = sessionmaker(bind=engine)

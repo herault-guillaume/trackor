@@ -83,18 +83,36 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
                     price = Price.fromstring(solde.text)
                 else:
                     price = Price.fromstring(price_elements.text)
-                print(price,CMN[product_name],source)
 
-                if CMN[product_name][:2] == 'or':
+
+
+                item_data = CMN[product_name]
+                minimum = 1
+                quantity = 1
+                if isinstance(item_data, tuple):
+                    name = item_data[0]
+                    quantity = item_data[1]
+                    bullion_type = item_data[0][:2]
+                else:
+                    name = item_data
+                    bullion_type = item_data[:2]
+
+                if bullion_type == 'or':
                     buy_price = buy_price_gold
-                else :
+                else:
                     buy_price = buy_price_silver
+
+                print(price,CMN[product_name],source)
 
                 coin = Item(name=CMN[product_name],
                             buy=price.amount_float,
                             delivery_fee=get_delivery_price(price.amount_float),
                             buy_premium=((price.amount_float+get_delivery_price(price.amount_float))-(buy_price*poids_pieces[CMN[product_name]]))*100.0/(buy_price*poids_pieces[CMN[product_name]]),
-                            source=source, session_id=session_id, bullion_type=CMN[product_name][:2])
+                            source=source,
+                            session_id=session_id,
+                            bullion_type=bullion_type,
+                            quantity=quantity,
+                            minimum=minimum)
                 session.add(coin)
                 session.commit()
 

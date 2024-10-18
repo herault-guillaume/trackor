@@ -108,7 +108,6 @@ def get_price_for(session, session_id,buy_price_gold,buy_price_silver):
                     name_title = product.find_element(By.CLASS_NAME, "card-content-title")
                     url = name_title.get_attribute('href')
                     name = name_title.text.strip()
-                    print(name)
 
                     price_text = product.find_element(By.CLASS_NAME, 'article-price').text
                     price = Price.fromstring(price_text)

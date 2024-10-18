@@ -82,27 +82,32 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
                 url = name_title.find('a')['href']
                 print(price,CMN[name],url)
 
-                bullion_type = CMN[name][:2]
-                # Extract and clean:
-                #price = float(price_text.replace('€', '').replace(',', '.'))
+                item_data = CMN[name]
+                minimum = 1
+                quantity = 1
+                if isinstance(item_data, tuple):
+                    name = item_data[0]
+                    quantity = item_data[1]
+                    bullion_type = item_data[0][:2]
+                else:
+                    name = item_data
+                    bullion_type = item_data[:2]
+
                 if bullion_type == 'or':
                     buy_price = buy_price_gold
                 else:
                     buy_price = buy_price_silver
-                    
-                if CMN[name][:2] == 'or':
-                    coin = Item(name=CMN[name],
-                                buy=price.amount_float,
-                                buy_premium=((price.amount_float + get_delivery_price(price.amount_float)) - (
-                                                 buy_price * poids_pieces[CMN[name]])) * 100.0 / (buy_price * poids_pieces[
-                                                           CMN[name]]),
 
-                                source=url,
-                                delivery_fee=get_delivery_price(price.amount_float),
-                                session_id=session_id,
-                                bullion_type=bullion_type,
-                                quantity=1,
-                                minimum=1)
+                coin = Item(name=name,
+                            buy=price.amount_float,
+                            buy_premium=((price.amount_float + get_delivery_price(price.amount_float)) - (
+                                             buy_price * poids_pieces[name])) * 100.0 / (buy_price * poids_pieces[name]),
+                            source=url,
+                            delivery_fee=get_delivery_price(price.amount_float),
+                            session_id=session_id,
+                            bullion_type=bullion_type,
+                            quantity=quantity,
+                            minimum=minimum)
                 session.add(coin)
                 session.commit()
 

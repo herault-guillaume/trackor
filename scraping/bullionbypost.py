@@ -72,7 +72,7 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
     driver = Driver(uc=True, headless=True)
 
     #driver = webdriver.Chrome(options=options)
-    for coin_name, url in urls.items():
+    for CMN, url in urls.items():
         try:
             driver.get(url)  # Load the page
             time.sleep(random.randint(5,10))
@@ -86,10 +86,22 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
             # Get all rows from the table body
             rows = pricing_table[1].find_elements(By.CSS_SELECTOR, "tbody tr")
 
+            item_data = CMN
 
-            if coin_name[:2] == 'or':
+            minimum = 1
+            quantity = 1
+
+            if isinstance(item_data, tuple):
+                name = item_data[0]
+                quantity = item_data[1]
+                bullion_type = item_data[0][:2]
+            else:
+                name = item_data
+                bullion_type = item_data[:2]
+
+            if bullion_type == 'or':
                 buy_price = buy_price_gold
-            else :
+            else:
                 buy_price = buy_price_silver
 
             # Extract "Prix Net" (Net par Unité) for each row
@@ -100,18 +112,19 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
                 minimum = int(row.find_elements(By.TAG_NAME, "td")[0].text.replace('+',''))
                 price = Price.fromstring(row.find_elements(By.TAG_NAME, "td")[3].text)
 
-                print(price, coin_name, url)
-                coin = Item(name=coin_name,
+                print(price, CMN, url)
+                coin = Item(name=name,
                             buy=price.amount_float,
                             source=url,
-                            buy_premium=((price.amount_float + 0.0) - (buy_price * poids_pieces[coin_name])) * 100.0 / (buy_price * poids_pieces[coin_name]),
+                            buy_premium=((price.amount_float + 0.0) - (buy_price * poids_pieces[CMN])) * 100.0 / (buy_price * poids_pieces[CMN]),
                             delivery_fee=0.0,
                             session_id=session_id,
-                            bullion_type=coin_name[:2],
+                            bullion_type=CMN[:2],
+                            quantity=quantity,
                             minimum=minimum)
 
-            session.add(coin)
-            session.commit()
+                session.add(coin)
+                session.commit()
 
         except Exception:
             print(traceback.format_exc())

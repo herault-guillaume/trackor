@@ -42,7 +42,7 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
     # Set up headless Chrome
     driver = Driver(uc=True, headless=True)
 
-    for coin_name, url in urls.items():
+    for CMN, url in urls.items():
         try:
             driver.get(url)  # Load the page
             # Locate the price element by its unique combination of classes
@@ -72,20 +72,39 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
             delivery_elements = WebDriverWait(driver, 7).until(
                 EC.presence_of_all_elements_located((By.XPATH, "//p[@text-decoration='underline' and @font-style='italic']"))
             )
-            print(price,coin_name,url)
+            print(price,CMN,url)
             # Find the span element within the p element
             span_element = delivery_elements[1].find_element(By.XPATH, ".//span[@font-style='italic']")
             delivery_fee = Price.fromstring(span_element.text)
 
-            if coin_name[:2] == 'or':
-                coin = Item(name=coin_name,
-                            buy=price.amount_float,
-                            source=url,
-                            buy_premium=((price.amount_float + delivery_fee.amount_float) - (
-                                             buy_price * poids_pieces[coin_name])) * 100.0 / (buy_price * poids_pieces[
-                                                       coin_name]),
+            item_data = CMN
+            minimum = 1
+            quantity = 1
+            if isinstance(item_data, tuple):
+                name = item_data[0]
+                quantity = item_data[1]
+                bullion_type = item_data[0][:2]
+            else:
+                name = item_data
+                bullion_type = item_data[:2]
 
-                            delivery_fee=delivery_fee.amount_float, session_id=session_id, bullion_type='g')
+            if bullion_type == 'or':
+                buy_price = buy_price_gold
+            else:
+                buy_price = buy_price_silver
+
+            coin = Item(name=name,
+                        buy=price.amount_float,
+                        source=url,
+                        buy_premium=((price.amount_float + delivery_fee.amount_float) - (
+                                         buy_price * poids_pieces[name])) * 100.0 / (buy_price * poids_pieces[
+                                                   name]),
+
+                        delivery_fee=delivery_fee.amount_float,
+                        session_id=session_id,
+                        bullion_type=bullion_type,
+                        quantity=quantity,
+                        minimum=minimum)
             session.add(coin)
             session.commit()
 

@@ -22,7 +22,7 @@ pd.set_option('display.width', None)
 pd.set_option('display.max_colwidth', None)
 
 Base = declarative_base()
-engine = create_engine(r'sqlite:///C:\Users\Guillaume Hérault\PycharmProjects\trackor\models\pieces_or.db')
+engine = create_engine(r'sqlite:///C:\Users\guillaume.herault\PycharmProjects\trackor\models\pieces_or.db')
 Base.metadata.create_all(engine)
 Session = sessionmaker(bind=engine)
 
@@ -51,19 +51,19 @@ results = []
 
 # Itérer sur chaque combinaison unique de nom de pièce et de source
 
-for coin_name in unique_coins:
+for CMN in unique_coins:
     for source in unique_sources:
         # Filtrer les données pour la pièce et la source actuelles
         # Filtrer les données pour la pièce, la source (domaine) actuelles
-        current_coin_data = cp_df[(cp_df['nom'] == coin_name) &
+        current_coin_data = cp_df[(cp_df['nom'] == CMN) &
                                       (cp_df['source'].apply(lambda x: urlparse(x).netloc) == source)].copy()
         if current_coin_data.empty:
             continue  # Passer à la combinaison suivante si aucune donnée n'est trouvée
 
         # Get gold weight for the current coin
-        gold_weight = poids_pieces.get(coin_name)
+        gold_weight = poids_pieces.get(CMN)
         if gold_weight is None:
-            print(f"Warning: Gold weight not found for coin '{coin_name}'. Skipping...")
+            print(f"Warning: Gold weight not found for coin '{CMN}'. Skipping...")
             continue
 
         gp_df['timestamp_'] = pd.to_datetime(gp_df['timestamp'])
@@ -90,7 +90,7 @@ for coin_name in unique_coins:
         print('Critical Values:')
         for key, value in result[4].items():
             print('\t%s: %.3f' % (key, value))
-        print(coin_name,source)
+        print(CMN,source)
         break
  # Or use .diff() for absolute difference
 
@@ -100,7 +100,7 @@ for coin_name in unique_coins:
 
         # Check if there's enough data after resampling
         if len(current_coin_data) < 2 or len(gp_df) < 2:
-            print(f"Warning: Not enough data for '{coin_name}' from '{source}'. Skipping...")
+            print(f"Warning: Not enough data for '{CMN}' from '{source}'. Skipping...")
             continue
 
         # Split data into training and validation sets
@@ -137,10 +137,10 @@ for coin_name in unique_coins:
                             best_params = (p, d, q)
 
                     except Exception as e:
-                        print(f"Error fitting ARIMA({p}, {d}, {q}) model for '{coin_name}' from '{source}': {e}")
+                        print(f"Error fitting ARIMA({p}, {d}, {q}) model for '{CMN}' from '{source}': {e}")
 
         if best_model:
-            results.append({'Coin': coin_name, 'Source': source, 'Lag (Jours)': lag,
+            results.append({'Coin': CMN, 'Source': source, 'Lag (Jours)': lag,
                             'Best ARIMA Params': best_params, 'Best MSE': best_mse,
                             'ARIMA Model': best_model})
 

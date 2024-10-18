@@ -4,8 +4,9 @@ from models.model import Item, poids_pieces
 
 from price_parser import Price
 import traceback
+import re
 
-coin_name = {
+CMN = {
     "20 Pesos – Mexique | Or": "or - 20 pesos mex",
     "20 Francs Napoléon – Premier Empire | Or": "or - 20 francs fr napoléon empereur laurée",  # Assuming this is the "tête laurée" type, most common for First Empire
     "2,5 Pesos – Mexique | Or": "or - 2.5 pesos mex",
@@ -64,7 +65,18 @@ coin_name = {
     "5 dollars indien": "or - 5 dollars tête indien",
     "5 dollars Liberty": "or - 5 dollars liberté",
     "2 Pesos – Mexique | Or": "or - 2 pesos mex",
-    "2 Pesos – Mexique | Or": "or - 2 pesos mex",
+
+    "Maple Leaf 1 Once | Argent": "ar - 1 oz maple leaf",
+    "Philharmonique de Vienne 1 Once | Argent": "ar - 1 oz philharmonique",
+    "Kangourou 1 Once | Argent": "ar - 1 oz kangourou",
+    "American Eagle 1 Once | Argent": "ar - 1 oz silver eagle",
+    "50 Francs Hercule | Argent": "ar - 50 francs fr hercule (1974-1980)",
+    "100 Francs | Argent": "ar - 100 francs fr",
+    "10 Francs Turin | Argent": "ar - 10 francs fr turin (1860-1928)",
+    "10 Francs Hercule | Argent": "ar - 10 francs fr hercule (1965-1973)",
+    "5 Francs Semeuse | Argent": "ar - 5 francs fr semeuse (1959-1969)",
+
+
 }
 
 def get_delivery_price(price):
@@ -108,17 +120,42 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
             # Extract price (assuming you want the "sell" price)
             price_span = div.find('span', class_='woocommerce-Price-amount amount')
             price = Price.fromstring(price_span.text)
-            print(price,coin_name[coin_label],url)
-            #price = float(price_text.replace('€', '').replace(',', '.'))
-            if coin_name[coin_label][:2] == 'or':
-                coin = Item(name=coin_name[coin_label],
-                            buy=price.amount_float,
-                            source=url,
-                            buy_premium=((price.amount_float + get_delivery_price(price.amount_float)) - (
-                                             buy_price * poids_pieces[coin_name[coin_label]])) * 100.0 / (buy_price * poids_pieces[
-                                                       coin_name[coin_label]]),
 
-                            delivery_fee=get_delivery_price(price.amount_float), session_id=session_id, bullion_type='g')
+            minimum = 1
+
+            item_data = CMN[coin_label]
+            minimum = 1
+            quantity = 1
+            if isinstance(item_data, tuple):
+                name = item_data[0]
+                quantity = item_data[1]
+                bullion_type = item_data[0][:2]
+            else:
+                name = item_data
+                bullion_type = item_data[:2]
+
+            if bullion_type == 'or':
+                buy_price = buy_price_gold
+            else:
+                buy_price = buy_price_silver
+            
+            print(price,CMN[coin_label],url)
+
+            #price = float(price_text.replace('€', '').replace(',', '.'))
+            coin = Item(name=name,
+                        buy=price.amount_float,
+                        source=url,
+                        buy_premium=(((price.amount_float + get_delivery_price(
+                            price.amount_float) / minimum) / float(quantity)) - (
+                                             buy_price * poids_pieces[name])) * 100.0 / (
+                                            buy_price * poids_pieces[name]),
+
+                        delivery_fee=get_delivery_price(price.amount_float),
+                        session_id=session_id,
+                        bullion_type=bullion_type,
+                        quantity=quantity,
+                        minimum=minimum)
+
             session.add(coin)
             session.commit()
 

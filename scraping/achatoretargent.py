@@ -14,6 +14,7 @@ from scraping.changedelabourse import CMN
 CMN = {
     '20 Francs Marianne Coq': 'or - 20 francs fr coq marianne',
     '10 Francs Napoléon': 'or - 10 francs fr',
+    '20 Fr Or Coq': 'or - 20 francs fr coq marianne',
     '50 Pesos Or': 'or - 50 pesos mex',
     "Louis d'Or - 20 Francs Or": 'or - 20 francs fr',
     '20 Francs Napoléon': 'or - 20 francs fr',
@@ -152,6 +153,8 @@ def get_price_for(session, session_id, buy_price_gold,buy_price_silver):
 
                 item_data = CMN[product_name]
                 quantity = 1
+                minimum = 1
+
                 if isinstance(item_data,tuple):
                     name = item_data[0]
                     quantity = item_data[1]
@@ -181,7 +184,7 @@ def get_price_for(session, session_id, buy_price_gold,buy_price_silver):
                         minimum = int(re.search(r"\d+", qty_div.get_text(strip=True)).group())
                         price = Price.fromstring(price_div.get_text(strip=True))
 
-                        print(price, name, source,quantity)
+                        print(price, name, source)
                         if name == 'ar - 50 centimes francs fr semeuse':
                             price= Price.fromstring(str(Price.price.amount_float * quantity) + '€')
                             minimum = quantity

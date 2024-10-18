@@ -79,20 +79,39 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
             product_name = product_name_link.text.strip()
             url = product_name_link['href']
             #print(product_name)
+
+            item_data = CMN[product_name]
             print(price,CMN[product_name],'https://capornumismatique.com'+url)
 
             if price:
+                minimum = 1
+                quantity = 1
 
+                if isinstance(item_data, tuple):
+                    name = item_data[0]
+                    quantity = item_data[1]
+                    bullion_type = item_data[0][:2]
+                else:
+                    name = item_data
+                    bullion_type = item_data[:2]
+
+                if bullion_type == 'or':
+                    buy_price = buy_price_gold
+                else:
+                    buy_price = buy_price_silver
                 # More robust price cleaning: handle variations in formatting
                 #price = float(price_text.replace('€', '').replace(' ', '').replace(',', '.'))
-                if CMN[product_name][:2] == 'or':
-                    coin = Item(name=CMN[product_name],
-                                buy=price.amount_float,
-                                source='https://capornumismatique.com'+url,
-                                buy_premium=((price.amount_float + get_delivery_price(price.amount_float)) - (
-                                                 buy_price * poids_pieces[ CMN[product_name]])) * 100.0 / (buy_price *
-                                                       poids_pieces[CMN[product_name]]),
-                                delivery_fee=get_delivery_price(price.amount_float), session_id=session_id, bullion_type='g')
+                coin = Item(name=CMN[product_name],
+                            buy=price.amount_float,
+                            source='https://capornumismatique.com'+url,
+                            buy_premium=((price.amount_float + get_delivery_price(price.amount_float)) - (
+                                             buy_price * poids_pieces[ CMN[product_name]])) * 100.0 / (buy_price *
+                                                   poids_pieces[CMN[product_name]]),
+                            delivery_fee=get_delivery_price(price.amount_float),
+                            session_id=session_id,
+                            bullion_type=bullion_type,
+                            quantity=quantity,
+                            minimum=minimum)
                 session.add(coin)
                 session.commit()
 

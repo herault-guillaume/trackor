@@ -8,7 +8,7 @@ from models.model import Item, poids_pieces
 from price_parser import Price
 import traceback
 
-table_lookup = {
+CMN = {
         "20 Fr Or Coq" : 'or - 20 francs fr coq marianne',
         "20 Fr Or Vreneli" : 'or - 20 francs sui vreneli croix',
         "20 Fr Or Génie" : 'or - 20 francs fr génie debout',
@@ -20,7 +20,7 @@ table_lookup = {
         "10 Fr Or Vreneli" : "or - 10 francs sui vreneli croix",
         "20 Dollars Or St Gaudens" : "or - 20 dollars liberté st gaudens",
         "20 Dollars Or Liberty" : "or - 20 dollars liberté longacre",
-        "50 Pesos Or" : "or - CMN",
+        "50 Pesos Or" : "or - 50 pesos or",
         "Krugerrand" : "or - 1 oz krugerrand",
         "10 Gulden Or" : "or - 10 florins wilhelmina",
         "20 Fr Or Italie" : "or - 20 lire umberto I",
@@ -95,10 +95,10 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
                 product_name_div = ligne_tab_div.find_element(By.CLASS_NAME, "produitOrNom")
                 product_name = product_name_div.text
 
-                if not table_lookup.get(product_name,None):
+                if not CMN.get(product_name,None):
                     continue
 
-                product_name = table_lookup[product_name]
+                item_data = CMN[product_name]
 
                 # Find the div with class "colonne produitOr"
                 produit_or_div = ligne_tab_div.find_element(By.CLASS_NAME, "colonne.produitOr")
@@ -109,22 +109,35 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
                 # Extract the href attribute
                 source = first_a_tag.get_attribute("href")
                 price = Price.fromstring(tr_element[1].find_elements(By.TAG_NAME, 'td')[1].get_attribute('innerHTML'))
-                print(price,product_name, source)
 
-                if product_name[:2] == 'or':
+                quantity = 1
+                minimum = 1
+                if isinstance(item_data, tuple):
+                    name = item_data[0]
+                    quantity = item_data[1]
+                    bullion_type = item_data[0][:2]
+                else:
+                    name = item_data
+                    bullion_type = item_data[:2]
+
+                if bullion_type == 'or':
                     buy_price = buy_price_gold
                 else:
                     buy_price = buy_price_silver
 
-                coin = Item(name=product_name,
+                print(price,item_data, source)
+                coin = Item(name=name,
                             buy=price.amount_float,
                             source=source,
                             buy_premium=((price.amount_float + get_delivery_price(price.amount_float)) - (
-                                             buy_price * poids_pieces[product_name])) * 100.0 / (buy_price *
-                                                   poids_pieces[product_name]),
+                                             buy_price * poids_pieces[name])) * 100.0 / (buy_price *
+                                                   poids_pieces[name]),
 
                             delivery_fee=get_delivery_price(price.amount_float),
-                            session_id=session_id, bullion_type=product_name[:2])
+                            session_id=session_id,
+                            bullion_type=bullion_type,
+                            quantity=quantity,
+                            minimum=minimum)
                 session.add(coin)
                 session.commit()
 

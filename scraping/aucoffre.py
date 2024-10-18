@@ -72,7 +72,7 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
     }
-    for coin_name, url in urls.items():
+    for CMN, url in urls.items():
         flag_one_find = False
         for p in ['?page={page}'.format(page=page) for page in range(1,5)]:
             try:
@@ -82,7 +82,7 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
                 soup = BeautifulSoup(response.content,'html.parser')
 
                 # Use a more specific selector to avoid accidental matches
-                elements = soup.select("div[data-url*='{coin_name}']".format(coin_name=url[1]))
+                elements = soup.select("div[data-url*='{CMN}']".format(CMN=url[1]))
 
                 for element in elements :
                     element_location = element.find("dl","dl-horizontal dl-left dl-small mb-0")
@@ -92,28 +92,44 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
                     if not img_tag['title'] == 'Localisation France (FR)' :
                         continue
 
-                    price_element = element.select_one("div[data-url*='{coin_name}'] .text-xlarge.text-bolder.m-0.text-nowrap".format(coin_name=url[1]))
+                    price_element = element.select_one("div[data-url*='{CMN}'] .text-xlarge.text-bolder.m-0.text-nowrap".format(CMN=url[1]))
 
                     if price_element :
                         price_text = price_element.text.strip()
 
                         price = Price.fromstring(price_text)
-                        print(price,coin_name,url)
 
-                        if coin_name[:2] == 'or':
+                        item_data = CMN
+
+                        minimum = 1
+                        quantity = 1
+
+                        if isinstance(item_data, tuple):
+                            name = item_data[0]
+                            quantity = item_data[1]
+                            bullion_type = item_data[0][:2]
+                        else:
+                            name = item_data
+                            bullion_type = item_data[:2]
+
+                        if bullion_type == 'or':
                             buy_price = buy_price_gold
                         else:
                             buy_price = buy_price_silver
 
+                        print(price,name,url)
                         # More robust price cleaning: handle variations in formatting
                         #price = float(price_text.replace('€', '').replace(' ', '').replace(',', '.'))
-                        if coin_name[:2] == 'or':
-                            coin = Item(name=coin_name,
-                                        buy=price.amount_float,
-                                        source=url[0],
-                                        buy_premium=((price.amount_float + 15.0) - (buy_price * poids_pieces[
-                                                 coin_name])) * 100.0 / (buy_price * poids_pieces[coin_name]),
-                                        delivery_fee=15.0, session_id=session_id, bullion_type=coin_name[:2])
+                        coin = Item(name=name,
+                                    buy=price.amount_float,
+                                    source=url[0],
+                                    buy_premium=((price.amount_float + 15.0) - (buy_price * poids_pieces[
+                                             CMN])) * 100.0 / (buy_price * poids_pieces[CMN]),
+                                    delivery_fee=15.0,
+                                    session_id=session_id,
+                                    bullion_type=bullion_type,
+                                    quantity=quantity,
+                                    minimum=minimum)
                         session.add(coin)
                         session.commit()
                         flag_one_find = True

@@ -7,7 +7,7 @@ from models.model import Item, poids_pieces
 from price_parser import Price
 import traceback
 
-coin_name_to_map = {
+CMN = {
     "20 $ US" :  'or - 20 dollars',
     "10 $ US" : 'or - 10 dollars liberté',
     "5 $ US" :'or - 5 dollars liberté',
@@ -51,18 +51,35 @@ def get_price_for(session, session_id,buy_price_gold,buy_price_silver):
                 if name_element and price_element:
                     name = name_element.text.strip()
                     price = Price.fromstring(price_element.text)
-                    print(price,coin_name_to_map[name],url)
-                    if coin_name_to_map[name][:2] == 'or':
-                        coin = Item(name=coin_name_to_map[name],
+                    print(price,CMN[name],url)
+
+                    item_data = CMN[name]
+                    minimum = 1
+                    quantity = 1
+                    if isinstance(item_data, tuple):
+                        name = item_data[0]
+                        quantity = item_data[1]
+                        bullion_type = item_data[0][:2]
+                    else:
+                        name = item_data
+                        bullion_type = item_data[:2]
+
+                    if bullion_type == 'or':
+                        buy_price = buy_price_gold
+                    else:
+                        buy_price = buy_price_silver
+
+                        coin = Item(name=name,
                                     buy=price.amount_float,
                                     source=url,
-                                    buy_premium=((price.amount_float + 30.0) - (buy_price * poids_pieces[
-                                             coin_name_to_map[name]])) * 100.0 / (buy_price * poids_pieces[coin_name_to_map[name]]),
-
+                                    buy_premium=((price.amount_float + 30.0) - (buy_price * poids_pieces[name])) * 100.0 / (buy_price * poids_pieces[name]),
                                     delivery_fee=30.0,
-                                    session_id=session_id, bullion_type='g')
-                    session.add(coin)
-                    session.commit()
+                                    session_id=session_id,
+                                    bullion_type=bullion_type,
+                                    quantity=quantity,
+                                    minimum=minimum)
+                        session.add(coin)
+                        session.commit()
 
             except Exception as e:
                 print(traceback.format_exc())
