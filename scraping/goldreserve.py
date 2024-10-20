@@ -75,8 +75,6 @@ CMN = {
     "10 Francs Turin | Argent": "ar - 10 francs fr turin (1860-1928)",
     "10 Francs Hercule | Argent": "ar - 10 francs fr hercule (1965-1973)",
     "5 Francs Semeuse | Argent": "ar - 5 francs fr semeuse (1959-1969)",
-
-
 }
 
 def get_delivery_price(price):
@@ -120,8 +118,6 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
             # Extract price (assuming you want the "sell" price)
             price_span = div.find('span', class_='woocommerce-Price-amount amount')
             price = Price.fromstring(price_span.text)
-
-            minimum = 1
 
             item_data = CMN[coin_label]
             minimum = 1

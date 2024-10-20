@@ -20,7 +20,6 @@ import traceback
 import bullionvault
 import acheterorargent
 import aucoffre
-# import joubertchange_5minimum
 import gold
 import achatoretargent
 import capornumismatique
@@ -91,7 +90,7 @@ def update_json_file(new_data,
         file_name: The name of the JSON file within the bucket.
         new_data: The new JSON data (Python dictionary or list) to write to the file.
     """
-    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = r"C:\Users\guillaume.herault\PycharmProjects\trackor\trackor-431010-1ff28b492956.json"
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = r"C:\Users\Guillaume Hérault\PycharmProjects\trackor\trackor-431010-1ff28b492956.json"
     storage_client = storage.Client()
     bucket = storage_client.bucket(bucket_name)
     blob = bucket.blob(filename)
@@ -171,6 +170,8 @@ def calculate_and_store_coin_data(session, session_id, coin_names, filename):
     """
 
     # Première requête pour obtenir tous les résultats avec les noms de pièces spécifiés
+    from sqlalchemy import or_
+
     all_results = (
         session.query(
             Item.name,
@@ -178,7 +179,11 @@ def calculate_and_store_coin_data(session, session_id, coin_names, filename):
             Item.source,
             Item.timestamp
         )
-        .filter(Item.name.in_(coin_names))
+        .filter(
+            or_(
+                Item.name.like(f"%{coin_name}%") for coin_name in coin_names
+            )
+        )
         .filter(Item.session_id == session_id)
         .all()
     )
@@ -228,7 +233,7 @@ def calculate_and_store_coin_data(session, session_id, coin_names, filename):
     return data
 
 def fetch_and_update_data():
-    for attempt in range(1):
+    for attempt in range(5):
         time.sleep(5)# Retry up to 5 times
         try:
             start_time = time.time()
@@ -251,6 +256,7 @@ def fetch_and_update_data():
             goldavenue.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
             goldforex.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
             goldreserve.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
+
             lmp.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
             lcdor.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
             merson.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
@@ -265,50 +271,37 @@ def fetch_and_update_data():
             # pieceor.get(session,session_id)
 
             find_best_deals(session,session_id,num_deals=15)
-            # calculate_and_store_coin_data(session, session_id, ['or - 1 oz krugerrand'], './results/1_oz_krugerrand.json')
-            # calculate_and_store_coin_data(session, session_id, ['or - 20 francs fr coq marianne',
-            #                                                             'or - 20 francs fr cérès',
-            #                                                             'or - 20 francs fr génie debout',
-            #                                                             'or - 20 francs fr napoléon III',
-            #                                                             'or - 20 francs fr louis XVIII buste nu',
-            #                                                             'or - 20 francs fr charles X',
-            #                                                             'or - 20 francs fr louis XVIII buste habillé',
-            #                                                             'or - 20 francs fr louis philippe laurée',
-            #                                                             'or - 20 francs fr napoléon empereur',
-            #                                                             'or - 20 francs fr napoléon empereur laurée',
-            #                                                             'or - 20 francs fr louis-napoléon bonaparte',
-            #                                                             'or - 20 francs fr',
-            #                                                             ],
-            #                               './results/20_fr_france.json')
-            # calculate_and_store_coin_data(session, session_id, ['or - 20 francs bel leopold I','or - 20 francs union latine',
-            #                                                     'or - 20 lire umberto I','or - 20 lire vittorio emanuele II'],
-            #                               './results/20_fr_union_latine.json')
-            # calculate_and_store_coin_data(session, session_id, [],
-            #                               './results/20_lires_italie.json')
-            # calculate_and_store_coin_data(session, session_id, ['or - 20 francs sui vreneli croix',
-            #                                                             'or - 20 francs confederatio suisse'],
-            #                               './results/20_fr_suisse.json')
-            # calculate_and_store_coin_data(session, session_id, ['or - 1 souverain edouart VII',
-            #                                                             'or - 1 souverain georges V',
-            #                                                             'or - 1 souverain elizabeth II'
-            #                                                             'or - 1 souverain victoria jubilee'],
-            #                               './results/1_souv_ru.json')
-            # calculate_and_store_coin_data(session, session_id, ['or - 1/2 souverain georges V',
-            #                                                             'or - 1/2 souverain victoria',
-            #                                                     ],
-            #                               './results/1_2_souv_ru.json')
-            # calculate_and_store_coin_data(session, session_id, ['or - 50 pesos mex'], './results/50_pesos_mex.json')
-            # calculate_and_store_coin_data(session, session_id, ['or - 20 mark wilhelm II'], './results/20_mark_all.json')
-            # calculate_and_store_coin_data(session, session_id, ['or - 5 dollars liberté','or - 5 dollars tête indien'],
-            #                               './results/5_dol_usa.json')
-            # calculate_and_store_coin_data(session, session_id, ['or - 20 dollars liberté longacre','or - 20 dollars liberté st gaudens','or - 20 dollars tete indien','or - 20 dollars'], './results/20_dol_usa.json')
-            # calculate_and_store_coin_data(session, session_id, ['or - 10 dollars liberté','or - 10 dollars tête indien'],
-            #                               './results/10_dol_usa.json')
-            # calculate_and_store_coin_data(session, session_id, ['or - 10 francs fr',
-            #                                                             'or - 10 francs fr coq marianne',
-            #                                                             'or - 10 francs fr cérès 1850-1851',
-            #                                                             'or - 10 francs fr napoléon III'],
-            #                               './results/10_fr_france.json')
+            calculate_and_store_coin_data(session, session_id, ['or - 1 oz krugerrand'], './results/1_oz_krugerrand.json')
+            calculate_and_store_coin_data(session, session_id, ['or - 20 francs fr'],'./results/20_fr_france.json')
+            calculate_and_store_coin_data(session, session_id, ['or - 20 francs bel leopold I','or - 20 francs union latine',
+                                                                'or - 20 lire umberto I','or - 20 lire vittorio emanuele II'],
+                                          './results/20_fr_union_latine.json')
+            calculate_and_store_coin_data(session, session_id, [],
+                                          './results/20_lires_italie.json')
+            calculate_and_store_coin_data(session, session_id, ['or - 20 francs sui vreneli croix',
+                                                                        'or - 20 francs confederatio suisse'],
+                                          './results/20_fr_suisse.json')
+            calculate_and_store_coin_data(session, session_id, ['or - 1 souverain edouart VII',
+                                                                        'or - 1 souverain georges V',
+                                                                        'or - 1 souverain elizabeth II'
+                                                                        'or - 1 souverain victoria jubilee'],
+                                          './results/1_souv_ru.json')
+            calculate_and_store_coin_data(session, session_id, ['or - 1/2 souverain georges V',
+                                                                        'or - 1/2 souverain victoria',
+                                                                ],
+                                          './results/1_2_souv_ru.json')
+            calculate_and_store_coin_data(session, session_id, ['or - 50 pesos mex'], './results/50_pesos_mex.json')
+            calculate_and_store_coin_data(session, session_id, ['or - 20 mark wilhelm II'], './results/20_mark_all.json')
+            calculate_and_store_coin_data(session, session_id, ['or - 5 dollars liberté','or - 5 dollars tête indien'],
+                                          './results/5_dol_usa.json')
+            calculate_and_store_coin_data(session, session_id, ['or - 20 dollars liberté longacre','or - 20 dollars liberté st gaudens','or - 20 dollars tete indien','or - 20 dollars'], './results/20_dol_usa.json')
+            calculate_and_store_coin_data(session, session_id, ['or - 10 dollars liberté','or - 10 dollars tête indien'],
+                                          './results/10_dol_usa.json')
+            calculate_and_store_coin_data(session, session_id, ['or - 10 francs fr',
+                                                                        'or - 10 francs fr coq marianne',
+                                                                        'or - 10 francs fr cérès 1850-1851',
+                                                                        'or - 10 francs fr napoléon III'],
+                                          './results/10_fr_france.json')
             print("--- %s seconds ---" % (time.time() - start_time))
             return  # Sortir de la fonction si la mise à jour est réussie
 
@@ -317,12 +310,13 @@ def fetch_and_update_data():
             print(traceback.format_exc())
             time.sleep(5)  # Attendre 5 secondes avant de réessayer
 
+
 scheduler = BackgroundScheduler()
 try :
     fetch_and_update_data()
 except Exception as e :
     print(traceback.format_exc())
-quit()
+# quit()
 # Schedule the jobs at 11 AM and 7 PM with randomization
 scheduler.add_job(
     fetch_and_update_data,

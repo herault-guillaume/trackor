@@ -386,6 +386,6 @@ poids_pieces  = {
                     }
 
 # Configuration de la base de données
-engine = create_engine(r'sqlite:///C:\Users\guillaume.herault\PycharmProjects\trackor\models\pieces_or.db')
+engine = create_engine(r'sqlite:///C:\Users\Guillaume Hérault\PycharmProjects\trackor\models\pieces_or.db')
 Base.metadata.create_all(engine)
 Session = sessionmaker(bind=engine)
