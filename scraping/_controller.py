@@ -263,11 +263,12 @@ def fetch_and_update_data():
             session_id = uuid.uuid4()
             session = Session()
 
-            buy_price_gold,g_sell_price_eur,buy_price_silver,s_sell_price_eur = bullionvault.get(session,session_id)
+            # buy_price_gold,g_sell_price_eur,buy_price_silver,s_sell_price_eur = bullionvault.get(session,session_id)
+            buy_price_gold,g_sell_price_eur,buy_price_silver,s_sell_price_eur = 81.57, 81.42, 1.022, 1.019
             #
-            abacor.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
-            # acheterorargent.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
+            # abacor.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
             # achatoretargent.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
+            acheterorargent.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
             # aucoffre.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
             # bdor.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
             # bullionbypost.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
@@ -292,21 +293,21 @@ def fetch_and_update_data():
             # joubertchange.get(session,session_id)
             # pieceor.get(session,session_id)
 
-            range_ = [(1,5),(5,10),(10,50),(50,500)]
-            find_best_deals(session,session_id,num_deals=15)
-            calculate_and_store_coin_data(session, session_id, ['or - 1 oz krugerrand'], range_,'./results/1_oz_krugerrand.json')
-            calculate_and_store_coin_data(session, session_id, ['or - 20 francs fr'], range_,'./results/20_fr_france.json')
-            calculate_and_store_coin_data(session, session_id, ['or - 20 francs bel leopold I','or - 20 francs union latine','or - 20 lire umberto I','or - 20 lire vittorio emanuele II'], range_, './results/20_fr_union_latine.json')
-            calculate_and_store_coin_data(session, session_id, ['or - 20 lire'],range_,'./results/20_lires_italie.json')
-            calculate_and_store_coin_data(session, session_id, ['or - 20 francs sui'],range_,'./results/20_fr_suisse.json')
-            calculate_and_store_coin_data(session, session_id, ['or - 1 souverain'],range_,'./results/1_souv_ru.json')
-            calculate_and_store_coin_data(session, session_id, ['or - 1/2 souverain'],range_,'./results/1_2_souv_ru.json')
-            calculate_and_store_coin_data(session, session_id, ['or - 50 pesos mex'],  range_,'./results/50_pesos_mex.json')
-            calculate_and_store_coin_data(session, session_id, ['or - 20 mark'],  range_,'./results/20_mark_all.json')
-            calculate_and_store_coin_data(session, session_id, ['or - 5 dollars'],range_,'./results/5_dol_usa.json')
-            calculate_and_store_coin_data(session, session_id, ['or - 20 dollars'],  range_,'./results/20_dol_usa.json')
-            calculate_and_store_coin_data(session, session_id, ['or - 10 dollars'],range_,'./results/10_dol_usa.json')
-            calculate_and_store_coin_data(session, session_id, ['or - 10 francs fr'], range_,'./results/10_fr_france.json')
+            # range_ = [(1,5),(5,10),(10,50),(50,500)]
+            # find_best_deals(session,session_id,num_deals=15)
+            # calculate_and_store_coin_data(session, session_id, ['or - 1 oz krugerrand'], range_,'./results/1_oz_krugerrand.json')
+            # calculate_and_store_coin_data(session, session_id, ['or - 20 francs fr'], range_,'./results/20_fr_france.json')
+            # calculate_and_store_coin_data(session, session_id, ['or - 20 francs bel leopold I','or - 20 francs union latine','or - 20 lire umberto I','or - 20 lire vittorio emanuele II'], range_, './results/20_fr_union_latine.json')
+            # calculate_and_store_coin_data(session, session_id, ['or - 20 lire'],range_,'./results/20_lires_italie.json')
+            # calculate_and_store_coin_data(session, session_id, ['or - 20 francs sui'],range_,'./results/20_fr_suisse.json')
+            # calculate_and_store_coin_data(session, session_id, ['or - 1 souverain'],range_,'./results/1_souv_ru.json')
+            # calculate_and_store_coin_data(session, session_id, ['or - 1/2 souverain'],range_,'./results/1_2_souv_ru.json')
+            # calculate_and_store_coin_data(session, session_id, ['or - 50 pesos mex'],  range_,'./results/50_pesos_mex.json')
+            # calculate_and_store_coin_data(session, session_id, ['or - 20 mark'],  range_,'./results/20_mark_all.json')
+            # calculate_and_store_coin_data(session, session_id, ['or - 5 dollars'],range_,'./results/5_dol_usa.json')
+            # calculate_and_store_coin_data(session, session_id, ['or - 20 dollars'],  range_,'./results/20_dol_usa.json')
+            # calculate_and_store_coin_data(session, session_id, ['or - 10 dollars'],range_,'./results/10_dol_usa.json')
+            # calculate_and_store_coin_data(session, session_id, ['or - 10 francs fr'], range_,'./results/10_fr_france.json')
             # print("--- %s seconds ---" % (time.time() - start_time))
             return  # Sortir de la fonction si la mise à jour est réussie
 

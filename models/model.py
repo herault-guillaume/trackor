@@ -303,7 +303,7 @@ poids_pieces  = {
                         'or - 2 souverain 2022 charles III': 14.64, # -> CPor
 
                         # Argent
-                        'ar - lingot 5 kg' : 1000.0,
+                        'ar - lingot 5 kg' : 5000.0,
                         'ar - 50 francs fr hercule (1974-1980)': 30.0 * 0.900,
                         'ar - 10 francs fr hercule (1965-1973)': 10.0 * 0.900,
                         'ar - 5 francs fr semeuse (1959-1969)': 12.0 * 0.835,
