@@ -20,7 +20,7 @@ CMN = {
         "10 Fr Or Vreneli" : "or - 10 francs sui vreneli croix",
         "20 Dollars Or St Gaudens" : "or - 20 dollars liberté st gaudens",
         "20 Dollars Or Liberty" : "or - 20 dollars liberté longacre",
-        "50 Pesos Or" : "or - 50 pesos or",
+        "50 Pesos Or" : "or - 50 pesos mex",
         "Krugerrand" : "or - 1 oz krugerrand",
         "10 Gulden Or" : "or - 10 florins wilhelmina",
         "20 Fr Or Italie" : "or - 20 lire umberto I",
@@ -127,13 +127,13 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
 
                 print(price,item_data, source)
                 coin = Item(name=name,
-                            buy=price.amount_float,
+                            prices=price.amount_float,
                             source=source,
-                            buy_premium=((price.amount_float + get_delivery_price(price.amount_float)) - (
+                            buy_premiums=(((price.amount_float + get_delivery_price(price.amount_float*minimum)/minimum)/float(quantity)) - (
                                              buy_price * poids_pieces[name])) * 100.0 / (buy_price *
                                                    poids_pieces[name]),
 
-                            delivery_fee=get_delivery_price(price.amount_float),
+                            delivery_fee=get_delivery_price(price.amount_float*minimum),
                             session_id=session_id,
                             bullion_type=bullion_type,
                             quantity=quantity,

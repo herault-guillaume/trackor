@@ -115,14 +115,14 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
                     price = discount_price
                 print(price, name, url)
                 coin = Item(name=name,
-                            buy=price.amount_float,
+                            prices=price.amount_float,
                             source=url,
-                            buy_premium=(((price.amount_float + get_delivery_price(
+                            buy_premiums=(((price.amount_float + get_delivery_price(
                                 price.amount_float) / minimum) / float(quantity)) - (
                                                  buy_price * poids_pieces[name])) * 100.0 / (
                                                 buy_price * poids_pieces[name]),
 
-                            delivery_fee=get_delivery_price(price.amount_float),
+                            delivery_fee=get_delivery_price(price.amount_float*minimum),
                             session_id=session_id,
                             bullion_type=bullion_type,
                             quantity=quantity,

@@ -4,14 +4,6 @@ from models.model import Item, poids_pieces
 from price_parser import Price
 import traceback
 
-def get_delivery_price(price):
-    if price <= 500.0:
-        return 14.00
-    elif 500 < price <= 1000.0 :
-        return 26.70
-    else:
-        return 56.10
-
 def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
     """
     Retrieves the 'or - 20 francs fr coq marianne' coin purchase price from Goldforex using requests and BeautifulSoup.
@@ -63,6 +55,12 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
     }
 
+    delivery_ranges = (
+        [1,500,14.0],
+        [500,1000,26.0],
+        [1000,100000000,56.0],
+    )
+
     for url in urls :
         try:
             response = requests.get(url, headers=headers)
@@ -84,8 +82,6 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
                 else:
                     price = Price.fromstring(price_elements.text)
 
-
-
                 item_data = CMN[product_name]
                 minimum = 1
                 quantity = 1
@@ -102,12 +98,38 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
                 else:
                     buy_price = buy_price_silver
 
-                print(price,CMN[product_name],source)
+                print(price,name,source)
 
-                coin = Item(name=CMN[product_name],
-                            buy=price.amount_float,
-                            delivery_fee=get_delivery_price(price.amount_float),
-                            buy_premium=((price.amount_float+get_delivery_price(price.amount_float))-(buy_price*poids_pieces[CMN[product_name]]))*100.0/(buy_price*poids_pieces[CMN[product_name]]),
+                price_ranges = [
+                    (1, 1000, price),  # Quantity 1-10, price 10.0 per unit
+                ]
+
+                def price_between(value,ranges):
+                    """
+                    Returns the price per unit for a given quantity.
+                    """
+                    for min_qty, max_qty, price in ranges:
+                        if min_qty <= value <= max_qty:
+                            if isinstance(price,Price):
+                                return price.amount_float
+                            else:
+                                return price
+
+                coin = Item(name=name,
+                            prices=';'.join(['{:.1f}'.format(p[2].amount_float) for p in price_ranges]),
+                            ranges=';'.join(['{min_}-{max_}'.format(min_=r[0],max_=r[1]) for r in price_ranges]),
+
+                            buy_premiums=';'.join(['{:.1f}'.format(((price_between(min,price_ranges)+price_between(price.amount_float*min,delivery_ranges)/min)/float(quantity)-
+                                                    (buy_price*poids_pieces[name]))*100.0/(buy_price*poids_pieces[name]))
+                                                  for min in range(1,minimum)])
+                                        + ';'.join(['{:.1f}'.format(((price_between(q,price_ranges)+price_between(price.amount_float*q,delivery_ranges))/float(q)-
+                                                     (buy_price*poids_pieces[name]))*100.0/(buy_price*poids_pieces[name]))
+                                                  for q in range(1,quantity)])
+                                         + ';'.join(['{:.1f}'.format(((price_between(min,price_ranges)+price_between(price.amount_float*min,delivery_ranges)/min)-
+                                                      (buy_price*poids_pieces[name]))*100.0/(buy_price*poids_pieces[name]))
+                                                  for min in range(minimum,150)]),
+
+                            delivery_fees=';'.join(['{min_}-{max_}-{price}'.format(min_=r[0],max_=r[1],price=r[2]) for r in delivery_ranges]),
                             source=source,
                             session_id=session_id,
                             bullion_type=bullion_type,

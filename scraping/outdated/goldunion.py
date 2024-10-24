@@ -31,9 +31,9 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
                 try:
                     price = float(price_text.replace('€', '').replace(',', '.'))
                     coin = Item(name="or - 20 francs coq marianne",
-                                buy=price,
+                                prices=price,
                                 source='https://goldunion.fr/products/20-francs-coq',
-                                buy_premium=((price.amount_float + get_delivery_price(price.amount_float)) - (buy_price * poids_pieces[CMN])) * 100.0 / (buy_price * poids_pieces[CMN]),
+                                buy_premiums=((price.amount_float + get_delivery_price(price.amount_float)) - (buy_price * poids_pieces[CMN])) * 100.0 / (buy_price * poids_pieces[CMN]),
 
                                 delivery_fee=20.0, session_id=session_id, bullion_type='g')
                     session.add(coin)

@@ -103,9 +103,9 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
             print(coin_label,price,url)
             #price = float(price_text.replace('€', '').replace(',', '.'))
             coin = Item(name=CMN[coin_label],
-                        buy=price.amount_float,
+                        prices=price.amount_float,
                         source=url,
-                        buy_premium=((price.amount_float + 35.0) - (
+                        buy_premiums=((price.amount_float + 35.0) - (
                                          buy_price * poids_pieces[name])) * 100.0 / (buy_price * poids_pieces[name]),
 
                         delivery_fee=35.0,

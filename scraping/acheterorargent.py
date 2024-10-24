@@ -219,8 +219,12 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
     print(base_url)
     for url in urls :
         time.sleep(randint(1,3))
-        response = requests.get(url)
-        response.raise_for_status()
+        try:
+            response = requests.get(url)
+            response.raise_for_status()
+        except Exception as e:
+            traceback.print_exc()
+            continue
         soup = BeautifulSoup(response.content, 'html.parser')
 
         div_product= soup.find_all('li',class_='type-product')
@@ -258,13 +262,13 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
                 print(price,name,source)
 
                 coin = Item(name=name,
-                            buy=price.amount_float,
+                            prices=price.amount_float,
                             source=source,
-                            buy_premium=(((price.amount_float + get_delivery_price(
-                                price.amount_float * minimum) / minimum) / float(quantity)) - (
+                            buy_premiums=((((price.amount_float + get_delivery_price(
+                                price.amount_float * minimum) /minimum)/float(quantity)) / float(quantity)) - (
                                                  buy_price * poids_pieces[name])) * 100.0 / (
                                                     buy_price * poids_pieces[name]),
-                            delivery_fee=get_delivery_price(price.amount_float),
+                            delivery_fee=get_delivery_price(price.amount_float*minimum),
                             session_id=session_id,
                             bullion_type=bullion_type,
                             quantity=quantity,

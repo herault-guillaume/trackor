@@ -66,9 +66,9 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
                 buy_price = buy_price_silver
 
             coin = Item(name=name,
-                        buy=price.amount_float,
+                        prices=price.amount_float,
                         source=url,
-                        buy_premium=((price.amount_float + 7.0) - (
+                        buy_premiums=((price.amount_float + 7.0) - (
                                          buy_price * poids_pieces[name])) * 100.0 / (buy_price * poids_pieces[
                                                    name]),
                         delivery_fee=7.0,

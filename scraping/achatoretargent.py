@@ -120,7 +120,7 @@ def get_price_for(session, session_id, buy_price_gold,buy_price_silver):
     ]
 
     for url in urls:
-
+        print(url)
         driver = Driver(uc=True, headless=True)
         driver.get(url)
 
@@ -184,17 +184,17 @@ def get_price_for(session, session_id, buy_price_gold,buy_price_silver):
                         minimum = int(re.search(r"\d+", qty_div.get_text(strip=True)).group())
                         price = Price.fromstring(price_div.get_text(strip=True))
 
-                        print(price, name, source)
+                        print(price, name, source, minimum, quantity)
                         if name == 'ar - 50 centimes francs fr semeuse':
                             price= Price.fromstring(str(Price.price.amount_float * quantity) + '€')
                             minimum = quantity
 
                         coin = Item(name=name,
-                                    buy=price.amount_float,
+                                    prices=price.amount_float,
                                     source=source,
-                                    buy_premium=(((price.amount_float + get_delivery_price(price.amount_float*minimum)/minimum)/float(quantity)) - (
+                                    buy_premiums=(((price.amount_float + get_delivery_price(price.amount_float*minimum)/minimum)/float(quantity)) - (
                                         buy_price * poids_pieces[name])) * 100.0 / (buy_price * poids_pieces[name]),
-                                    delivery_fee=get_delivery_price(price.amount_float),
+                                    delivery_fee=get_delivery_price(price.amount_float*minimum),
                                     session_id=session_id,
                                     bullion_type=bullion_type,
                                     quantity=quantity,
@@ -215,11 +215,11 @@ def get_price_for(session, session_id, buy_price_gold,buy_price_silver):
                         minimum = quantity
 
                     coin = Item(name=name,
-                                buy=price.amount_float,
+                                prices=price.amount_float,
                                 source=source,
-                                buy_premium=(((price.amount_float + get_delivery_price(price.amount_float))/float(quantity)) - (
+                                buy_premiums=(((price.amount_float + get_delivery_price(price.amount_float*minimum)/minimum)/float(quantity)) - (
                                              buy_price * poids_pieces[name])) * 100.0 / (buy_price *poids_pieces[name]),
-                                delivery_fee=get_delivery_price(price.amount_float),
+                                delivery_fee=get_delivery_price(price.amount_float*minimum),
                                 session_id=session_id,
                                 bullion_type=bullion_type,
                                 quantity=quantity,
@@ -227,8 +227,10 @@ def get_price_for(session, session_id, buy_price_gold,buy_price_silver):
 
                     session.add(coin)
                     session.commit()
+
             except Exception as e:
                 print(f"An error occurred while processing : {e}")
                 traceback.print_exc()
+
 
     driver.quit()

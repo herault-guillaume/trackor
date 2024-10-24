@@ -18,7 +18,7 @@ def get(session):
     # Clean the price text and convert to float
     price = float(span_element.text.replace('€', '').replace(',', '.'))
 
-    coin = Item(name="or - 20 francs coq marianne", buy=price, source='achatoretargent')
+    coin = Item(name="or - 20 francs coq marianne", prices=price, source='achatoretargent')
     session.add(coin)
     session.commit()
 

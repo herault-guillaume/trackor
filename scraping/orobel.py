@@ -102,16 +102,36 @@ def get_price_for(session, session_id,buy_price_gold,buy_price_silver):
 
                 print(price,CMN[name],url)
 
-                # Check if the name is in your CMN dictionary
-                if CMN[name][:2] == 'or':
-                    coin = Item(
-                        name=CMN[name],
-                        buy=price.amount_float,
-                        source=url,
-                        buy_premium=((price.amount_float + get_delivery_price(price.amount_float)) - (
-                                buy_price * poids_pieces[CMN[name]])) * 100.0 / (buy_price * poids_pieces[CMN[name]]),
-                        delivery_fee=get_delivery_price(price.amount_float),
-                        session_id=session_id,bullion_type='g')
+                minimum = 1
+                quantity = 1
+                item_data = CMN[name]
+                if isinstance(item_data, tuple):
+                    name = item_data[0]
+                    quantity = item_data[1]
+                    bullion_type = item_data[0][:2]
+                else:
+                    name = item_data
+                    bullion_type = item_data[:2]
+
+                if bullion_type == 'or':
+                    buy_price = buy_price_gold
+                else:
+                    buy_price = buy_price_silver
+
+                coin = Item(
+                    name=name,
+                    prices=price.amount_float,
+                    source=url,
+                    buy_premiums=(((price.amount_float + get_delivery_price(
+                        price.amount_float) / minimum) / float(quantity)) - (
+                                         buy_price * poids_pieces[name])) * 100.0 / (
+                                        buy_price * poids_pieces[name]),
+
+                    delivery_fee=get_delivery_price(price.amount_float * minimum),
+                    session_id=session_id,
+                    bullion_type=bullion_type,
+                    minimum=minimum,
+                    quantity=quantity)
                 session.add(coin)
                 session.commit()
 

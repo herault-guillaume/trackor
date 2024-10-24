@@ -102,12 +102,12 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
                 # More robust price cleaning: handle variations in formatting
                 #price = float(price_text.replace('€', '').replace(' ', '').replace(',', '.'))
                 coin = Item(name=CMN[product_name],
-                            buy=price.amount_float,
+                            prices=price.amount_float,
                             source='https://capornumismatique.com'+url,
-                            buy_premium=((price.amount_float + get_delivery_price(price.amount_float)) - (
+                            buy_premiums=(((price.amount_float + get_delivery_price(price.amount_float*minimum)/minimum)/float(quantity)) - (
                                              buy_price * poids_pieces[ CMN[product_name]])) * 100.0 / (buy_price *
                                                    poids_pieces[CMN[product_name]]),
-                            delivery_fee=get_delivery_price(price.amount_float),
+                            delivery_fee=get_delivery_price(price.amount_float*minimum),
                             session_id=session_id,
                             bullion_type=bullion_type,
                             quantity=quantity,

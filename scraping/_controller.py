@@ -2,7 +2,7 @@ import pathlib
 
 from models.model import Item, Session, poids_pieces
 from sqlalchemy import func, asc
-from sqlalchemy.sql.expression import and_
+from sqlalchemy.sql.expression import and_, or_
 import json
 from datetime import datetime, timedelta
 from google.cloud import storage
@@ -122,7 +122,7 @@ def find_best_deals(session, session_id, num_deals=50,filename='./results/best_d
         session.query(
             Item.name,
             Item.buy,
-            Item.buy_premium,
+            Item.buy_premiums,
             Item.source,
             Item.timestamp
         )
@@ -130,13 +130,22 @@ def find_best_deals(session, session_id, num_deals=50,filename='./results/best_d
         .all()
     )
 
+    print(        session.query(
+            Item.name,
+            Item.buy,
+            Item.buy_premiums,
+            Item.source,
+            Item.timestamp
+        )
+        .filter(Item.session_id == session_id)
+        .all())
     deals = []
 
     for row in results:
         if row.name in poids_pieces and not 'lingot' in str(row.name).lower():
             deals.append({
                 "name": row.name[5:],
-                "prime": "{:.1f}".format(row.buy_premium),
+                "prime": "{:.1f}".format(row.buy_premiums),
                 "source": row.source,
                 "last_updated": format_date_to_french_quarterly_hour(row.timestamp)
             })
@@ -155,7 +164,7 @@ def find_best_deals(session, session_id, num_deals=50,filename='./results/best_d
     return sorted_deals
 
 
-def calculate_and_store_coin_data(session, session_id, coin_names, filename):
+def calculate_and_store_coin_data(session, session_id, coin_names, range_,filename):
     """
     Calcule le total (j_achete + delivery_fee) pour chaque pièce,
     garde une seule pièce par source avec le prix le plus bas,
@@ -170,67 +179,81 @@ def calculate_and_store_coin_data(session, session_id, coin_names, filename):
     """
 
     # Première requête pour obtenir tous les résultats avec les noms de pièces spécifiés
-    from sqlalchemy import or_
 
-    all_results = (
-        session.query(
-            Item.name,
-            Item.buy_premium,
-            Item.source,
-            Item.timestamp
-        )
-        .filter(
-            or_(
-                Item.name.like(f"%{coin_name}%") for coin_name in coin_names
+    for r in range_ :
+        all_results = (
+            session.query(
+                Item.name,
+                Item.buy_premiums,
+                Item.source,
+                Item.timestamp
             )
-        )
-        .filter(Item.session_id == session_id)
-        .all()
-    )
-
-    # Extraire le domaine de chaque URL source et le stocker dans un dictionnaire
-    source_domains = {result: urlparse(result.source).netloc for result in all_results}
-
-    # Filtrer et sélectionner la pièce la moins chère par domaine en Python
-    unique_results = []
-    seen_domains = set()
-    for result in all_results:
-        domain = source_domains[result]
-        if domain not in seen_domains:
-            cheapest_coin = min(
-                (r for r in all_results if source_domains[r] == domain),
-                key=lambda x: x.buy_premium
+            .filter(
+                or_(
+                    Item.name.like(f"{coin_name}%") for coin_name in coin_names
+                )
             )
-            unique_results.append(cheapest_coin)
-            seen_domains.add(domain)
+            .filter(Item.session_id == session_id)
+            .filter(
+                or_(
+                    and_ (
+                            r[0] <= Item.quantity,
+                            Item.quantity < r[1],
+                    ),
+                    and_ (
+                            r[0] <= Item.minimum,
+                            Item.minimum < r[1],
+                    )
+                ))
+            .all()
+        )
 
-    # Trier les résultats par prix total croissant
-    unique_results.sort(key=lambda x: x.buy_premium)
+        print([i for i in all_results])
 
-    # Calcul de la médiane de tous les prix
-    all_totals = [row.buy_premium for row in unique_results]
-    # if all_totals:
-    #     median_total = statistics.median(all_totals)
-    # else:
-    #     median_total = 0
+        # Extraire le domaine de chaque URL source et le stocker dans un dictionnaire
+        source_domains = {result: urlparse(result.source).netloc for result in all_results}
 
-    # Conversion des résultats en dictionnaire, en calculant la différence par rapport à la moyenne
-    data = []
-    for i, row in enumerate(unique_results):
-        row_data = {
-            "source": row.source,
-            "prime": "{:.1f}".format(row.buy_premium),
-            "last_updated": format_date_to_french_quarterly_hour(row.timestamp)
-        }
-        data.append(row_data)
+        # Filtrer et sélectionner la pièce la moins chère par domaine
+        unique_results = []
+        seen_domains = set()
+        for result in all_results:
+            domain = source_domains[result]
+            if domain not in seen_domains:
+                cheapest_coin = min(
+                    (r for r in all_results if source_domains[r] == domain),
+                    key=lambda x: x.buy_premiums
+                )
+                unique_results.append(cheapest_coin)
+                seen_domains.add(domain)
 
-    # Stockage dans un fichier JSON
-    with open(filename, "w", encoding='utf8') as f:
-        json.dump(data, f, indent=0)
+        # Trier les résultats par prix total croissant
+        unique_results.sort(key=lambda x: x.buy_premiums)
 
-    update_json_file(data, filename=pathlib.WindowsPath(filename).name)
+        # Calcul de la médiane de tous les prix
+        all_totals = [row.buy_premiums for row in unique_results]
+        # if all_totals:
+        #     median_total = statistics.median(all_totals)
+        # else:
+        #     median_total = 0
 
-    return data
+        # Conversion des résultats en dictionnaire, en calculant la différence par rapport à la moyenne
+        data = []
+        for i, row in enumerate(unique_results):
+            row_data = {
+                "source": row.source,
+                "prime": "{:.1f}".format(row.buy_premiums),
+                "last_updated": format_date_to_french_quarterly_hour(row.timestamp)
+            }
+            data.append(row_data)
+        filename = pathlib.WindowsPath(filename)
+        fp = filename.parent
+        fn = filename.stem + '_{r_min}_{r_max}'.format(r_min = r[0],r_max = r[1]) + filename.suffix
+        filepath = fp / fn
+        # Stockage dans un fichier JSON
+        with open(filepath, "w", encoding='utf8') as f:
+            json.dump(data, f, indent=0)
+
+        update_json_file(data, filename=filepath.name)
 
 def fetch_and_update_data():
     for attempt in range(5):
@@ -241,68 +264,50 @@ def fetch_and_update_data():
             session = Session()
 
             buy_price_gold,g_sell_price_eur,buy_price_silver,s_sell_price_eur = bullionvault.get(session,session_id)
-
+            #
             abacor.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
-            acheterorargent.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
-            achatoretargent.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
-            aucoffre.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
-            bdor.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
-            bullionbypost.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
-            capornumismatique.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
-            changedelabourse.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
-            changerichelieu.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
-            changevivienne.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
-            gold.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
-            goldavenue.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
-            goldforex.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
-            goldreserve.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
-
-            lmp.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
-            lcdor.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
-            merson.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
-            monlingot.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
-            oretchange.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
-            orinvestissement.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
-            orobel.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
-            shopcomptoirdelor.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
+            # acheterorargent.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
+            # achatoretargent.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
+            # aucoffre.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
+            # bdor.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
+            # bullionbypost.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
+            # capornumismatique.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
+            # changedelabourse.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
+            # changerichelieu.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
+            # changevivienne.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
+            # gold.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
+            # goldavenue.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
+            # goldforex.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
+            # goldreserve.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
+            # lmp.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
+            # lcdor.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
+            # merson.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
+            # monlingot.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
+            # oretchange.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
+            # orinvestissement.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
+            # orobel.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
+            # shopcomptoirdelor.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
 
             # goldunion.get(session,session_id)  # arnaque?
             # joubertchange.get(session,session_id)
             # pieceor.get(session,session_id)
 
+            range_ = [(1,5),(5,10),(10,50),(50,500)]
             find_best_deals(session,session_id,num_deals=15)
-            calculate_and_store_coin_data(session, session_id, ['or - 1 oz krugerrand'], './results/1_oz_krugerrand.json')
-            calculate_and_store_coin_data(session, session_id, ['or - 20 francs fr'],'./results/20_fr_france.json')
-            calculate_and_store_coin_data(session, session_id, ['or - 20 francs bel leopold I','or - 20 francs union latine',
-                                                                'or - 20 lire umberto I','or - 20 lire vittorio emanuele II'],
-                                          './results/20_fr_union_latine.json')
-            calculate_and_store_coin_data(session, session_id, [],
-                                          './results/20_lires_italie.json')
-            calculate_and_store_coin_data(session, session_id, ['or - 20 francs sui vreneli croix',
-                                                                        'or - 20 francs confederatio suisse'],
-                                          './results/20_fr_suisse.json')
-            calculate_and_store_coin_data(session, session_id, ['or - 1 souverain edouart VII',
-                                                                        'or - 1 souverain georges V',
-                                                                        'or - 1 souverain elizabeth II'
-                                                                        'or - 1 souverain victoria jubilee'],
-                                          './results/1_souv_ru.json')
-            calculate_and_store_coin_data(session, session_id, ['or - 1/2 souverain georges V',
-                                                                        'or - 1/2 souverain victoria',
-                                                                ],
-                                          './results/1_2_souv_ru.json')
-            calculate_and_store_coin_data(session, session_id, ['or - 50 pesos mex'], './results/50_pesos_mex.json')
-            calculate_and_store_coin_data(session, session_id, ['or - 20 mark wilhelm II'], './results/20_mark_all.json')
-            calculate_and_store_coin_data(session, session_id, ['or - 5 dollars liberté','or - 5 dollars tête indien'],
-                                          './results/5_dol_usa.json')
-            calculate_and_store_coin_data(session, session_id, ['or - 20 dollars liberté longacre','or - 20 dollars liberté st gaudens','or - 20 dollars tete indien','or - 20 dollars'], './results/20_dol_usa.json')
-            calculate_and_store_coin_data(session, session_id, ['or - 10 dollars liberté','or - 10 dollars tête indien'],
-                                          './results/10_dol_usa.json')
-            calculate_and_store_coin_data(session, session_id, ['or - 10 francs fr',
-                                                                        'or - 10 francs fr coq marianne',
-                                                                        'or - 10 francs fr cérès 1850-1851',
-                                                                        'or - 10 francs fr napoléon III'],
-                                          './results/10_fr_france.json')
-            print("--- %s seconds ---" % (time.time() - start_time))
+            calculate_and_store_coin_data(session, session_id, ['or - 1 oz krugerrand'], range_,'./results/1_oz_krugerrand.json')
+            calculate_and_store_coin_data(session, session_id, ['or - 20 francs fr'], range_,'./results/20_fr_france.json')
+            calculate_and_store_coin_data(session, session_id, ['or - 20 francs bel leopold I','or - 20 francs union latine','or - 20 lire umberto I','or - 20 lire vittorio emanuele II'], range_, './results/20_fr_union_latine.json')
+            calculate_and_store_coin_data(session, session_id, ['or - 20 lire'],range_,'./results/20_lires_italie.json')
+            calculate_and_store_coin_data(session, session_id, ['or - 20 francs sui'],range_,'./results/20_fr_suisse.json')
+            calculate_and_store_coin_data(session, session_id, ['or - 1 souverain'],range_,'./results/1_souv_ru.json')
+            calculate_and_store_coin_data(session, session_id, ['or - 1/2 souverain'],range_,'./results/1_2_souv_ru.json')
+            calculate_and_store_coin_data(session, session_id, ['or - 50 pesos mex'],  range_,'./results/50_pesos_mex.json')
+            calculate_and_store_coin_data(session, session_id, ['or - 20 mark'],  range_,'./results/20_mark_all.json')
+            calculate_and_store_coin_data(session, session_id, ['or - 5 dollars'],range_,'./results/5_dol_usa.json')
+            calculate_and_store_coin_data(session, session_id, ['or - 20 dollars'],  range_,'./results/20_dol_usa.json')
+            calculate_and_store_coin_data(session, session_id, ['or - 10 dollars'],range_,'./results/10_dol_usa.json')
+            calculate_and_store_coin_data(session, session_id, ['or - 10 francs fr'], range_,'./results/10_fr_france.json')
+            # print("--- %s seconds ---" % (time.time() - start_time))
             return  # Sortir de la fonction si la mise à jour est réussie
 
         except Exception as e:

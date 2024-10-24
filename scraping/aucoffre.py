@@ -1,8 +1,11 @@
+import time
+
 import requests
 from bs4 import BeautifulSoup
 from models.model import Item, poids_pieces
 from price_parser import Price
 import traceback
+import re
 
 #https://www.aucoffre.com/acheter/tarifs-aucoffre-com
 
@@ -25,7 +28,7 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
         'or - 40 francs fr napoléon premier consul': ["https://www.aucoffre.com/recherche/metal-1/marketing_list-5/stype-11/produit","napoleon-40f-bonaparte-premier-consul"],
         'or - 40 francs fr louis XVIII': ["https://www.aucoffre.com/recherche/metal-1/marketing_list-5/stype-11/produit","napoleon-40f-louis-xviii"],
         'or - 40 francs fr napoléon empereur non laurée': ["https://www.aucoffre.com/recherche/metal-1/marketing_list-5/stype-11/produit","napoleon-40f-napoleon-1er-tete-nue-"],
-        'or - 50 francs fr napoléon III tête nue': ["https://www.aucoffre.com/recherche/marketing_list-5/stype-12/produit","apoleon-50f-napoleon-iii-tete-nue"],
+        'or - 50 francs fr napoléon III tête nue': ["https://www.aucoffre.com/recherche/marketing_list-5/stype-12/produit","napoleon-50f-napoleon-iii-tete-nue"],
         'or - 50 francs fr napoléon III tête laurée': ["https://www.aucoffre.com/recherche/marketing_list-5/stype-12/produit","napoleon-50f-napoleon-iii-tete-lauree"],
         'or - 100 francs fr napoléon III tête nue': ["https://www.aucoffre.com/recherche/marketing_list-5/stype-13/produit","napoleon-100f-napoleon-iii-tete-nue"],
         'or - 100 francs fr napoléon III tête laurée': ["https://www.aucoffre.com/recherche/marketing_list-5/stype-13/produit", "napoleon-100f-napoleon-iii-tete-lauree"],
@@ -82,17 +85,17 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
                 soup = BeautifulSoup(response.content,'html.parser')
 
                 # Use a more specific selector to avoid accidental matches
-                elements = soup.select("div[data-url*='{CMN}']".format(CMN=url[1]))
+                elements = soup.select("article[data-url*='{CMN}']".format(CMN=url[1]))
 
                 for element in elements :
                     element_location = element.find("dl","dl-horizontal dl-left dl-small mb-0")
 
-                    img_tag = element_location.find('img')
+                    flag = element_location.find('use', attrs={'xlink:href': re.compile(r'#icon-flag_fr')})
 
-                    if not img_tag['title'] == 'Localisation France (FR)' :
+                    if not flag :
                         continue
 
-                    price_element = element.select_one("div[data-url*='{CMN}'] .text-xlarge.text-bolder.m-0.text-nowrap".format(CMN=url[1]))
+                    price_element = element.select_one("article[data-url*='{CMN}'] .text-xlarge.text-bolder.m-0.text-nowrap".format(CMN=url[1]))
 
                     if price_element :
                         price_text = price_element.text.strip()
@@ -121,9 +124,9 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
                         # More robust price cleaning: handle variations in formatting
                         #price = float(price_text.replace('€', '').replace(' ', '').replace(',', '.'))
                         coin = Item(name=name,
-                                    buy=price.amount_float,
+                                    prices=price.amount_float,
                                     source=url[0],
-                                    buy_premium=((price.amount_float + 15.0) - (buy_price * poids_pieces[
+                                    buy_premiums=((price.amount_float + 15.0) - (buy_price * poids_pieces[
                                              CMN])) * 100.0 / (buy_price * poids_pieces[CMN]),
                                     delivery_fee=15.0,
                                     session_id=session_id,

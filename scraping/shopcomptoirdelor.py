@@ -132,9 +132,9 @@ def get_price_for(session, session_id,buy_price_gold,buy_price_silver):
 
                     #Check if the name is in your CMN dictionary
                     coin = Item(name=name,
-                                buy=price.amount_float,
+                                prices=price.amount_float,
                                 source=url,
-                                buy_premium=(((price.amount_float + 24.95 / minimum) / float(quantity)) - (
+                                buy_premiums=(((price.amount_float + 24.95 / minimum) / float(quantity)) - (
                                                      buy_price * poids_pieces[name])) * 100.0 / (
                                                         buy_price * poids_pieces[name]),
 
