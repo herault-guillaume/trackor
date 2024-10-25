@@ -7,6 +7,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from models.model import Item, poids_pieces
 from price_parser import Price
 import traceback
+import re
 
 CMN = {
         "20 Fr Or Coq" : 'or - 20 francs fr coq marianne',
@@ -53,17 +54,16 @@ CMN = {
         "5 Roubles" : "or - 5 roubles",
 }
 
-def get_delivery_price(price):
-    #https://www.bdor.fr/achat-or-en-ligne/livraison-or
-    if price < 1000.0:
-        return 15.0
-    else :
-        return 0.0
-
 def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
     driver = Driver(uc=True, headless=True)
     url = "https://www.bdor.fr/achat-or-en-ligne"
     print(url)
+
+    delivery_ranges = [
+        (0.0,1000.0,15.0),
+        (1000.0,999999999999.0,0.0)
+    ]
+
     try :
         driver.get(url)
         following_element = None
@@ -71,47 +71,69 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
         # Find the div by data-idr using WebDriverWait for dynamic loading
 
         for id in ['100989','105846']:
+
+            # on attend le chargement de l'ensemble des lignes à scrapper
             wait = WebDriverWait(driver, 10)  # Adjust timeout as needed
             div_element = wait.until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, "div[data-idr='{id}']".format(id=id)))
             )
             trs_elements = wait.until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, "tr.prixPalier[data-ordre='1']"))
+                EC.presence_of_element_located((By.CSS_SELECTOR, "tr.prixPalier"))
             )
             divs_produit = wait.until(
                 EC.presence_of_element_located((By.CLASS_NAME, "produitOrNom"))
             )
+
             #time.sleep(5)
             # Find all ligneTab divs within the div_element
             ligne_tab_divs = div_element.find_elements(By.CLASS_NAME, "ligneTab")
 
             for ligne_tab_div in ligne_tab_divs:
                 # Find the specific tr element within each ligneTab div
-                tr_element = ligne_tab_div.find_elements(
-                    By.CSS_SELECTOR, "tr.prixPalier[data-ordre='1']"
-                )
 
                 # Extract product name from the div with produitOrNom class
                 product_name_div = ligne_tab_div.find_element(By.CLASS_NAME, "produitOrNom")
                 product_name = product_name_div.text
-
+                print(product_name)
                 if not CMN.get(product_name,None):
                     continue
 
                 item_data = CMN[product_name]
 
                 # Find the div with class "colonne produitOr"
-                produit_or_div = ligne_tab_div.find_element(By.CLASS_NAME, "colonne.produitOr")
+                produit_or_div = ligne_tab_div.find_element(By.CLASS_NAME, "produitOr")
 
                 # Find the first <a> tag within it
                 first_a_tag = produit_or_div.find_element(By.TAG_NAME, "a")
 
                 # Extract the href attribute
                 source = first_a_tag.get_attribute("href")
-                price = Price.fromstring(tr_element[1].find_elements(By.TAG_NAME, 'td')[1].get_attribute('innerHTML'))
 
-                quantity = 1
+                price_ranges = []
+                trs = ligne_tab_div.find_elements(By.CLASS_NAME, "prixPalier")
+
+                len_price = len(trs)
+                print(len_price)
+                i = 0  # Skip the first qty div ("Vous achetez")
+                for tr in trs[:len_price//2]:
+                    tds = tr.find_elements(By.TAG_NAME, 'td')
+                    tds = [td.get_attribute("innerHTML").replace('<span class="motarticles" style="display: none;"> articles</span>','') for td in tds]
+
+                    match = re.search(r"(\d+)\s*\D+\s*(\d+)",tds[0])
+                    if match:
+                        min = int(match.group(1))
+                        max = int(match.group(2))
+                    else:
+                        #print(tr)
+                        min = int(re.search(r"\d+",tds[0]).group())
+                        max = 9999999999.0
+
+                    price = Price.fromstring(tds[1])
+                    price_ranges.append([min, max, price]),
+
                 minimum = 1
+                quantity = 1
+
                 if isinstance(item_data, tuple):
                     name = item_data[0]
                     quantity = item_data[1]
@@ -125,15 +147,27 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
                 else:
                     buy_price = buy_price_silver
 
-                print(price,item_data, source)
-                coin = Item(name=name,
-                            prices=price.amount_float,
-                            source=source,
-                            buy_premiums=(((price.amount_float + get_delivery_price(price.amount_float*minimum)/minimum)/float(quantity)) - (
-                                             buy_price * poids_pieces[name])) * 100.0 / (buy_price *
-                                                   poids_pieces[name]),
+                def price_between(value, ranges):
+                    """
+                    Returns the price per unit for a given quantity.
+                    """
 
-                            delivery_fee=get_delivery_price(price.amount_float*minimum),
+                    for min_qty, max_qty, price in ranges:
+                        if min_qty <= value <= max_qty:
+                            if isinstance(price, Price):
+                                return price.amount_float
+                            else:
+                                return price
+                print(price,name, url)
+                coin = Item(name=name,
+                            prices=';'.join(['{:.1f}'.format(p[2].amount_float) for p in price_ranges]),
+                            ranges=';'.join(['{min_}-{max_}'.format(min_=r[0],max_=r[1]) for r in price_ranges]),
+                            buy_premiums=';'.join(
+['{:.1f}'.format(((price_between(minimum,price_ranges)/quantity + price_between(price_between(minimum,price_ranges)*minimum,delivery_ranges)/(quantity*minimum)) - (buy_price*poids_pieces[name]))*100.0/(buy_price*poids_pieces[name])) for i in range(1,minimum)] +
+['{:.1f}'.format(((price_between(i,price_ranges)/quantity + price_between(price_between(i,price_ranges)*i,delivery_ranges)/(quantity*i)) - (buy_price*poids_pieces[name]))*100.0/(buy_price*poids_pieces[name])) for i in range(minimum,151)]
+                            ),
+                            delivery_fees=';'.join(['{min_}-{max_}-{price}'.format(min_=r[0],max_=r[1],price=r[2]) for r in delivery_ranges]),
+                            source=source,
                             session_id=session_id,
                             bullion_type=bullion_type,
                             quantity=quantity,

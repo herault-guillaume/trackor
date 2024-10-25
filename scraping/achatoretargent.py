@@ -187,7 +187,7 @@ def get_price_for(session, session_id, buy_price_gold,buy_price_silver):
                             max = int(match.group(2))
                         else:
                             min = int(re.search(r"\d+", qty_div.get_text(strip=True)).group())
-                            max = 999999999
+                            max = 9999999999.0
 
                         price = Price.fromstring(price_div.get_text(strip=True))
                         price_ranges.append([min, max, price]),

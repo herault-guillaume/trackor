@@ -4,6 +4,7 @@ import time
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import NoSuchElementException
 from models.model import Item, poids_pieces
 from seleniumbase import Driver
 
@@ -71,6 +72,10 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
     print("https://www.bullionbypost.fr/")
     driver = Driver(uc=True, headless=True)
 
+    delivery_ranges = [
+        (0.0,99999999999.0,0.0)
+    ]
+
     #driver = webdriver.Chrome(options=options)
     for CMN, url in urls.items():
         try:
@@ -104,27 +109,55 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
             else:
                 buy_price = buy_price_silver
 
+
+            price_ranges = []
+
             # Extract "Prix Net" (Net par Unité) for each row
-            prix_net_values = []
-            for row in rows:
+            for i, row in enumerate(rows):
 
                 # Assuming "Prix Net" is always the second column (index 1)
-                minimum = int(row.find_elements(By.TAG_NAME, "td")[0].text.replace('+',''))
-                price = Price.fromstring(row.find_elements(By.TAG_NAME, "td")[3].text)
+                min = int(row.find_elements(By.TAG_NAME, "td")[0].text.replace('+',''))
+                if i == len(rows)-1 :
+                    max = 9999999999.0
+                else:
+                    max = int(rows[i+1].find_elements(By.TAG_NAME, "td")[0].text.replace('+',''))-1
 
-                print(price, CMN, url)
-                coin = Item(name=name,
-                            prices=price.amount_float,
-                            source=url,
-                            buy_premiums=((price.amount_float + 0.0) - (buy_price * poids_pieces[CMN])) * 100.0 / (buy_price * poids_pieces[CMN]),
-                            delivery_fee=0.0,
-                            session_id=session_id,
-                            bullion_type=CMN[:2],
-                            quantity=quantity,
-                            minimum=minimum)
+                try :
+                    row.find_elements(By.TAG_NAME, "td")[3].find_element(By.TAG_NAME,'del')
+                    price = Price.fromstring(row.find_elements(By.TAG_NAME, "td")[3].find_element(By.TAG_NAME,'span').text)
+                except NoSuchElementException:
+                    price = Price.fromstring(row.find_elements(By.TAG_NAME, "td")[3].text)
 
-                session.add(coin)
-                session.commit()
+                price_ranges.append([min, max, price]),
+
+            def price_between(value, ranges):
+                """
+                Returns the price per unit for a given quantity.
+                """
+
+                for min_qty, max_qty, price in ranges:
+                    if min_qty <= value <= max_qty:
+                        if isinstance(price, Price):
+                            return price.amount_float
+                        else:
+                            return price
+            print()
+            coin = Item(name=name,
+                        prices=';'.join(['{:.1f}'.format(p[2].amount_float) for p in price_ranges]),
+                        ranges=';'.join(['{min_}-{max_}'.format(min_=r[0],max_=r[1]) for r in price_ranges]),
+                        buy_premiums=';'.join(
+['{:.1f}'.format(((price_between(minimum,price_ranges)/quantity + price_between(price_between(minimum,price_ranges)*minimum,delivery_ranges)/(quantity*minimum)) - (buy_price*poids_pieces[name]))*100.0/(buy_price*poids_pieces[name])) for i in range(1,minimum)] +
+['{:.1f}'.format(((price_between(i,price_ranges)/quantity + price_between(price_between(i,price_ranges)*i,delivery_ranges)/(quantity*i)) - (buy_price*poids_pieces[name]))*100.0/(buy_price*poids_pieces[name])) for i in range(minimum,151)]
+                        ),
+                        delivery_fees=';'.join(['{min_}-{max_}-{price}'.format(min_=r[0],max_=r[1],price=r[2]) for r in delivery_ranges]),
+                        source=url,
+                        session_id=session_id,
+                        bullion_type=bullion_type,
+                        quantity=quantity,
+                        minimum=minimum)
+
+            session.add(coin)
+            session.commit()
 
         except Exception:
             print(traceback.format_exc())
