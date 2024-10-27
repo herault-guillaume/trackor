@@ -38,7 +38,7 @@ def get_price_for(session, session_id,buy_price_gold,buy_price_silver):
     url = "https://www.gold.fr/achat-piece-or/"
     response = requests.get(url)
     response.raise_for_status()  # Check for HTTP errors
-
+    delivery_ranges=[[0,100000.0,30.0],(100000,float('inf'),80.0)]
     soup = BeautifulSoup(response.content, 'html.parser')
     tables = soup.find_all('table', class_="pricesTable coinsCompleteTable bours")
 
@@ -46,6 +46,7 @@ def get_price_for(session, session_id,buy_price_gold,buy_price_silver):
         for row in table.find_all('tr'):
             try:
                 name_element = row.find('td', class_="name speak")
+                source = url[:-1] + name_element.find('a')['href']
                 price_element = row.find('td', class_="price speak")
 
                 if name_element and price_element:
@@ -69,17 +70,37 @@ def get_price_for(session, session_id,buy_price_gold,buy_price_silver):
                     else:
                         buy_price = buy_price_silver
 
-                        coin = Item(name=name,
-                                    prices=price.amount_float,
-                                    source=url,
-                                    buy_premiums=((price.amount_float + 30.0) - (buy_price * poids_pieces[name])) * 100.0 / (buy_price * poids_pieces[name]),
-                                    delivery_fee=30.0,
-                                    session_id=session_id,
-                                    bullion_type=bullion_type,
-                                    quantity=quantity,
-                                    minimum=minimum)
-                        session.add(coin)
-                        session.commit()
+                    price_ranges = [(minimum,999999999,price)]
+
+                    def price_between(value, ranges):
+                        """
+                        Returns the price per unit for a given quantity.
+                        """
+
+                        for min_qty, max_qty, price in ranges:
+                            if min_qty <= value <= max_qty:
+                                if isinstance(price, Price):
+                                    return price.amount_float
+                                else:
+                                    return price
+
+                    coin = Item(name=name,
+                                prices=';'.join(['{:.2f}'.format(p[2].amount_float) for p in price_ranges]),
+                                ranges=';'.join(['{min_}-{max_}'.format(min_=r[0],max_=r[1]) for r in price_ranges]),
+                                buy_premiums=';'.join(
+        ['{:.2f}'.format(((price_between(minimum,price_ranges)/quantity + price_between(price_between(minimum,price_ranges)*minimum,delivery_ranges)/(quantity*minimum)) - (buy_price*poids_pieces[name]))*100.0/(buy_price*poids_pieces[name])) for i in range(1,minimum)] +
+        ['{:.2f}'.format(((price_between(i,price_ranges)/quantity + price_between(price_between(i,price_ranges)*i,delivery_ranges)/(quantity*i)) - (buy_price*poids_pieces[name]))*100.0/(buy_price*poids_pieces[name])) for i in range(minimum,151)]
+                                ),
+                                delivery_fees=';'.join(['{min_}-{max_}-{price}'.format(min_=r[0],max_=r[1],price=r[2]) for r in delivery_ranges]),
+                                source=source,
+                                session_id=session_id,
+                                bullion_type=bullion_type,
+                                quantity=quantity,
+                                minimum=minimum)
+
+                    session.add(coin)
+                    session.commit()
+
 
             except Exception as e:
                 print(traceback.format_exc())

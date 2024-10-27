@@ -137,16 +137,29 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
             
             print(price,CMN[coin_label],url)
 
-            #price = float(price_text.replace('€', '').replace(',', '.'))
-            coin = Item(name=name,
-                        prices=price.amount_float,
-                        source=url,
-                        buy_premiums=(((price.amount_float + get_delivery_price(
-                            price.amount_float) / minimum) / float(quantity)) - (
-                                             buy_price * poids_pieces[name])) * 100.0 / (
-                                            buy_price * poids_pieces[name]),
+            delivery_ranges = [(0.0,1000.0,10.0),(1000.0,5000.0,25.0),(5000.0,float('inf'),0.0)]
+            price_ranges = [(minimum,999999999,price)]
 
-                        delivery_fee=get_delivery_price(price.amount_float*minimum),
+            def price_between(value, ranges):
+                """
+                Returns the price per unit for a given quantity.
+                """
+                for min_qty, max_qty, price in ranges:
+                    if min_qty <= value <= max_qty:
+                        if isinstance(price, Price):
+                            return price.amount_float
+                        else:
+                            return price
+
+            coin = Item(name=name,
+                        prices=';'.join(['{:.2f}'.format(p[2].amount_float) for p in price_ranges]),
+                        ranges=';'.join(['{min_}-{max_}'.format(min_=r[0],max_=r[1]) for r in price_ranges]),
+                        buy_premiums=';'.join(
+['{:.2f}'.format(((price_between(minimum,price_ranges)/quantity + price_between(price_between(minimum,price_ranges)*minimum,delivery_ranges)/(quantity*minimum)) - (buy_price*poids_pieces[name]))*100.0/(buy_price*poids_pieces[name])) for i in range(1,minimum)] +
+['{:.2f}'.format(((price_between(i,price_ranges)/quantity + price_between(price_between(i,price_ranges)*i,delivery_ranges)/(quantity*i)) - (buy_price*poids_pieces[name]))*100.0/(buy_price*poids_pieces[name])) for i in range(minimum,151)]
+                        ),
+                        delivery_fees=';'.join(['{min_}-{max_}-{price}'.format(min_=r[0],max_=r[1],price=r[2]) for r in delivery_ranges]),
+                        source=url,
                         session_id=session_id,
                         bullion_type=bullion_type,
                         quantity=quantity,

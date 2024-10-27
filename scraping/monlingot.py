@@ -56,7 +56,7 @@ def get_delivery_price(price):
     if price < 2500 :
         return 9.90 # Not available for higher values
     elif 2500 <= price < 20000 :
-        return 39.90
+        return 19.90
     else:
         return 0.0
 
@@ -77,10 +77,13 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
             response.raise_for_status()
 
             soup = BeautifulSoup(response.content, 'html.parser')
+
+            delivery_ranges = [(0.0,2500.0,9.9),(2500.0,20000.0,19.90),(20000.0,float('inf'),39.90)]
             products_table = soup.find('table',class_='table-product-discounts')
             products_tbody = products_table.find('tbody')
 
             quantity = 1
+            minimum = 1
 
             if isinstance(item_data, tuple):
                 name = item_data[0]
@@ -97,39 +100,58 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
 
             # Find the tr element based on its attributes
             tr_elements = products_tbody.find_all('tr')
+
+            price_ranges = []
             for tr in tr_elements:
             # Extract all td elements within the tr
 
                 td_elements = tr.find_all('td')
-                minimum = int(re.search(r"\d+", td_elements[0].text).group())
+
+                match = re.search(r"(\d+)\s*\D+\s*(\d+)", td_elements[0].text)
+
+                if match:
+                    min = int(match.group(1))
+                    max = int(match.group(2))
+                else:
+                    min = int(re.search(r"\d+", td_elements[0].text).group())
+                    max = 9999999999.9
 
                 min_p = int(soup.find('input', id='quantity_wanted')['min'])
                 if min_p>minimum:
                     minimum = min_p
 
-                current_price = Price.fromstring(soup.find('div',class_='current-price').text)
-                discount_price = Price.fromstring(td_elements[1].text)
-                if current_price.amount_float < discount_price.amount_float and soup.find('div',class_='discount-block').find('span',class_='discount') :
-                    price = current_price
-                else :
-                    price = discount_price
-                print(price, name, url)
-                coin = Item(name=name,
-                            prices=price.amount_float,
-                            source=url,
-                            buy_premiums=(((price.amount_float + get_delivery_price(
-                                price.amount_float) / minimum) / float(quantity)) - (
-                                                 buy_price * poids_pieces[name])) * 100.0 / (
-                                                buy_price * poids_pieces[name]),
+                price = Price.fromstring(td_elements[1].text)
 
-                            delivery_fee=get_delivery_price(price.amount_float*minimum),
-                            session_id=session_id,
-                            bullion_type=bullion_type,
-                            quantity=quantity,
-                            minimum=minimum)
+                price_ranges.append((min,max,price))
 
-                session.add(coin)
-                session.commit()
+            def price_between(value, ranges):
+                """
+                Returns the price per unit for a given quantity.
+                """
+                for min_qty, max_qty, price in ranges:
+                    if min_qty <= value <= max_qty:
+                        if isinstance(price, Price):
+                            return price.amount_float
+                        else:
+                            return price
+
+            coin = Item(name=name,
+                        prices=';'.join(['{:.2f}'.format(p[2].amount_float) for p in price_ranges]),
+                        ranges=';'.join(['{min_}-{max_}'.format(min_=r[0],max_=r[1]) for r in price_ranges]),
+                        buy_premiums=';'.join(
+['{:.2f}'.format(((price_between(minimum,price_ranges)/quantity + price_between(price_between(minimum,price_ranges)*minimum,delivery_ranges)/(quantity*minimum)) - (buy_price*poids_pieces[name]))*100.0/(buy_price*poids_pieces[name])) for i in range(1,minimum)] +
+['{:.2f}'.format(((price_between(i,price_ranges)/quantity + price_between(price_between(i,price_ranges)*i,delivery_ranges)/(quantity*i)) - (buy_price*poids_pieces[name]))*100.0/(buy_price*poids_pieces[name])) for i in range(minimum,151)]
+                        ),
+                        delivery_fees=';'.join(['{min_}-{max_}-{price}'.format(min_=r[0],max_=r[1],price=r[2]) for r in delivery_ranges]),
+                        source=url,
+                        session_id=session_id,
+                        bullion_type=bullion_type,
+                        quantity=quantity,
+                        minimum=minimum)
+
+            session.add(coin)
+            session.commit()
+
 
         except Exception as e:
             print(traceback.format_exc())

@@ -9,7 +9,7 @@ import re
 CMN = {
     "https://www.oretchange.com/pieces-or/196-achat-20-francs-coq.html": 'or - 20 francs fr coq marianne',
     "https://www.oretchange.com/pieces-or/176-achat-20-francs-napoleon-iii.html": 'or - 20 francs fr napoléon III',
-    "https://www.oretchange.com/pieces-or/200-achat-souverain-victoria.html": 'or - 1 souverain georges V',
+    "https://www.oretchange.com/pieces-or/200-achat-souverain-victoria.html": 'or - 1 souverain',
     "https://www.oretchange.com/pieces-or/198-achat-20-francs-suisse-confederation.html": 'or - 20 francs sui',
     "https://www.oretchange.com/pieces-or/179-achat-20-francs-union-latine.html": 'or - 20 francs union latine',
     "https://www.oretchange.com/pieces-or/182-achat-50-pesos-mexique.html": 'or - 50 pesos mex',
@@ -45,6 +45,7 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
     }
+    delivery_ranges = [(0.0,999999999.9,0.0)]
     for url, item_data in CMN.items():
         response = requests.get(url, headers=headers)
         response.raise_for_status()
@@ -68,50 +69,63 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
             else:
                 buy_price = buy_price_silver
 
-            minimum = int(soup.find('input', class_='qty')['value'])
-            unique_price = soup.find('div',class_='metal_product').find('b')
+            price_ranges = []
 
-            if unique_price:
+            table = soup.find('table',class_='table table-bordered')
+
+            if not table:
+                unique_price = soup.find('div',class_='metal_product').find('b')
                 price = Price.fromstring(unique_price.text)
-                print(price,name,url)
-                coin = Item(name=name,
-                            prices=price.amount_float,
-                            source=url,
-                            buy_premiums=(((price.amount_float + (0.0 * minimum) / minimum) / float(quantity)) - (
-                                                 buy_price * poids_pieces[name])) * 100.0 / (
-                                                    buy_price * poids_pieces[name]),
+                price_ranges.append((1,999999999,price))
 
-                            delivery_fee=0.0,
-                            session_id=session_id,
-                            bullion_type=bullion_type,
-                            quantity=quantity,
-                            minimum=minimum)
-                session.add(coin)
-                session.commit()
-
-            else:
-                rows = soup.find('table',class_='table table-bordered').find('tbody').find_all('tr')
+            else :
+                rows = table.find('tbody').find_all('tr')
                 values = [row.find_all('td') for row in rows]
 
                 for v in values:
-                    minimum = int(re.search(r"\d+", v[0].text).group())
+                    match = re.search(r"(\d+)\s*\D+\s*(\d+)", v[0].text)
+
+                    if match:
+                        min = int(match.group(1))
+                        max = int(match.group(2))
+                    else:
+                        min = int(re.search(r"\d+", v[0].text).group())
+                        max = 9999999999.9
+
+                    min_p = int(soup.find('input', class_='qty')['value'])
+                    if min_p>minimum:
+                        minimum = min_p
+
                     price = Price.fromstring(v[1].text)
-                    print(price, name, url)
-                    coin = Item(name=name,
-                                prices=price.amount_float,
-                                source=url,
-                                buy_premiums=(((price.amount_float + (0.0 * minimum) / minimum) / float(quantity)) - (
-                                        buy_price * poids_pieces[name])) * 100.0 / (
-                                                    buy_price * poids_pieces[name]),
+                    price_ranges.append((min,max,price))
 
-                                delivery_fee=0.0,
-                                session_id=session_id,
-                                bullion_type=bullion_type,
-                                quantity=quantity,
-                                minimum=minimum)
+            def price_between(value, ranges):
+                """
+                Returns the price per unit for a given quantity.
+                """
+                for min_qty, max_qty, price in ranges:
+                    if min_qty <= value <= max_qty:
+                        if isinstance(price, Price):
+                            return price.amount_float
+                        else:
+                            return price
+            print(price,name,url)
+            coin = Item(name=name,
+                        prices=';'.join(['{:.2f}'.format(p[2].amount_float) for p in price_ranges]),
+                        ranges=';'.join(['{min_}-{max_}'.format(min_=r[0],max_=r[1]) for r in price_ranges]),
+                        buy_premiums=';'.join(
+['{:.2f}'.format(((price_between(minimum,price_ranges)/quantity + price_between(price_between(minimum,price_ranges)*minimum,delivery_ranges)/(quantity*minimum)) - (buy_price*poids_pieces[name]))*100.0/(buy_price*poids_pieces[name])) for i in range(1,minimum)] +
+['{:.2f}'.format(((price_between(i,price_ranges)/quantity + price_between(price_between(i,price_ranges)*i,delivery_ranges)/(quantity*i)) - (buy_price*poids_pieces[name]))*100.0/(buy_price*poids_pieces[name])) for i in range(minimum,151)]
+                        ),
+                        delivery_fees=';'.join(['{min_}-{max_}-{price}'.format(min_=r[0],max_=r[1],price=r[2]) for r in delivery_ranges]),
+                        source=url,
+                        session_id=session_id,
+                        bullion_type=bullion_type,
+                        quantity=quantity,
+                        minimum=minimum)
 
-                    session.add(coin)
-                    session.commit()
+            session.add(coin)
+            session.commit()
 
         except Exception as e:
             print(traceback.format_exc())

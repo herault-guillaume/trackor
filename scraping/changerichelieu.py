@@ -48,22 +48,6 @@ CMN = {
     "50 Francs Hercule": "ar - 50 francs fr hercule (1974-1980)",
     "Boite 250 Pièces Kangourou": ("ar - 1 oz nugget / kangourou",250),
 }
-def get_delivery_price(price):
-    #https://www.changerichelieu.fr/livraison
-    if price <= 600.0:
-        return 10.0
-    elif 600.0 < price <= 2500.0 :
-        return 20.0
-    elif 2500.0 < price <= 5000.0 :
-        return 34.0
-    elif 5000.0 < price <= 7500.0 :
-        return 50.0
-    elif 7500.0 < price <= 10000.0 :
-        return 56.0
-    elif 10000.0 < price <= 15000.0 :
-        return 65.0
-    else :
-        return 0.0
 
 def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
     """
@@ -73,7 +57,18 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
     }
-    for url in urls :
+
+    delivery_ranges = [
+    (0, 600, 10.0),      # Price 0-600, delivery cost 10.0
+    (600.01, 2500, 20.0),  # Price 600.01-2500, delivery cost 20.0
+    (2500.01, 5000, 34.0), # Price 2500.01-5000, delivery cost 34.0
+    (5000.01, 7500, 50.0), # Price 5000.01-7500, delivery cost 50.0
+    (7500.01, 10000, 56.0),# Price 7500.01-10000, delivery cost 56.0
+    (10000.01, 15000, 65.0),# Price 10000.01-15000, delivery cost 65.0
+    (15000.01, float('inf'), 0.0)  # Price 15000.01+, free delivery
+]
+
+    for url in urls:
         response = requests.get(url, headers=headers)
         response.raise_for_status()
 
@@ -89,14 +84,29 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
                 source = product_name_element['href']
                 item_data = CMN[product_name]
 
-                # Extract price
-                price_element = div.find('p', class_='price product-price')
-                price = Price.fromstring(price_element.text.strip())
-
                 minimum = 1
                 min_p = div.find('p', class_='alqty hidden')
                 if min_p:
                     minimum = int(re.search(r"\d+", min_p.text).group())
+
+                qty = div.find_all('li',class_='left')
+                prices = div.find_all('li',class_='right')
+                price_ranges = []
+                if len(qty) > 1 and len(prices) > 1:
+                    for q,p in zip(qty[1:],prices[1:]):
+                        match = re.search(r"(\d+)\s*\D+\s*(\d+)", q.text)
+                        if match :
+                            min = int(match.group(1))
+                            max = int(match.group(2))
+                        else:
+                            min = int(re.search(r"\d+", q.text).group())
+                            max = 9999999999.0
+                        price_ranges.append((min,max,Price.fromstring(p.text)))
+
+                else :                    # Extract price
+                    price_element = div.find('p', class_='price product-price')
+                    price = Price.fromstring(price_element.text.strip())
+                    price_ranges.append((minimum,999999999,price))
 
                 quantity = 1
                 if isinstance(item_data, tuple):
@@ -114,54 +124,34 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
 
                 print(price,CMN[product_name], source)
 
-                qty = div.find_all('li',class_='left')
-                prices = div.find_all('li',class_='right')
+                def price_between(value, ranges):
+                    """
+                    Returns the price per unit for a given quantity.
+                    """
 
-                if len(qty)>1 and len(prices)>1:
-                    for q,p in zip(qty[1:],prices[1:]):
+                    for min_qty, max_qty, price in ranges:
+                        if min_qty <= value <= max_qty:
+                            if isinstance(price, Price):
+                                return price.amount_float
+                            else:
+                                return price
 
-                        min = int(re.search(r"\d+", q.text).group())
-                        if min > minimum:
-                            minimum = min
+                coin = Item(name=name,
+                            prices=';'.join(['{:.2f}'.format(p[2].amount_float) for p in price_ranges]),
+                            ranges=';'.join(['{min_}-{max_}'.format(min_=r[0],max_=r[1]) for r in price_ranges]),
+                            buy_premiums=';'.join(
+    ['{:.2f}'.format(((price_between(minimum,price_ranges)/quantity + price_between(price_between(minimum,price_ranges)*minimum,delivery_ranges)/(quantity*minimum)) - (buy_price*poids_pieces[name]))*100.0/(buy_price*poids_pieces[name])) for i in range(1,minimum)] +
+    ['{:.2f}'.format(((price_between(i,price_ranges)/quantity + price_between(price_between(i,price_ranges)*i,delivery_ranges)/(quantity*i)) - (buy_price*poids_pieces[name]))*100.0/(buy_price*poids_pieces[name])) for i in range(minimum,151)]
+                            ),
+                            delivery_fees=';'.join(['{min_}-{max_}-{price}'.format(min_=r[0],max_=r[1],price=r[2]) for r in delivery_ranges]),
+                            source=url,
+                            session_id=session_id,
+                            bullion_type=bullion_type,
+                            quantity=quantity,
+                            minimum=minimum)
 
-                        coin = Item(name=name,
-                                    prices=price.amount_float,
-                                    source=source,
-                                    buy_premiums=(((price.amount_float + get_delivery_price(
-                                        price.amount_float*minimum) / minimum) / float(quantity)) - (
-                                                         buy_price * poids_pieces[name])) * 100.0 / (
-                                                            buy_price * poids_pieces[name]),
-
-                                    delivery_fee=get_delivery_price(price.amount_float*minimum),
-                                    session_id=session_id,
-                                    bullion_type=bullion_type,
-                                    quantity=quantity,
-                                    minimum=minimum)
-
-                        session.add(coin)
-                        session.commit()
-
-                else :
-                    # Extract price
-                    price_element = div.find('p', class_='price product-price')
-                    price = Price.fromstring(price_element.text.strip())
-
-                    coin = Item(name=name,
-                                prices=price.amount_float,
-                                source=source,
-                                buy_premiums=(((price.amount_float + get_delivery_price(
-                                    price.amount_float) / minimum) / float(quantity)) - (
-                                                     buy_price * poids_pieces[name])) * 100.0 / (
-                                                    buy_price * poids_pieces[name]),
-
-                                delivery_fee=get_delivery_price(price.amount_float*minimum),
-                                session_id=session_id,
-                                bullion_type=bullion_type,
-                                quantity=quantity,
-                                minimum=minimum)
-
-                    session.add(coin)
-                    session.commit()
+                session.add(coin)
+                session.commit()
 
 
 

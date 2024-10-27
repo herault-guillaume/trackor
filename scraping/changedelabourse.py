@@ -6,64 +6,49 @@ import traceback
 import re
 
 CMN = {
-    "Napoléon Or 20 Francs": "or - 20 francs fr",  # Assuming a standard 20 Francs gold coin
-    "50 Pesos": "or - 50 pesos mex",
-    "Souverain": "or - 1 souverain",  # Assuming a modern Sovereign
-    "20 Dollars US": "or - 20 dollars",
-    "10 Francs Napoléon": "or - 10 francs fr",
-    "20 Francs Suisse": "or - 20 francs sui vreneli croix",
-    "10 Dollars US": "or - 10 dollars liberté",
-    "5 Dollars US": "or - 5 dollars liberté",
-    "Krugerrand": "or - 1 oz krugerrand",
-    "10 Florins": "or - 10 florins",  # Assuming Wilhelmina reign
-    "20 Reichsmarks": "or - 20 mark",
-    "Union Latine": "or - 20 francs union latine",
-    "20 Francs Tunisie": "or - 20 francs tunisie",
-    "Demi Souverain": "or - 1/2 souverain",  # Assuming a George V half Sovereign
-    "American Eagle 1 OZ": "or - 1 oz american eagle",
-    "American Buffalo 1 OZ": "or - 1 oz buffalo",
-    "Maple Leaf Or 1 OZ": "or - 1 oz maple leaf",
-    "Philharmonique 1 OZ": "or - 1 oz philharmonique",
-    "Britannia 1 OZ Or": "or - 1 oz britannia",
-    "Nugget 1 OZ": "or - 1 oz nugget / kangourou",
-    "PANDA OR 30 GRAMMES": "or - 500 yuan panda",
-    "EpargnOr 1/10 Oz": "or - 1/10 oz EpargnOr",
-    "1 Ducat Francois-Joseph 1915 Or": "or - 1 ducat",
+    "https://www.changedelabourse.com/or/pieces-d-or-d-investissement/napoleon-or-20-francs": "or - 20 francs fr",  # Assuming a standard 20 Francs gold coin
+    "https://www.changedelabourse.com/or/pieces-d-or-d-investissement/50-pesos": "or - 50 pesos mex",
+    "https://www.changedelabourse.com/or/pieces-d-or-d-investissement/souverain": "or - 1 souverain",  # Assuming a modern Sovereign
+    "https://www.changedelabourse.com/or/pieces-d-or-d-investissement/20-dollars-us": "or - 20 dollars",
+    "https://www.changedelabourse.com/or/pieces-d-or-d-investissement/10-francs-napoleon": "or - 10 francs fr",
+    "https://www.changedelabourse.com/or/pieces-d-or-d-investissement/20-francs-suisse": "or - 20 francs sui vreneli croix",
+    "https://www.changedelabourse.com/or/pieces-d-or-d-investissement/10-dollars-us": "or - 10 dollars liberté",
+    "https://www.changedelabourse.com/or/pieces-d-or-d-investissement/5-dollars-us": "or - 5 dollars liberté",
+    "https://www.changedelabourse.com/or/pieces-d-or-d-investissement/krugerrand": "or - 1 oz krugerrand",
+    "https://www.changedelabourse.com/or/pieces-d-or-d-investissement/10-florins": "or - 10 florins",  # Assuming Wilhelmina reign
+    "https://www.changedelabourse.com/or/pieces-d-or-d-investissement/20-reichsmarks": "or - 20 mark",
+    "https://www.changedelabourse.com/or/pieces-d-or-d-investissement/union-latine": "or - 20 francs union latine",
+    "https://www.changedelabourse.com/or/pieces-d-or-d-investissement/20-francs-tunisie": "or - 20 francs tunisie",
+    "https://www.changedelabourse.com/or/pieces-d-or-d-investissement/demi-souverain": "or - 1/2 souverain",  # Assuming a George V half Sovereign
+    "https://www.changedelabourse.com/or/pieces-d-or-modernes/american-eagle-1-oz": "or - 1 oz american eagle",
+    "https://www.changedelabourse.com/or/pieces-d-or-modernes/american-buffalo-1-oz": "or - 1 oz buffalo",
+    "https://www.changedelabourse.com/or/pieces-d-or-modernes/maple-leaf-or-1-oz": "or - 1 oz maple leaf",
+    "https://www.changedelabourse.com/or/pieces-d-or-modernes/philharmonique-1-oz": "or - 1 oz philharmonique",
+    "https://www.changedelabourse.com/or/pieces-d-or-modernes/britannia-1-oz-or": "or - 1 oz britannia",
+    "https://www.changedelabourse.com/or/pieces-d-or-modernes/nugget-1-oz": "or - 1 oz nugget / kangourou",
+    "https://www.changedelabourse.com/or/pieces-d-or-modernes/panda-or-30-grammes": "or - 500 yuan panda",
+    "https://www.changedelabourse.com/or/pieces-d-or-modernes/epargnor-1-10-oz": "or - 1/10 oz EpargnOr",
+    "https://www.changedelabourse.com/or/pieces-d-or-d-investissement/1-ducat-francois-joseph-1915-or": "or - 1 ducat",
 
-    "5 Francs semeuse": "ar - 5 francs fr semeuse (1959-1969)",
-    "10 Francs Hercule": "ar - 10 francs fr hercule (1965-1973)",
-    "2 Francs Semeuse": "ar - 2 francs fr semeuse",
-    "1 Franc Semeuse": "ar - 1 franc fr semeuse",
-    "50 Cts Semeuse": "ar - 50 centimes francs fr semeuse",
-    "Ecu 5 Francs": "ar - 5 francs fr ecu (1854-1860)",
-    "100 Francs Argent": "ar - 100 francs fr",
-    "SILVER EAGLE 1 OZ": "ar - 1 oz silver eagle",
-    "Kangourou 1 OZ": "ar - 1 oz nugget / kangourou",
-    "Maple Leaf 1 Argent OZ": "ar - 1 oz maple leaf",
-    "Philharmonique 1 OZ ARGENT": "ar - 1 oz philharmonique",
-    "Britannia 1 Oz Argent": "ar - 1 oz britannia",
-    "BOÎTE 500 PIÈCES MAPLE LEAF": ("ar - 1 oz maple leaf",500),
-    "Sachet Scellé 1000 pièces 5 francs semeuse": ("ar - 5 francs fr semeuse (1959-1969)",1000),
-    "Sachet scellé 100 pièces 5 francs semeuse": ("ar - 5 francs fr semeuse (1959-1969)",100),
-    "50 Francs Hercule": "ar - 50 francs fr hercule (1974-1980)",
-    "Boite 250 Pièces Kangourou": ("ar - 1 oz nugget / kangourou",250),
+    "https://www.changedelabourse.com/argent/pieces-argent-francaises/5-francs-semeuse": "ar - 5 francs fr semeuse (1959-1969)",
+    "https://www.changedelabourse.com/argent/pieces-argent-francaises/10-francs-hercule": "ar - 10 francs fr hercule (1965-1973)",
+    "https://www.changedelabourse.com/argent/pieces-argent-francaises/2-francs-semeuse": "ar - 2 francs fr semeuse",
+    "https://www.changedelabourse.com/argent/pieces-argent-francaises/1-franc-semeuse": "ar - 1 franc fr semeuse",
+    "https://www.changedelabourse.com/argent/pieces-argent-francaises/50-cts-semeuse": "ar - 50 centimes francs fr semeuse",
+    "https://www.changedelabourse.com/argent/pieces-argent-francaises/ecu-5-francs": "ar - 5 francs fr ecu (1854-1860)",
+    "https://www.changedelabourse.com/argent/pieces-argent-francaises/100-francs-argent": "ar - 100 francs fr",
+    "https://www.changedelabourse.com/argent/pieces-argent-modernes/silver-eagle-1-oz": "ar - 1 oz silver eagle",
+    "https://www.changedelabourse.com/argent/pieces-argent-modernes/kangourou-1-oz": "ar - 1 oz nugget / kangourou",
+    "https://www.changedelabourse.com/argent/pieces-argent-modernes/maple-leaf-1-argent-oz": "ar - 1 oz maple leaf",
+    "https://www.changedelabourse.com/argent/pieces-argent-modernes/philharmonique-1-oz-argent": "ar - 1 oz philharmonique",
+    "https://www.changedelabourse.com/argent/pieces-argent-modernes/britannia-1-oz-argent": "ar - 1 oz britannia",
+    "https://www.changedelabourse.com/argent/gros-volumes-argent/boite-500-pieces-maple-leaf": ("ar - 1 oz maple leaf",500),
+    "https://www.changedelabourse.com/argent/gros-volumes-argent/sachet-scelle-1000-pieces-5-francs-semeuse": ("ar - 5 francs fr semeuse (1959-1969)",1000),
+    "https://www.changedelabourse.com/argent/gros-volumes-argent/sachet-scelle-100-pieces-5-francs-semeuse": ("ar - 5 francs fr semeuse (1959-1969)",100),
+    "https://www.changedelabourse.com/argent/pieces-argent-francaises/50-francs-hercule": "ar - 50 francs fr hercule (1974-1980)",
+    "https://www.changedelabourse.com/argent/gros-volumes-argent/boite-250-pieces-kangourou": ("ar - 1 oz nugget / kangourou",250),
 
 }
-def get_delivery_price(price):
-    if 0 <= price <= 600:
-        return 10.0
-    elif 600.01 <= price <= 2500:
-        return 20.0
-    elif 2500.01 <= price <= 5000:
-        return 34.0
-    elif 5000.01 <= price <= 7500:
-        return 50.0
-    elif 7500.01 <= price <= 10000:
-        return 56.0
-    elif 10000.01 <= price <= 15000:
-        return 65.0
-    else:  # price > 15000.01
-        return 0.0  # Free delivery
 
 def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
     """
@@ -74,73 +59,95 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
 
     }
+    delivery_ranges = [
+        (0, 600, 10.0),      # Price 0-600, delivery cost 10.0
+        (600.01, 2500, 20.0),  # Price 600.01-2500, delivery cost 20.0
+        (2500.01, 5000, 34.0), # Price 2500.01-5000, delivery cost 34.0
+        (5000.01, 7500, 50.0), # Price 5000.01-7500, delivery cost 50.0
+        (7500.01, 10000, 56.0),# Price 7500.01-10000, delivery cost 56.0
+        (10000.01, 15000, 65.0),# Price 10000.01-15000, delivery cost 65.0
+        (15000.01, 999999999999.0, 0.0)  # Price 15000.01+, free delivery
+    ]
 
-    urls = ['https://www.changedelabourse.com/or','https://www.changedelabourse.com/argent']
+    for url, name in CMN.items() :
+        try :
+            response = requests.get(url, headers=headers)
+            response.raise_for_status()
 
-    for url in urls :
-        response = requests.get(url, headers=headers)
-        response.raise_for_status()
+            soup = BeautifulSoup(response.content, 'html.parser')
 
-        soup = BeautifulSoup(response.content, 'html.parser')
+            # Find the 'ul' with class 'product_list list row'
+            item_data = name
 
-        # Find the 'ul' with class 'product_list list row'
-        product_list = soup.find('ul', class_='product_list list row')
+            # Extract the price
+            price_span = soup.find('span', id='our_price_display')
+            price = Price.fromstring(price_span.text.strip())
 
-        # Iterate over each 'li' within the 'ul'
-        for product_item in product_list.find_all('li'):
-            try:
+            minimum = int(soup.find('input',id="quantity_wanted")['value'])
 
-                # Extract the product name
-                product_name_link = product_item.find('a', class_='product-name')
-                product_name = product_name_link.text.strip()
-                url = product_name_link['href']
-                item_data = CMN[product_name]
+            mins = soup.find_all('p',class_='cdb-quantite')
+            mins_prices = soup.find_all('p',class_='cdb-pricea')
 
-                # Extract the price
-                price_span = product_item.find('span', class_='price product-price')
-                price = Price.fromstring(price_span.text.strip())
+            price_ranges = []
+            if mins and mins_prices:
+                for i in range(0,len(mins)+1):
+                    if i == 0:
+                        price_ranges.append((minimum,int(re.search(r"\d+", mins[i].text).group()),price))
+                    elif i == len(mins):
+                        price_ranges.append((int(re.search(r"\d+", mins[i-1].text).group()),999999999,
+                                             Price.fromstring(mins_prices[i-1].text)))
+                    else :
+                        price_ranges.append((int(re.search(r"\d+", mins[i-1].text).group()),
+                                             int(re.search(r"\d+", mins[i].text).group()),
+                                             Price.fromstring(mins_prices[i-1].text)))
+            else :
+                price_ranges.append([minimum,999999999,price])
 
-                minimum=1
-                min_p = product_item.find('p', class_='alqty')
-                if min_p:
-                    minimum = int(re.search(r"\d+", min_p.text).group())
+            quantity = 1
+            if isinstance(item_data,tuple):
+                name = item_data[0]
+                quantity = item_data[1]
+                bullion_type = item_data[0][:2]
+            else :
+                name=item_data
+                bullion_type = item_data[:2]
 
-                quantity = 1
-                if isinstance(item_data,tuple):
-                    name = item_data[0]
-                    quantity = item_data[1]
-                    bullion_type = item_data[0][:2]
-                else :
-                    name=item_data
-                    bullion_type = item_data[:2]
+            if bullion_type == 'or':
+                buy_price = buy_price_gold
+            else :
+                buy_price = buy_price_silver
 
-                if bullion_type == 'or':
-                    buy_price = buy_price_gold
-                else :
-                    buy_price = buy_price_silver
+            print(price,name, url)
 
-                print(price,CMN[product_name], url)
+            def price_between(value, ranges):
+                """
+                Returns the price per unit for a given quantity.
+                """
 
-                if price:
+                for min_qty, max_qty, price in ranges:
+                    if min_qty <= value <= max_qty:
+                        if isinstance(price, Price):
+                            return price.amount_float
+                        else:
+                            return price
 
-                    # More robust price cleaning: handle variations in formatting
-                    #price = float(price_text.replace('€', '').replace(' ', '').replace(',', '.'))
-                    coin = Item(name=name,
-                                prices=price.amount_float,
-                                source=url,
-                                buy_premiums=(((price.amount_float + get_delivery_price(
-                                    price.amount_float*minimum) / minimum) / float(quantity)) - (
-                                                     buy_price * poids_pieces[name])) * 100.0 / (
-                                                        buy_price * poids_pieces[name]),
+            coin = Item(name=name,
+                        prices=';'.join(['{:.2f}'.format(p[2].amount_float) for p in price_ranges]),
+                        ranges=';'.join(['{min_}-{max_}'.format(min_=r[0],max_=r[1]) for r in price_ranges]),
+                        buy_premiums=';'.join(
+['{:.2f}'.format(((price_between(minimum,price_ranges)/quantity + price_between(price_between(minimum,price_ranges)*minimum,delivery_ranges)/(quantity*minimum)) - (buy_price*poids_pieces[name]))*100.0/(buy_price*poids_pieces[name])) for i in range(1,minimum)] +
+['{:.2f}'.format(((price_between(i,price_ranges)/quantity + price_between(price_between(i,price_ranges)*i,delivery_ranges)/(quantity*i)) - (buy_price*poids_pieces[name]))*100.0/(buy_price*poids_pieces[name])) for i in range(minimum,151)]
+                        ),
+                        delivery_fees=';'.join(['{min_}-{max_}-{price}'.format(min_=r[0],max_=r[1],price=r[2]) for r in delivery_ranges]),
+                        source=url,
+                        session_id=session_id,
+                        bullion_type=bullion_type,
+                        quantity=quantity,
+                        minimum=minimum)
 
-                                delivery_fee=get_delivery_price(price.amount_float*minimum),
-                                session_id=session_id,
-                                bullion_type=bullion_type,
-                                quantity=quantity,
-                                minimum=minimum)
-                    session.add(coin)
-                    session.commit()
+            session.add(coin)
+            session.commit()
 
-            except Exception as e:
-                print(traceback.format_exc())
-                pass
+        except Exception as e:
+            print(traceback.format_exc())
+            pass

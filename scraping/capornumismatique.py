@@ -23,6 +23,7 @@ CMN = {'20 Francs Marianne Coq': 'or - 20 francs fr coq marianne',
  '20 DeutschMarks': 'or - 20 mark',
  '20 Francs Tunisie': 'or - 20 francs tunisie',
  '5 Roubles': 'or - 5 roubles'}
+
 def get_delivery_price(price):
     if 0 <= price <= 600:
         return 10.0
@@ -43,6 +44,8 @@ def get_delivery_price(price):
     else:  # price > 15000.01
         return 0.0  # Free delivery
 
+
+
 def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
     """
     Retrieves the 'or - 20 francs coq marianne' coin purchase price from Change de la Bourse using requests and BeautifulSoup.
@@ -52,6 +55,18 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
 
     }
+
+    delivery_ranges = [
+    (0, 600, 10.0),
+    (600.01, 1500, 18.0),
+    (1500.01, 3000, 28.0),
+    (3000.01, 5000, 38.0),
+    (5000.01, 7500, 60.0),
+    (7500.01, 10000, 70.0),
+    (10000.01, 15000, 85.0),
+    (15000.01, 20000, 90.0),
+    (20000.01, float('inf'), 0.0)  # Free delivery above 20000
+]
 
     response = requests.get('https://capornumismatique.com/produits/or/or-bourse', headers=headers)
     response.raise_for_status()
@@ -77,11 +92,10 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
             # Extract the product name
             product_name_link = product_item.find('a', class_='productLink d-block d-md-none')
             product_name = product_name_link.text.strip()
-            url = product_name_link['href']
+            url = 'https://capornumismatique.com' + product_name_link['href']
             #print(product_name)
 
             item_data = CMN[product_name]
-            print(price,CMN[product_name],'https://capornumismatique.com'+url)
 
             if price:
                 minimum = 1
@@ -99,21 +113,37 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
                     buy_price = buy_price_gold
                 else:
                     buy_price = buy_price_silver
-                # More robust price cleaning: handle variations in formatting
-                #price = float(price_text.replace('€', '').replace(' ', '').replace(',', '.'))
-                coin = Item(name=CMN[product_name],
-                            prices=price.amount_float,
-                            source='https://capornumismatique.com'+url,
-                            buy_premiums=(((price.amount_float + get_delivery_price(price.amount_float*minimum)/minimum)/float(quantity)) - (
-                                             buy_price * poids_pieces[ CMN[product_name]])) * 100.0 / (buy_price *
-                                                   poids_pieces[CMN[product_name]]),
-                            delivery_fee=get_delivery_price(price.amount_float*minimum),
-                            session_id=session_id,
-                            bullion_type=bullion_type,
-                            quantity=quantity,
-                            minimum=minimum)
-                session.add(coin)
-                session.commit()
+
+            def price_between(value, ranges):
+                """
+                Returns the price per unit for a given quantity.
+                """
+
+                for min_qty, max_qty, price in ranges:
+                    if min_qty <= value <= max_qty:
+                        if isinstance(price, Price):
+                            return price.amount_float
+                        else:
+                            return price
+
+            price_ranges = [(1,9999999999,price)]
+
+            print(price,name,url)
+            coin = Item(name=name,
+                        prices=';'.join(['{:.2f}'.format(p[2].amount_float) for p in price_ranges]),
+                        ranges=';'.join(['{min_}-{max_}'.format(min_=r[0],max_=r[1]) for r in price_ranges]),
+                        buy_premiums=';'.join(
+['{:.2f}'.format(((price_between(minimum,price_ranges)/quantity + price_between(price_between(minimum,price_ranges)*minimum,delivery_ranges)/(quantity*minimum)) - (buy_price*poids_pieces[name]))*100.0/(buy_price*poids_pieces[name])) for i in range(1,minimum)] +
+['{:.2f}'.format(((price_between(i,price_ranges)/quantity + price_between(price_between(i,price_ranges)*i,delivery_ranges)/(quantity*i)) - (buy_price*poids_pieces[name]))*100.0/(buy_price*poids_pieces[name])) for i in range(minimum,151)]
+                        ),
+                        delivery_fees=';'.join(['{min_}-{max_}-{price}'.format(min_=r[0],max_=r[1],price=r[2]) for r in delivery_ranges]),
+                        source=url,
+                        session_id=session_id,
+                        bullion_type=bullion_type,
+                        quantity=quantity,
+                        minimum=minimum)
+            session.add(coin)
+            session.commit()
 
         except (requests.exceptions.RequestException, ValueError) as e:
             print(f"Error retrieving or parsing price: {e}",url)

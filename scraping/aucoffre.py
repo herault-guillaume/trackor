@@ -123,16 +123,44 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
                         print(price,name,url)
                         # More robust price cleaning: handle variations in formatting
                         #price = float(price_text.replace('€', '').replace(' ', '').replace(',', '.'))
+                        price_ranges = [(minimum,999999999.9,price)]
+                        delivery_ranges = [
+                            (0,2500.0,50.0)
+                            (0,5000.0,100.0)
+                            (0,7500.0,150.0)
+                            (0,10000.0,200.0)
+                            (0,12500.0,250.0)
+                            (0,15000.0,300.0)
+                            (0,17500.0,350.0)
+                            (0,20000.0,400.0)
+                            (0,22500.0,450.0)
+                            ,]
+
+                        def price_between(value, ranges):
+                            """
+                            Returns the price per unit for a given quantity.
+                            """
+                            for min_qty, max_qty, price in ranges:
+                                if min_qty <= value <= max_qty:
+                                    if isinstance(price, Price):
+                                        return price.amount_float
+                                    else:
+                                        return price
+
                         coin = Item(name=name,
-                                    prices=price.amount_float,
+                                    prices=';'.join(['{:.2f}'.format(p[2].amount_float) for p in price_ranges]),
+                                    ranges=';'.join(['{min_}-{max_}'.format(min_=r[0],max_=r[1]) for r in price_ranges]),
+                                    buy_premiums=';'.join(
+            ['{:.2f}'.format(((price_between(minimum,price_ranges)/quantity + price_between(price_between(minimum,price_ranges)*minimum,delivery_ranges)/(quantity*minimum)) - (buy_price*poids_pieces[name]))*100.0/(buy_price*poids_pieces[name])) for i in range(1,minimum)] +
+            ['{:.2f}'.format(((price_between(i,price_ranges)/quantity + price_between(price_between(i,price_ranges)*i,delivery_ranges)/(quantity*i)) - (buy_price*poids_pieces[name]))*100.0/(buy_price*poids_pieces[name])) for i in range(minimum,151)]
+                                    ),
+                                    delivery_fees=';'.join(['{min_}-{max_}-{price}'.format(min_=r[0],max_=r[1],price=r[2]) for r in delivery_ranges]),
                                     source=url[0],
-                                    buy_premiums=((price.amount_float + 15.0) - (buy_price * poids_pieces[
-                                             CMN])) * 100.0 / (buy_price * poids_pieces[CMN]),
-                                    delivery_fee=15.0,
                                     session_id=session_id,
                                     bullion_type=bullion_type,
                                     quantity=quantity,
                                     minimum=minimum)
+
                         session.add(coin)
                         session.commit()
                         flag_one_find = True
