@@ -111,21 +111,43 @@ def update_table(budget, quantity, bullion_type, n):
         })
     )
 
+    def get_price(ranges, quantity):
+      """
+      Calculates the price based on the quantity and given ranges.
+
+      Args:
+        ranges: A string of ranges in the format '1-9;10-48;49-98;99-9999999999.9'.
+        quantity: The quantity of the item.
+
+      Returns:
+        The price as a float.
+      """
+      ranges = ranges.split(';')
+      for r in ranges:
+        lower, upper, price = map(float, r.split('-'))
+        if lower <= quantity <= upper:
+          return price  # Return the price directly
+      return None  # Or handle the case where quantity is outside all ranges
+
+    items_df['price'] = items_df.apply(
+        lambda row: get_price(row['ranges'], quantity), axis=1
+    )
+
     # Cheapest offer analysis and recommendations
     cheapest_offers = []
 
     # Get buying gold and silver coin values
     metal_price = metal_prices_df['buy_price'].iloc[0]
-    print(metal_price)
-    for i, row in items_df.iterrows():
 
+    for i, row in items_df.iterrows():
+        print(row['price'])
         try :
             # Get the premium for the specified quantity
             lowest_premium = row['buy_premiums']  # Adjust index for 0-based list
             # Calculate total cost
             # Calculate total cost (using bullion_type)
 
-            total_cost = ((poids_pieces[row['name']] * metal_price)  + (1.0 + lowest_premium / 100)*metal_price) * quantity * row['quantity']
+            total_cost = (row['price']  + (lowest_premium / 100)*row['price']) * quantity * row['quantity']
 
             # Check if the offer meets the budget
             if total_cost <= budget:

@@ -12,8 +12,7 @@ class Item(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=True, index=True)
-    prices = Column(String, nullable=True)
-    ranges = Column(String, nullable=True)
+    price_ranges = Column(String, nullable=True)
     sell = Column(Float, nullable=True)
     quantity = Column(Integer, nullable=False)
     minimum = Column(Integer, nullable=True)
