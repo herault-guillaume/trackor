@@ -55,7 +55,7 @@ CMN = {
 }
 
 def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
-    driver = Driver(uc=True, headless=True)
+
     url = "https://www.bdor.fr/achat-or-en-ligne"
     print(url)
 
@@ -65,6 +65,7 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
     ]
 
     try :
+        driver = Driver(uc=True, headless=True)
         driver.get(url)
         following_element = None
         # Locate the element
@@ -163,7 +164,7 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
                             price_ranges=';'.join(['{min_}-{max_}-{price}'.format(min_=r[0],max_=r[1],price=r[2].amount_float) for r in price_ranges]),
                             buy_premiums=';'.join(
 ['{:.2f}'.format(((price_between(minimum,price_ranges)/quantity + price_between(price_between(minimum,price_ranges)*minimum,delivery_ranges)/(quantity*minimum)) - (buy_price*poids_pieces[name]))*100.0/(buy_price*poids_pieces[name])) for i in range(1,minimum)] +
-['{:.2f}'.format(((price_between(i,price_ranges)/quantity + price_between(price_between(i,price_ranges)*i,delivery_ranges)/(quantity*i)) - (buy_price*poids_pieces[name]))*100.0/(buy_price*poids_pieces[name])) for i in range(minimum,151)]
+['{:.2f}'.format(((price_between(i,price_ranges)/quantity + price_between(price_between(i,price_ranges),delivery_ranges)/(quantity*i)) - (buy_price*poids_pieces[name]))*100.0/(buy_price*poids_pieces[name])) for i in range(minimum,151)]
                             ),
                             delivery_fees=';'.join(['{min_}-{max_}-{price}'.format(min_=r[0],max_=r[1],price=r[2]) for r in delivery_ranges]),
                             source=source,
@@ -179,3 +180,4 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
         print(e)
         print(traceback.format_exc())
 
+        driver.quit()

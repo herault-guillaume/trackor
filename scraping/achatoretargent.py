@@ -1,3 +1,5 @@
+import time
+
 import requests
 from bs4 import BeautifulSoup
 from seleniumbase import Driver
@@ -114,19 +116,19 @@ def get_price_for(session, session_id, buy_price_gold,buy_price_silver):
         (15000.01,100000000000000.0,0.0),
     ]
 
+
     for url in urls:
-        print(url)
-        driver = Driver(uc=True, headless=True)
+        driver = Driver(uc=True, headless=False)
         driver.get(url)
 
         # Explicitly wait for the target element to be present
-        wait = WebDriverWait(driver, 15)  # Adjust timeout as needed
-        tableau = wait.until(EC.presence_of_element_located((By.ID, "contentCategVitrine")))
-        wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, "div.row.BStooltip.align-items-center")))
+        tableau = WebDriverWait(driver, 15).until(EC.presence_of_element_located((By.ID, "contentCategVitrine")))
+
+        WebDriverWait(driver, 15).until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, "div.row.BStooltip.align-items-center")))
 
         # Use find_elements to get a list of matching elements
         rows = tableau.find_elements(By.CSS_SELECTOR, "div[id*='prod']")
-
+        print('2')
         for row in rows:
             try:
 
@@ -141,7 +143,7 @@ def get_price_for(session, session_id, buy_price_gold,buy_price_silver):
 
                 source = "https://www.achat-or-et-argent.fr" + product_url_elem[1]["href"]
                 # Explicitly wait for the span within the product_url_elem to be visible
-                wait.until(EC.presence_of_all_elements_located((By.TAG_NAME, "span")))
+                WebDriverWait(driver, 7).until(EC.presence_of_all_elements_located((By.TAG_NAME, "span")))
 
                 span_elem = row_soup.find('span')
                 product_name = span_elem.text.strip()
@@ -220,8 +222,8 @@ def get_price_for(session, session_id, buy_price_gold,buy_price_silver):
                 coin = Item(name=name,
                             price_ranges=';'.join(['{min_}-{max_}-{price}'.format(min_=r[0],max_=r[1],price=r[2].amount_float) for r in price_ranges]),
                             buy_premiums=';'.join(
-['{:.2f}'.format(((price_between(minimum,price_ranges)/quantity + price_between(price_between(minimum,price_ranges)*minimum,delivery_ranges)/(quantity*minimum)) - (buy_price*poids_pieces[name]))*100.0/(buy_price*poids_pieces[name])) for i in range(1,minimum)] +
-['{:.2f}'.format(((price_between(i,price_ranges)/quantity + price_between(price_between(i,price_ranges)*i,delivery_ranges)/(quantity*i)) - (buy_price*poids_pieces[name]))*100.0/(buy_price*poids_pieces[name])) for i in range(minimum,151)]
+                            ['{:.2f}'.format(((price_between(minimum,price_ranges)/quantity + price_between(price_between(minimum,price_ranges)*minimum,delivery_ranges)/(quantity*minimum)) - (buy_price*poids_pieces[name]))*100.0/(buy_price*poids_pieces[name])) for i in range(1,minimum)] +
+                            ['{:.2f}'.format(((price_between(i,price_ranges)/quantity + price_between(price_between(i,price_ranges),delivery_ranges)/(quantity*i)) - (buy_price*poids_pieces[name]))*100.0/(buy_price*poids_pieces[name])) for i in range(minimum,151)]
                             ),
                             delivery_fees=';'.join(['{min_}-{max_}-{price}'.format(min_=r[0],max_=r[1],price=r[2]) for r in delivery_ranges]),
                             source=source,
@@ -236,5 +238,4 @@ def get_price_for(session, session_id, buy_price_gold,buy_price_silver):
                 print(f"An error occurred while processing : {e}")
                 traceback.print_exc()
 
-
-    driver.quit()
+        driver.quit()

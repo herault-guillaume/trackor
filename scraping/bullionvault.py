@@ -10,10 +10,9 @@ from models.model import MetalPrice
 def get(session,session_id):
     """Uses Selenium to click the currency button, then scrapes the 1 kg gold price in Euros."""
 
-    driver = Driver(uc=True, headless=True)
-
     try:
         url = "https://or.bullionvault.fr/"
+        driver = Driver(uc=True, headless=True)
         driver.get(url)
         time.sleep(3)
         try:
@@ -87,11 +86,9 @@ def get(session,session_id):
         session.add(silver_price)
         session.commit()
         print(g_buy_price_eur,g_sell_price_eur,s_buy_price_eur,s_sell_price_eur)
+        driver.quit()
         return g_buy_price_eur,g_sell_price_eur,s_buy_price_eur,s_sell_price_eur
 
     except Exception as e:
         print(f"Error scraping BullionVault: {e}",url)
         return None
-
-    finally:
-        driver.quit()

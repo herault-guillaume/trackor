@@ -70,7 +70,6 @@ urls = {
 }
 def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
     print("https://www.bullionbypost.fr/")
-    driver = Driver(uc=True, headless=True)
 
     delivery_ranges = [
         (0.0,99999999999.0,0.0)
@@ -79,6 +78,7 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
     #driver = webdriver.Chrome(options=options)
     for CMN, url in urls.items():
         try:
+            driver = Driver(uc=True, headless=False)
             driver.get(url)  # Load the page
             time.sleep(random.randint(5,10))
             # Locate the price element by its text content
@@ -146,7 +146,7 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
                         price_ranges=';'.join(['{min_}-{max_}-{price}'.format(min_=r[0],max_=r[1],price=r[2].amount_float) for r in price_ranges]),
                         buy_premiums=';'.join(
 ['{:.2f}'.format(((price_between(minimum,price_ranges)/quantity + price_between(price_between(minimum,price_ranges)*minimum,delivery_ranges)/(quantity*minimum)) - (buy_price*poids_pieces[name]))*100.0/(buy_price*poids_pieces[name])) for i in range(1,minimum)] +
-['{:.2f}'.format(((price_between(i,price_ranges)/quantity + price_between(price_between(i,price_ranges)*i,delivery_ranges)/(quantity*i)) - (buy_price*poids_pieces[name]))*100.0/(buy_price*poids_pieces[name])) for i in range(minimum,151)]
+['{:.2f}'.format(((price_between(i,price_ranges)/quantity + price_between(price_between(i,price_ranges),delivery_ranges)/(quantity*i)) - (buy_price*poids_pieces[name]))*100.0/(buy_price*poids_pieces[name])) for i in range(minimum,151)]
                         ),
                         delivery_fees=';'.join(['{min_}-{max_}-{price}'.format(min_=r[0],max_=r[1],price=r[2]) for r in delivery_ranges]),
                         source=url,
@@ -157,9 +157,9 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
 
             session.add(coin)
             session.commit()
+            driver.quit()
 
         except Exception:
             print(traceback.format_exc())
             pass
 
-    driver.quit()

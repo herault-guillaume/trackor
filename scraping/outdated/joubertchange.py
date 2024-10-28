@@ -75,10 +75,11 @@ def get_delivery_price(price):
 
 def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
 
-    driver = Driver(uc=True, headless=True)
+
     urls =["https://www.joubert-change.fr/or-investissement/cours/prix.html",""]
     for url in urls :
-        #driver = webdriver.Chrome(options=options)
+        driver = Driver(uc=True, headless=True)
+
         driver.get(url)
 
         pricing_table = WebDriverWait(driver, 10).until(
