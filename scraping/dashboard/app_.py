@@ -74,12 +74,12 @@ app.layout = dbc.Container([
                     dcc.RangeSlider(
                         id='budget-slider',
                         min=0,
-                        max=15000,
+                        max=12500,
                         step=250,
-                        value=[500, 3000],  # Default range
+                        value=[0, 2500],  # Default range
                         marks={
                             0: '0 €',
-                            15000: '15k €',
+                            12500: '12k5 €',
                         },
                         allowCross=False,
                         persistence=True,
@@ -195,11 +195,10 @@ app.layout = dbc.Container([
                         style={'text-align': 'center'}
                     ),
                     html.Th([html.I(className="fa-solid fa-tag", style={'font-size': '16px'}),"  Total FDPI (€)"], style={'text-align': 'center'})
-                    ])
-                ), # Apply spinner only to the tbody
-                    html.Tbody(id='cheapest-offer-table-body')
-                ,
-                ], bordered=True, hover=True, responsive=True, striped=True, dark=True),
+                ])
+            , id='table-header'), # Apply spinner only to the tbody
+                    html.Tbody(id='cheapest-offer-table-body'),
+        ], bordered=True, hover=True, responsive=True, striped=True, dark=True),
     ],  color="gold", type="border", spinner_style={"position": "absolute", "top": "3em"}),
 
     dcc.Interval(

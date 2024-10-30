@@ -35,6 +35,7 @@ def get_delivery_price(price):
 #https://www.gold.fr/informations-sur-l-or/nous-connaitre/conditions-generales-dutilisation#frais-et-commissions
 
 def get_price_for(session, session_id,buy_price_gold,buy_price_silver):
+    url_domain = "https://www.gold.fr"
     url = "https://www.gold.fr/achat-piece-or/"
     response = requests.get(url)
     response.raise_for_status()  # Check for HTTP errors
@@ -46,7 +47,7 @@ def get_price_for(session, session_id,buy_price_gold,buy_price_silver):
         for row in table.find_all('tr'):
             try:
                 name_element = row.find('td', class_="name speak")
-                source = url[:-1] + name_element.find('a')['href']
+                source = url_domain + name_element.find('a')['href']
                 price_element = row.find('td', class_="price speak")
 
                 if name_element and price_element:
