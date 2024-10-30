@@ -20,18 +20,18 @@ class Item(Base):
     sell_premium = Column(Float, nullable=True)
     delivery_fees = Column(String, nullable=True)
     source = Column(String,nullable=False)
-    timestamp = Column(DateTime, default=lambda: datetime.now(pytz.timezone('CET')))
-    session_id = Column(UUID(as_uuid=True))
-    bullion_type = Column(String,nullable=True)
+    timestamp = Column(DateTime, default=lambda: datetime.now(pytz.timezone('CET')).replace(second=0, microsecond=0))
+    session_id = Column(UUID(as_uuid=True,),index=True)
+    bullion_type = Column(String,nullable=True, index=False)
 
 class MetalPrice(Base):
     __tablename__ = 'metal_price'
     id = Column(Integer, primary_key=True)
     buy_price = Column(Float,nullable=True)
     sell_price = Column(Float,nullable=True)
-    timestamp = Column(DateTime, default=lambda: datetime.now(pytz.timezone('CET')))
+    timestamp = Column(DateTime, default=lambda: datetime.now(pytz.timezone('CET')).replace(second=0, microsecond=0),index=True)
     session_id = Column(UUID(as_uuid=True))
-    bullion_type = Column(String,nullable=True)
+    bullion_type = Column(String,nullable=True, index=True)
 
 poids_pieces  = {
                         'or - 1 ducat': 3.44,
@@ -121,8 +121,8 @@ poids_pieces  = {
                         'or - 1/2 souverain victoria': 3.661, # -> CPor
                         'or - 1/10 oz koala 2023': 3.11, # -> CPor
                         'or - 1/20 oz': 1.55,
-                        'or - 1/20 lunar': 1.55,
-                        'or - 1/20 maple leaf': 1.55,
+                        'or - 1/20 oz lunar': 1.55,
+                        'or - 1/20 oz maple leaf': 1.55,
                         'or - 1/20 oz nugget / kangourou': 1.55,
                         'or - 1/20 oz dragon 2024 lunar III': 1.55,
                         'or - 1/20 oz lapin 2023 lunar III': 1.55,

@@ -118,7 +118,7 @@ def get_price_for(session, session_id, buy_price_gold,buy_price_silver):
 
 
     for url in urls:
-        driver = Driver(uc=True, headless=False)
+        driver = Driver(uc=True, headless=True)
         driver.get(url)
 
         # Explicitly wait for the target element to be present

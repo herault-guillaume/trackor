@@ -37,7 +37,7 @@ CMN = {
     '20 francs belges or diverses années' : 'or - 20 francs bel',
     'Philharmonique 1 OZ or diverses années' : 'or - 1 oz philharmonique',
     'Panda 1 OZ or diverses années' : 'or - 1 oz panda',
-    "Feuille d'Érable 1/20 OZ or diverses années" : 'or - 1/20 maple leaf',
+    "Feuille d'Érable 1/20 OZ or diverses années" : 'or - 1/20 oz maple leaf',
     '4 ducats autrichiens or diverses années' : 'or - 4 ducats',
     "Kangourou 1/2 OZ or diverses années": 'or - 1/2 oz nugget / kangourou',
     'Kangourou 1/4 OZ or diverses années' : 'or - 1/4 oz nugget / kangourou',

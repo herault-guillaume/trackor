@@ -78,7 +78,7 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
     #driver = webdriver.Chrome(options=options)
     for CMN, url in urls.items():
         try:
-            driver = Driver(uc=True, headless=False)
+            driver = Driver(uc=True, headless=True)
             driver.get(url)  # Load the page
             time.sleep(random.randint(5,10))
             # Locate the price element by its text content
