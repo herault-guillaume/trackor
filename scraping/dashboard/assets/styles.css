@@ -8,6 +8,11 @@
     background-color: silver;
     border-color: silver;
 }
+/* Target dropdown items on hover */
+.VirtualizedSelectOption:hover {
+  background-color: lightyellow !important; /* Or your preferred light gold color */
+}
+
 
 .equal-height-cards .card {
   height: 100%;  // Make cards take full height of the row
@@ -17,4 +22,73 @@
 
 .larger-switch .form-check-input {
     transform: scale(1.5); /* Adjust the scale factor as needed */
+}
+
+/* General styles */
+body {
+  font-family: 'Roboto', sans-serif; /* Use a different font */
+  background-color: #1a1a1a; /* Slightly lighter background */
+}
+
+.card {
+  border: none;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* More pronounced shadow */
+  border-radius: 10px; /* Rounded corners for cards */
+}
+
+.card-header {
+  background-color: #282828; /* Darker header */
+  color: #ffd700; /* More vibrant gold */
+  font-weight: 600;
+  border-radius: 10px 10px 0 0; /* Rounded top corners */
+}
+
+.card-body {
+  background-color: #212121; /* Slightly different background for card body */
+}
+
+/* Input components */
+.form-control {
+  background-color: #282828;
+  border: 1px solid #444; /* Subtle border */
+  color: #eee; /* Lighter text */
+}
+
+.form-control:focus {
+  box-shadow: none; /* Remove default focus shadow */
+  border-color: #ffc107; /* Gold border on focus */
+}
+
+/* Switch component */
+.gold-silver-switch .form-check-input:checked {
+  background-color: #ffd700;
+  border-color: #ffd700;
+}
+
+.gold-silver-switch .form-check-input:not(:checked) {
+  background-color: #c0c0c0; /* More realistic silver */
+  border-color: #c0c0c0;
+}
+
+/* Table styles */
+.table-dark {
+  background-color: #212121;
+  border-radius: 5px; /* Rounded corners for table */
+}
+
+.table-dark thead th {
+  border-color: #333;
+}
+
+.table-dark tbody tr:hover {
+  background-color: #282828;
+}
+
+/* Target the slider's active track */
+.rc-slider-track-1 {
+  background-color: gold !important; /* Change to your desired color */
+}
+
+.rc-slider-handle:active {
+  box-shadow: 0 0 0 5px rgba(0, 0, 0, 0.4) !important;
 }

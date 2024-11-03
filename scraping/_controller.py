@@ -264,7 +264,7 @@ def fetch_and_update_data():
             session = Session()
 
             buy_price_gold,g_sell_price_eur,buy_price_silver,s_sell_price_eur = bullionvault.get(session,session_id)
-            # buy_price_gold,g_sell_price_eur,buy_price_silver,s_sell_price_eur = 81.57, 81.42, 1.022, 1.019
+            #buy_price_gold,g_sell_price_eur,buy_price_silver,s_sell_price_eur = 81.57, 81.42, 1.022, 1.019
 
             abacor.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
             achatoretargent.get_price_for(session,session_id,buy_price_gold,buy_price_silver)

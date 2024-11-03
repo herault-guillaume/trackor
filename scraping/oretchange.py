@@ -92,12 +92,14 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
                         min = int(re.search(r"\d+", v[0].text).group())
                         max = 9999999999.9
 
-                    min_p = int(soup.find('input', class_='qty')['value'])
-                    if min_p>minimum:
-                        minimum = min_p
+
 
                     price = Price.fromstring(v[1].text)
                     price_ranges.append((min,max,price))
+
+            min_p = int(soup.find('input', class_='qty')['value'])
+            if min_p>minimum:
+                minimum = min_p
 
             def price_between(value, ranges):
                 """

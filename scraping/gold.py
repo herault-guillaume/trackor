@@ -53,7 +53,7 @@ def get_price_for(session, session_id,buy_price_gold,buy_price_silver):
                 if name_element and price_element:
                     name = name_element.text.strip()
                     price = Price.fromstring(price_element.text)
-                    print(price,CMN[name],url)
+                    print(price,CMN[name],source)
 
                     item_data = CMN[name]
                     minimum = 1

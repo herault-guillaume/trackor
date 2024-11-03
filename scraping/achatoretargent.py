@@ -11,8 +11,6 @@ from price_parser import Price
 import traceback
 import re
 
-from scraping.changedelabourse import CMN
-
 CMN = {
     '20 Francs Marianne Coq': 'or - 20 francs fr coq marianne',
     '10 Francs Napoléon': 'or - 10 francs fr',
@@ -119,12 +117,17 @@ def get_price_for(session, session_id, buy_price_gold,buy_price_silver):
 
     for url in urls:
         driver = Driver(uc=True, headless=True)
+
+        # chrome_version = driver.capabilities['browserVersion']
+        # print(f"Chrome version: {chrome_version}")
+        # driver = Driver(uc=True, headless=True, browser_version="118.0.5993.70")
         driver.get(url)
+        wait = WebDriverWait(driver, 20)
 
         # Explicitly wait for the target element to be present
-        tableau = WebDriverWait(driver, 15).until(EC.presence_of_element_located((By.ID, "contentCategVitrine")))
+        tableau = wait.until(EC.presence_of_element_located((By.ID, "contentCategVitrine")))
 
-        WebDriverWait(driver, 15).until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, "div.row.BStooltip.align-items-center")))
+        wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, "div.row.BStooltip.align-items-center")))
 
         # Use find_elements to get a list of matching elements
         rows = tableau.find_elements(By.CSS_SELECTOR, "div[id*='prod']")
@@ -143,7 +146,7 @@ def get_price_for(session, session_id, buy_price_gold,buy_price_silver):
 
                 source = "https://www.achat-or-et-argent.fr" + product_url_elem[1]["href"]
                 # Explicitly wait for the span within the product_url_elem to be visible
-                WebDriverWait(driver, 7).until(EC.presence_of_all_elements_located((By.TAG_NAME, "span")))
+                wait.until(EC.presence_of_all_elements_located((By.TAG_NAME, "span")))
 
                 span_elem = row_soup.find('span')
                 product_name = span_elem.text.strip()
@@ -237,5 +240,4 @@ def get_price_for(session, session_id, buy_price_gold,buy_price_silver):
             except Exception as e:
                 print(f"An error occurred while processing : {e}")
                 traceback.print_exc()
-
         driver.quit()
