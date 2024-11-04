@@ -1,11 +1,8 @@
 import time
-
 import requests
 from bs4 import BeautifulSoup
 from numpy.random.mtrand import randint
-
 from models.model import Item, poids_pieces
-from datetime import datetime
 import traceback
 from price_parser import Price
 

@@ -32,8 +32,6 @@ CMN = {
     "https://www.oretchange.com/pieces-d-argent-internationales/217-achat-panda-1-once-argent.html" : 'ar - 10 yuan panda 30g',
     "https://www.oretchange.com/pieces-d-argent-internationales/253-kangourou-1-once-argent.html" : 'ar - 1 oz nugget / kangourou',
 
-
-
 }
 
 def get_price_for(session,session_id,buy_price_gold,buy_price_silver):

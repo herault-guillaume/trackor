@@ -3,16 +3,15 @@ import time
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from seleniumbase import Driver
+
 
 from models.model import MetalPrice
 
-def get(session,session_id):
+def get(session,session_id,driver):
     """Uses Selenium to click the currency button, then scrapes the 1 kg gold price in Euros."""
 
     try:
         url = "https://or.bullionvault.fr/"
-        driver = Driver(uc=True, headless=True)
         driver.get(url)
         time.sleep(3)
         try:
@@ -86,7 +85,7 @@ def get(session,session_id):
         session.add(silver_price)
         session.commit()
         print(g_buy_price_eur,g_sell_price_eur,s_buy_price_eur,s_sell_price_eur)
-        driver.quit()
+
         return g_buy_price_eur,g_sell_price_eur,s_buy_price_eur,s_sell_price_eur
 
     except Exception as e:

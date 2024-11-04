@@ -1,5 +1,3 @@
-
-
 import requests
 from bs4 import BeautifulSoup
 from models.model import Item, poids_pieces

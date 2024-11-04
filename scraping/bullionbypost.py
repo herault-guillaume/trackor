@@ -4,10 +4,9 @@ import time
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import NoSuchElementException, InvalidSessionIdException
 from models.model import Item, poids_pieces
 from seleniumbase import Driver
-
 from price_parser import Price
 import traceback
 
@@ -68,18 +67,24 @@ urls = {
     "ar - 10 yuan panda 30g": "https://www.bullionbypost.fr/pieces-argent/panda-argent/piece-30g-panda-chinois-argent-notre-choix/",
     "ar - 1 oz": "https://www.bullionbypost.fr/pieces-argent/pieces-argent-1-once-notre-choix/piece-argent-1-once-meilleure-offreb/",
 }
-def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
+def get_price_for(session,session_id,buy_price_gold,buy_price_silver,driver):
     print("https://www.bullionbypost.fr/")
 
     delivery_ranges = [
         (0.0,99999999999.0,0.0)
     ]
+    # test de la première url
+    try :
+        driver.get(urls['or - 20 francs fr'])  # Load the page
+    except InvalidSessionIdException:
+        driver = Driver(uc=True, headless=True)
 
     #driver = webdriver.Chrome(options=options)
     for CMN, url in urls.items():
+
+        driver.get(url)  # Load the page
+
         try:
-            driver = Driver(uc=True, headless=True)
-            driver.get(url)  # Load the page
             time.sleep(random.randint(5,10))
             # Locate the price element by its text content
             # price_element = WebDriverWait(driver, 10).until(
@@ -157,7 +162,6 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
 
             session.add(coin)
             session.commit()
-            driver.quit()
 
         except Exception:
             print(traceback.format_exc())

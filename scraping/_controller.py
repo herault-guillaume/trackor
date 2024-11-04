@@ -1,21 +1,19 @@
 import pathlib
 
 from models.model import Item, Session, poids_pieces
-from sqlalchemy import func, asc
 from sqlalchemy.sql.expression import and_, or_
 import json
-from datetime import datetime, timedelta
 from google.cloud import storage
 import os
 import time
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
-from datetime import datetime, timedelta
+from datetime import datetime
 import random
 import uuid
-import statistics
 from urllib.parse import urlparse
 import traceback
+from seleniumbase import Driver
 
 import bullionvault
 import acheterorargent
@@ -90,7 +88,7 @@ def update_json_file(new_data,
         file_name: The name of the JSON file within the bucket.
         new_data: The new JSON data (Python dictionary or list) to write to the file.
     """
-    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = r"C:\Users\Guillaume Hérault\PycharmProjects\trackor\trackor-431010-1ff28b492956.json"
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = r"C:\Users\guillaume.herault\PycharmProjects\trackor\trackor-431010-1ff28b492956.json"
     storage_client = storage.Client()
     bucket = storage_client.bucket(bucket_name)
     blob = bucket.blob(filename)
@@ -257,27 +255,29 @@ def calculate_and_store_coin_data(session, session_id, coin_names, range_,filena
 
 def fetch_and_update_data():
     for attempt in range(1):
+
+        driver = Driver(uc=True, headless=True)
         time.sleep(5)# Retry up to 5 times
         try:
             start_time = time.time()
             session_id = uuid.uuid4()
             session = Session()
 
-            buy_price_gold,g_sell_price_eur,buy_price_silver,s_sell_price_eur = bullionvault.get(session,session_id)
+            buy_price_gold,g_sell_price_eur,buy_price_silver,s_sell_price_eur = bullionvault.get(session,session_id,driver)
             #buy_price_gold,g_sell_price_eur,buy_price_silver,s_sell_price_eur = 81.57, 81.42, 1.022, 1.019
 
             abacor.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
-            achatoretargent.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
+            achatoretargent.get_price_for(session,session_id,buy_price_gold,buy_price_silver,driver)
             acheterorargent.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
             aucoffre.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
-            bdor.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
-            bullionbypost.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
+            bdor.get_price_for(session,session_id,buy_price_gold,buy_price_silver,driver)
+            bullionbypost.get_price_for(session,session_id,buy_price_gold,buy_price_silver,driver)
             capornumismatique.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
             changedelabourse.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
             changerichelieu.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
             changevivienne.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
             gold.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
-            goldavenue.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
+            goldavenue.get_price_for(session,session_id,buy_price_gold,buy_price_silver,driver)
             goldforex.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
             goldreserve.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
             lcdor.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
@@ -286,8 +286,8 @@ def fetch_and_update_data():
             monlingot.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
             oretchange.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
             orinvestissement.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
-            orobel.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
-            shopcomptoirdelor.get_price_for(session,session_id,buy_price_gold,buy_price_silver)
+            orobel.get_price_for(session,session_id,buy_price_gold,buy_price_silver,driver)
+            shopcomptoirdelor.get_price_for(session,session_id,buy_price_gold,buy_price_silver,driver)
 
             # goldunion.get(session,session_id)  # arnaque?
             # joubertchange.get(session,session_id)

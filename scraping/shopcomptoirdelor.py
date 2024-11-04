@@ -1,12 +1,9 @@
-import requests
-from bs4 import BeautifulSoup
 from models.model import Item, poids_pieces
-from seleniumbase import Driver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from price_parser import Price
-import traceback
+
 
 
 CMN = {
@@ -58,7 +55,7 @@ CMN = {
 
 }
 
-def get_price_for(session, session_id,buy_price_gold,buy_price_silver):
+def get_price_for(session, session_id,buy_price_gold,buy_price_silver,driver):
     """
     Retrieves coin purchase prices from Orobel using Selenium.
     """
@@ -76,7 +73,6 @@ def get_price_for(session, session_id,buy_price_gold,buy_price_silver):
     ]
 
     print(urls)
-    driver = Driver(uc=True, headless=True)
 
     for url in urls:
         try :
@@ -166,4 +162,3 @@ def get_price_for(session, session_id,buy_price_gold,buy_price_silver):
         except Exception as e:
             #print(traceback.format_exc())
             pass
-    driver.quit()

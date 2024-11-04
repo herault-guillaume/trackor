@@ -141,5 +141,3 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
             except Exception:
                 print(traceback.format_exc())
                 pass
-
-        driver.quit()

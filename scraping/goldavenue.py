@@ -1,4 +1,3 @@
-from seleniumbase import Driver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -38,12 +37,11 @@ urls = {
 
 
 
-def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
+def get_price_for(session,session_id,buy_price_gold,buy_price_silver,driver):
     # Set up headless Chrome
 
     for CMN, url in urls.items():
         try:
-            driver = Driver(uc=True, headless=True)
             driver.get(url)  # Load the page
             # Locate the price element by its unique combination of classes
             # Wait for the span element to be present (adjust timeout as needed)
@@ -123,7 +121,6 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
 
             session.add(coin)
             session.commit()
-            driver.quit()
 
         except Exception as e :
             print(traceback.format_exc())

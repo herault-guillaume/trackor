@@ -8,7 +8,7 @@ import sqlite3
 from models.model import poids_pieces
 
 # Database file path
-db_path = r'C:\Users\Guillaume Hérault\PycharmProjects\trackor\models\pieces_or.db'
+db_path = r'C:\Users\guillaume.herault\PycharmProjects\trackor\models\pieces_or.db'
 
 def get_country_flag_image(country_code):
     """

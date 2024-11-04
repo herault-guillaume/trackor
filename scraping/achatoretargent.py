@@ -1,8 +1,4 @@
-import time
-
-import requests
 from bs4 import BeautifulSoup
-from seleniumbase import Driver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -90,7 +86,7 @@ CMN = {
     "Sachet Scellé 45 pièces d'Ecu 5 Francs" : ('ar - 5 francs fr ecu (1854-1860)',45),
 }
 
-def get_price_for(session, session_id, buy_price_gold,buy_price_silver):
+def get_price_for(session, session_id, buy_price_gold,buy_price_silver,driver):
 
     base_url = "https://www.achat-or-et-argent.fr"
     print(base_url)
@@ -114,13 +110,8 @@ def get_price_for(session, session_id, buy_price_gold,buy_price_silver):
         (15000.01,100000000000000.0,0.0),
     ]
 
-
     for url in urls:
-        driver = Driver(uc=True, headless=True)
 
-        # chrome_version = driver.capabilities['browserVersion']
-        # print(f"Chrome version: {chrome_version}")
-        # driver = Driver(uc=True, headless=True, browser_version="118.0.5993.70")
         driver.get(url)
         wait = WebDriverWait(driver, 20)
 
@@ -240,4 +231,3 @@ def get_price_for(session, session_id, buy_price_gold,buy_price_silver):
             except Exception as e:
                 print(f"An error occurred while processing : {e}")
                 traceback.print_exc()
-        driver.quit()
