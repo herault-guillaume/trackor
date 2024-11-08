@@ -6,6 +6,10 @@ from models.model import Item, poids_pieces
 from price_parser import Price
 import traceback
 import re
+import logging
+
+# Get the logger
+logger = logging.getLogger(__name__)
 
 #https://www.aucoffre.com/acheter/tarifs-aucoffre-com
 
@@ -14,6 +18,7 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
     Fetches the buy price of the 20 Francs Marianne coin from AuCOFFRE using requests and BeautifulSoup.
     """
     print('https://www.aucoffre.com/')
+    logger.debug(f"Scraping started for https://www.aucoffre.com/") # Example debug log
     urls = {
         'or - 20 francs fr coq marianne': ["https://www.aucoffre.com/recherche/metal-1/marketing_list-5/stype-1/produit","20f-marianne"],
         'or - 20 francs fr napoléon empereur nue': ["https://www.aucoffre.com/recherche/metal-1/marketing_list-5/stype-1/produit","napoleon-20f-napoleon-iii-tete-nue"],
@@ -171,7 +176,12 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
                 if flag_one_find:
                     break
 
+            except KeyError as e:
+                logger.error(f"KeyError: {name}")
+
+            except requests.exceptions.RequestException as e:
+                logger.error(f"Request error occurred: {e}")
+
             except Exception as e:
-                print(e)
-                print(traceback.format_exc())
-                pass
+                logger.error(f"An error occurred: {e}")
+                traceback.print_exc()

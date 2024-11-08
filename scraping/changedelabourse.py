@@ -4,6 +4,10 @@ from models.model import Item, poids_pieces
 from price_parser import Price
 import traceback
 import re
+import logging
+
+# Get the logger
+logger = logging.getLogger(__name__)
 
 CMN = {
     "https://www.changedelabourse.com/or/pieces-d-or-d-investissement/napoleon-or-20-francs": "or - 20 francs fr",  # Assuming a standard 20 Francs gold coin
@@ -55,6 +59,8 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
     Retrieves the 'or - 20 francs coq marianne' coin purchase price from Change de la Bourse using requests and BeautifulSoup.
     """
     print('https://www.changedelabourse.com/or')
+    logger.debug("Scraping started for https://www.changedelabourse.com/or")
+
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
 
@@ -147,6 +153,12 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
             session.add(coin)
             session.commit()
 
+
+        except KeyError as e:
+            logger.error(f"KeyError: {name}")
+
+        except requests.exceptions.RequestException as e:
+            logger.error(f"An error occurred while making the request: {e}")
+
         except Exception as e:
-            print(traceback.format_exc())
-            pass
+            logger.error(f"An error occurred while processing: {e}")

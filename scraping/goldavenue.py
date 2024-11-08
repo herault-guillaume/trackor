@@ -5,13 +5,17 @@ from selenium.webdriver.support import expected_conditions as EC
 from models.model import Item, poids_pieces
 from price_parser import Price
 import traceback
+import logging
+
+# Get the logger
+logger = logging.getLogger(__name__)
 
 urls = {
     'or - 1 oz philharmonique': 'https://www.goldavenue.com/fr/acheter/or/produit/1-once-piece-d-or-pur-999-9-philharmonique-annees-mixtes',
     'or - 20 francs fr napoléon III': "https://www.goldavenue.com/fr/acheter/or/produit/20-francs-piece-d-or-napoleon-iii-avec-ou-sans-couronne-de-laurier",
     'or - 20 francs fr coq marianne': "https://www.goldavenue.com/fr/acheter/or/produit/piece-d-or-pur-900-0-20-francs-napoleon-coq-de-chaplain",
     'or - 40 francs fr napoléon empereur laurée': "https://www.goldavenue.com/fr/acheter/or/produit/piece-de-monnaie-d-or-pur-900-0-40-francs-napoleon-bonaparte-premier-consul-an-xi",
-    'or - 50 francs fr or napoléon III tête nue': "https://www.goldavenue.com/fr/acheter/or/produit/piece-de-monnaie-d-or-pur-900-0-50-francs-napoleon-iii-tete-nue-1855-a-paris",
+    'or - 50 francs fr napoléon III tête nue': "https://www.goldavenue.com/fr/acheter/or/produit/piece-de-monnaie-d-or-pur-900-0-50-francs-napoleon-iii-tete-nue-1855-a-paris",
     'or - 100 francs fr napoléon III tête laurée': "https://www.goldavenue.com/fr/acheter/or/produit/piece-de-monnaie-d-or-pur-900-0-100-francs-napoleon-iii-tete-lauree-1869-a",
     'or - 20 francs sui vreneli croix': "https://www.goldavenue.com/fr/acheter/or/produit/piece-d-or-pur-900-0-vreneli-20-francs-suisse-helvetia-annees-mixtes",
     'or - 1 souverain victoria jubilee': "https://www.goldavenue.com/fr/acheter/or/produit/piece-souverain-or-victoria-or-pur-916-7",
@@ -39,7 +43,7 @@ urls = {
 
 def get_price_for(session,session_id,buy_price_gold,buy_price_silver,driver):
     # Set up headless Chrome
-
+    logger.debug("https://www.goldavenue.com/")
     for CMN, url in urls.items():
         try:
             driver.get(url)  # Load the page
@@ -122,7 +126,10 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver,driver):
             session.add(coin)
             session.commit()
 
-        except Exception as e :
-            print(traceback.format_exc())
-            pass
+        except KeyError as e:
+            logger.error(f"KeyError: {name}")
+
+        except Exception as e:
+            logger.error(f"An error occurred while scraping: {e}")
+            traceback.print_exc()
 

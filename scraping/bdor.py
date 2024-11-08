@@ -5,6 +5,10 @@ from models.model import Item, poids_pieces
 from price_parser import Price
 import traceback
 import re
+import logging
+
+# Get the logger
+logger = logging.getLogger(__name__)
 
 CMN = {
         "20 Fr Or Coq" : 'or - 20 francs fr coq marianne',
@@ -55,7 +59,7 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver,driver):
 
     url = "https://www.bdor.fr/achat-or-en-ligne"
     print(url)
-
+    logger.debug(f"Scraping started for {url}")
     delivery_ranges = [
         (0.0,1000.0,15.0),
         (1000.0,999999999999.0,0.0)
@@ -171,7 +175,9 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver,driver):
                 session.add(coin)
                 session.commit()
 
+    except KeyError as e:
+        logger.error(f"KeyError: {product_name}")  # Log the product name
 
     except Exception as e:
-        print(e)
-        print(traceback.format_exc())
+        logger.error(f"An error occurred while processing: {e}")
+        traceback.print_exc()

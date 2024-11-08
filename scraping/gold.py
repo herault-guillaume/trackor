@@ -6,6 +6,10 @@ from models.model import Item, poids_pieces
 
 from price_parser import Price
 import traceback
+import logging
+
+# Get the logger
+logger = logging.getLogger(__name__)
 
 CMN = {
     "20 $ US" :  'or - 20 dollars',
@@ -29,14 +33,12 @@ CMN = {
     "Reichsmark": 'or - 20 mark wilhelm II',
     # non côté
 }
-
-def get_delivery_price(price):
-    pass
 #https://www.gold.fr/informations-sur-l-or/nous-connaitre/conditions-generales-dutilisation#frais-et-commissions
 
 def get_price_for(session, session_id,buy_price_gold,buy_price_silver):
     url_domain = "https://www.gold.fr"
     url = "https://www.gold.fr/achat-piece-or/"
+    logger.debug("https://www.gold.fr/achat-piece-or/")
     response = requests.get(url)
     response.raise_for_status()  # Check for HTTP errors
     delivery_ranges=[[0,100000.0,30.0],(100000,float('inf'),80.0)]
@@ -101,9 +103,14 @@ def get_price_for(session, session_id,buy_price_gold,buy_price_silver):
                     session.add(coin)
                     session.commit()
 
+            except KeyError as e:
+
+                logger.error(f"KeyError: {name}")
 
             except Exception as e:
-                print(traceback.format_exc())
+
+                logger.error(f"An error occurred while processing: {e}")
+                traceback.print_exc()
 
 
 

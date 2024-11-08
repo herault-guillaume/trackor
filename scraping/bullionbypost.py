@@ -9,6 +9,9 @@ from models.model import Item, poids_pieces
 from seleniumbase import Driver
 from price_parser import Price
 import traceback
+import logging
+# Get the logger
+logger = logging.getLogger(__name__)
 
 urls = {
     "or - 10 francs fr": "https://www.bullionbypost.fr/pieces-or/francs-francais-piece-or/10-francs-notre-choix/",
@@ -69,6 +72,7 @@ urls = {
 }
 def get_price_for(session,session_id,buy_price_gold,buy_price_silver,driver):
     print("https://www.bullionbypost.fr/")
+    logger.debug(f"Scraping started for https://www.bullionbypost.fr/")
 
     delivery_ranges = [
         (0.0,99999999999.0,0.0)
@@ -163,7 +167,13 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver,driver):
             session.add(coin)
             session.commit()
 
-        except Exception:
-            print(traceback.format_exc())
-            pass
+
+        except KeyError as e:
+
+            logger.error(f"KeyError: {name}")
+
+        except Exception as e:
+
+            logger.error(f"An error occurred while processing: {e}")
+            traceback.print_exc()
 

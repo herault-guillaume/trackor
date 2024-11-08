@@ -4,6 +4,9 @@ from models.model import Item, poids_pieces
 from price_parser import Price
 import traceback
 import re
+import logging
+# Get the logger
+logger = logging.getLogger(__name__)
 
 # https://www.oretchange.com/content/1-livraison
 CMN = {
@@ -40,6 +43,7 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
     """
 
     print("https://www.oretchange.com/")
+    logger.debug("https://www.oretchange.com/")
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
     }
@@ -126,5 +130,12 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
             session.add(coin)
             session.commit()
 
+        except KeyError as e:
+            logger.error(f"KeyError: {name}")
+
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Request error occurred: {e}")
+
         except Exception as e:
-            print(traceback.format_exc())
+            logger.error(f"An error occurred: {e}")
+            traceback.print_exc()

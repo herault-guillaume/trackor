@@ -8,7 +8,7 @@ import sqlite3
 from models.model import poids_pieces
 
 # Database file path
-db_path = r'C:\Users\guillaume.herault\PycharmProjects\trackor\models\pieces_or.db'
+db_path = r'C:\Users\Guillaume Hérault\PycharmProjects\trackor\models\pieces_or.db'
 
 def get_country_flag_image(country_code):
     """
@@ -69,14 +69,14 @@ app.layout = dbc.Container([
     dbc.Row([
         dbc.Col(
             dbc.Card([
-                dbc.CardHeader([html.I(className="fa-solid fa-bullseye", style={'font-size': '16px'}),"  Mon budget (€)"],style = {'text-align': 'center'}),
+                dbc.CardHeader([html.I(className="fa-solid fa-bullseye fa-bounce", style={'font-size': '16px'}),"  Mon budget (€)",dbc.Tooltip("Le budget que je souhaite me fixer.", target="cardheader-budget")],style = {'text-align': 'center'}),
                 dbc.CardBody([
                     dcc.RangeSlider(
                         id='budget-slider',
                         min=0,
                         max=12500,
                         step=250,
-                        value=[0, 2500],  # Default range
+                        value=[0, 1000],  # Default range
                         marks={
                             0: '0 €',
                             12500: '12k5 €',
@@ -85,13 +85,13 @@ app.layout = dbc.Container([
                         persistence=True,
                         tooltip={"placement": "bottom", "always_visible": True,"style": {"color": "gold", "fontSize": "14px"}},  # Show tooltip always
                     )
-                ]),
+                ],id="cardheader-budget"),
             ]),
             xs=12, sm=12, md=6, lg=6, xl=6,xxl=6, className="mb-4"  # Adjust width for larger screens
         ),
         dbc.Col(
             dbc.Card([
-                dbc.CardHeader([html.I(className="fa-sharp fa-solid fa-coins", style={'font-size': '16px'}),"  Quantité max."],style = {'text-align': 'center'}),
+                dbc.CardHeader([html.I(className="fa-sharp fa-solid fa-coins fa-bounce", style={'font-size': '16px'}),"  Quantité max.",dbc.Tooltip("Le nombre maximum de pièces que je souhaite acheter.", target="cardheader-quantity")],style = {'text-align': 'center'}),
                 dbc.CardBody([
                 dcc.Dropdown(
                     id='quantity-dropdown',
@@ -122,14 +122,14 @@ app.layout = dbc.Container([
                     persistence=True,
                     style={'width': '100%','color': 'black','text-align': 'center'}
                 ),
-                ]),
+                ],id="cardheader-quantity"),
             ]),
             xs=6, sm=6, md=3, lg=3, xl=3,xxl=3,className="mb-4"
         ),
 
         dbc.Col(
             dbc.Card([
-                dbc.CardHeader([html.I(className="fa-solid fa-cube", style={'font-size': '16px'}),"  Bullion"], style={'text-align': 'center'}),
+                dbc.CardHeader([html.I(className="fa-solid fa-cube", style={'font-size': '16px'}),"  Bullion", dbc.Tooltip("Source cours du métal : BullionVault.", target="cardheader-bullion")], style={'text-align': 'center'}),
                 dbc.CardBody([
                     html.Div(
                         [
@@ -145,13 +145,15 @@ app.layout = dbc.Container([
                         ],
                         className="d-flex align-items-center justify-content-between"  # No need for width: 100% here
                     )
-                ,html.Div(id='metal-price-output')])
-            ],),  # Set a fixed width for the Card
+                ,html.Div(id='metal-price-output'),
+                ],id="cardheader-bullion")
+            ],                # The tooltip
+            ),  # Set a fixed width for the Card
             xs=6, sm=6, md=3, lg=3, xl=2,xxl=2, className="mb-4"
         ),
         dbc.Col(
             dbc.Card([
-                dbc.CardHeader([html.I(className="fa-solid fa-magnifying-glass", style={'font-size': '16px'}), "  Effigie/Année indifférenciées"], style={'text-align': 'center'}),  # New card for name selection
+                dbc.CardHeader([html.I(className="fa-solid fa-magnifying-glass", style={'font-size': '16px'}), "  Effigie/Année indifférenciées", dbc.Tooltip("Je récupère les offres pour un ou plusieurs types de pièce.", target="cardheader-years")], style={'text-align': 'center'}),  # New card for name selection
                 dbc.CardBody([
                     dcc.Dropdown(
                         id='piece-dropdown',
@@ -163,7 +165,7 @@ app.layout = dbc.Container([
                         style={'width': '100%', 'color': 'black', 'text-align': 'center'}
                     ),
                 ]),
-            ]),
+            ],id="cardheader-years"),
             xs=12, sm=12, md=8, lg=6, xl=4, xxl=4, className="mb-4"
         ),
     ], className="mb-4 equal-height-cards"),  # Add margin-bottom to the row
@@ -183,7 +185,7 @@ app.layout = dbc.Container([
                             html.I(className="fa-solid fa-arrow-trend-down", style={'font-size': '16px'}),
                             "  Prime (%)",
                             html.Span(id='premium-arrow', className="fa fa-sort ms-2"),
-                            dbc.Tooltip("La prime inclue les frais de port et le prix dégressif.",target="premium-header")  # The tooltip
+                            dbc.Tooltip("La prime inclue les frais de port et le prix dégressif. Valable uniquement à l'horaire affichée ci-dessus.",target="premium-header")  # The tooltip
                         ],
                         id="premium-header",
                         style={'text-align': 'center'},n_clicks=0),
@@ -208,8 +210,106 @@ app.layout = dbc.Container([
         id='interval-component',
         interval=30*60*1000,  # in milliseconds (30 minutes)
         n_intervals=0
+    ),
+
+    dbc.Row(
+        [
+            dbc.Col(
+                dbc.Card(
+                    [
+                        dbc.CardHeader(
+                            [
+                                html.I(className="fa-solid fa-envelope", style={'font-size': '22px'}),
+                                "  Contactez nous !",
+
+                            ],
+                        ),
+                        dbc.CardBody(
+                            [
+                                dbc.Form(
+                                    [
+                                        dbc.Row(
+                                            [
+                                                dbc.Label("Votre nom", html_for="name-input", width=3,
+                                                          className="text-end"),
+                                                dbc.Col(
+                                                    dbc.Input(type="text", id="name-input",
+                                                              placeholder="Entrez votre nom"),
+                                                    width=9,
+                                                ),
+                                            ],
+                                            className="mb-3",
+                                        ),
+                                        dbc.Row(
+                                            [
+                                                dbc.Label("Votre email", html_for="email-input", width=3,
+                                                          className="text-end"),
+                                                dbc.Col(
+                                                    dbc.Input(type="email", id="email-input",
+                                                              placeholder="Entrez votre email"),
+                                                    width=9,
+                                                ),
+                                            ],
+                                            className="mb-3",
+                                        ),
+                                        dbc.Row(
+                                            [
+                                                dbc.Label("Votre message", html_for="message-input", width=3,
+                                                          className="text-end"),
+                                                dbc.Col(
+                                                    dbc.Textarea(id="message-input",
+                                                                 placeholder="Entrez votre message"),
+                                                    width=9,
+                                                ),
+                                            ],
+                                            className="mb-3",
+                                        ),
+                                        dbc.Row(
+                                            [
+                                                dbc.Col(
+                                                    dbc.Button("Envoyer", id="submit-button", className="me-2",
+                                                               color='dark', ),
+                                                    width="auto",
+                                                ),
+                                                dbc.Col(
+                                                    html.Div(id="output", className="mt-3"),
+                                                    width="auto",
+                                                ),
+                                            ],
+                                            justify="end",
+                                        ),
+                                    ]
+                                ),
+                            ]
+                        ),
+                    ], style={'text-align': 'center'}
+                ),
+                width=6  # Takes up half of the grid (6 out of 12 columns)
+            ),
+            dbc.Col(
+                [
+                    dbc.Card(
+                    [
+                        dbc.CardHeader(
+                            [
+                                html.I(className="fa-solid fa-circle-exclamation fa-beat-fade", style={'font-size': '22px'}),
+                                "  Bullion-sniper.fr ne donne pas de conseils en investissement.",
+
+                            ],
+                        ),
+                        dbc.CardBody([
+                        "Nous attachons un soin particulier à créer et entretenir le présent site et à veiller à l’exactitude et à l’actualité de son contenu.",html.Br(),html.Br(), "Néanmoins, les éléments présentés dans ce site sont susceptibles de modifications fréquentes sans préavis. Bullion-sniper.fr ne garantit pas l’exactitude et l’actualité du contenu du site. Les éléments présentés Bullion-sniper.fr sont mis à disposition des utilisateurs sans aucune garantie d’aucune sorte et ne peuvent donner lieu à un quelconque droit à dédommagement.",
+                            html.Br(),html.Br(),"Bullion-sniper.fr x Dash ",html.I(className="fa-solid fa-heart fa-beat", style={'font-size': '22px', 'color' : 'gold'}),
+                    ])], style={'text-align': 'center'}
+                    )
+                ],
+                width=6)
+        ]
     )
-])
+]),
+
+
+
 
 
 @app.callback(
@@ -308,7 +408,6 @@ def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_
                 arrow_classNames['premium-arrow'], arrow_classNames['quantity-arrow'],
                 arrow_classNames['total_cost-arrow'])
     else :
-        print('else')
         def get_price(ranges, quantity):
             """
             Calculates the price based on the quantity and given ranges.
@@ -397,7 +496,7 @@ def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_
             df_copy['price'] = df_copy.apply(lambda row: get_price(row['price_ranges'], row['premium_index']+1), axis=1)
 
             # Cheapest offer analysis and recommendations
-            results = df_copy.sort_values(by='buy_premiums').head(40)
+            results = df_copy.sort_values(by='buy_premiums')
 
             for i, row in results.iterrows():
                 try :
@@ -406,7 +505,7 @@ def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_
                     total_cost = (spot_cost  + (row['buy_premiums']  / 100.0)*spot_cost) * (row['premium_index']+1) * float(row['quantity'])
 
                     # Check if the offer meets the budget
-                    if budget_min <= total_cost <= budget_max and (row['name'], row['source']) not in seen_offers and quantity >= row['minimum'] and quantity >= row['quantity'] :
+                    if (row['name'], row['source']) not in seen_offers and budget_min <= total_cost <= budget_max and quantity >= row['minimum'] and quantity >= row['quantity'] :
                         cheapest_offers.append({
                             'name': row['name'].upper(),
                             'source': row['source'],
@@ -423,7 +522,7 @@ def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_
 
         conn.close()
 
-        for offer in cheapest_offers:
+        for offer in cheapest_offers[:20]:
             table_rows.append(
                 html.Tr([
                     html.Td(

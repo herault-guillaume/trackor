@@ -1,10 +1,13 @@
 import requests
 from bs4 import BeautifulSoup
 from models.model import Item, poids_pieces
-
 from price_parser import Price
 import traceback
 import re
+import logging
+
+# Get the logger
+logger = logging.getLogger(__name__)
 
 CMN = {
     "20 Pesos – Mexique | Or": "or - 20 pesos mex",
@@ -91,81 +94,96 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
 
     url = "https://www.goldreserve.fr/boutique-goldreserve/?type=pieces"
     print(url)
-
+    logger.debug("https://www.goldreserve.fr/")
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
 
     }
+    try :
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
 
-    response = requests.get(url, headers=headers)
-    response.raise_for_status()
-
-    soup = BeautifulSoup(response.content, 'html.parser')
+        soup = BeautifulSoup(response.content, 'html.parser')
 
 
-    # Use a more specific CSS selector to target the price element
-    product_divs = soup.find_all('div',
-                                 class_='jet-woo-products__item jet-woo-builder-product')
+        # Use a more specific CSS selector to target the price element
+        product_divs = soup.find_all('div',
+                                     class_='jet-woo-products__item jet-woo-builder-product')
 
-    for div in product_divs:
-        try:
-            # Extract coin name
-            coin_label = div.find('h5',class_="jet-woo-product-title").text.strip()
+        for div in product_divs:
+            try:
+                # Extract coin name
+                coin_label = div.find('h5',class_="jet-woo-product-title").text.strip()
 
-            # Extract URL
-            url = div.find('a')['href']
+                # Extract URL
+                url = div.find('a')['href']
 
-            # Extract price (assuming you want the "sell" price)
-            price_span = div.find('span', class_='woocommerce-Price-amount amount')
-            price = Price.fromstring(price_span.text)
+                # Extract price (assuming you want the "sell" price)
+                price_span = div.find('span', class_='woocommerce-Price-amount amount')
+                price = Price.fromstring(price_span.text)
 
-            item_data = CMN[coin_label]
-            minimum = 1
-            quantity = 1
-            if isinstance(item_data, tuple):
-                name = item_data[0]
-                quantity = item_data[1]
-                bullion_type = item_data[0][:2]
-            else:
-                name = item_data
-                bullion_type = item_data[:2]
+                item_data = CMN[coin_label]
+                minimum = 1
+                quantity = 1
+                if isinstance(item_data, tuple):
+                    name = item_data[0]
+                    quantity = item_data[1]
+                    bullion_type = item_data[0][:2]
+                else:
+                    name = item_data
+                    bullion_type = item_data[:2]
 
-            if bullion_type == 'or':
-                buy_price = buy_price_gold
-            else:
-                buy_price = buy_price_silver
-            
-            print(price,CMN[coin_label],url)
+                if bullion_type == 'or':
+                    buy_price = buy_price_gold
+                else:
+                    buy_price = buy_price_silver
 
-            delivery_ranges = [(0.0,1000.0,10.0),(1000.0,5000.0,25.0),(5000.0,float('inf'),0.0)]
-            price_ranges = [(minimum,999999999,price)]
+                print(price,CMN[coin_label],url)
 
-            def price_between(value, ranges):
-                """
-                Returns the price per unit for a given quantity.
-                """
-                for min_qty, max_qty, price in ranges:
-                    if min_qty <= value <= max_qty:
-                        if isinstance(price, Price):
-                            return price.amount_float
-                        else:
-                            return price
+                delivery_ranges = [(0.0,1000.0,10.0),(1000.0,5000.0,25.0),(5000.0,float('inf'),0.0)]
+                price_ranges = [(minimum,999999999,price)]
 
-            coin = Item(name=name,
-                        price_ranges=';'.join(['{min_}-{max_}-{price}'.format(min_=r[0],max_=r[1],price=r[2].amount_float) for r in price_ranges]),
-                        buy_premiums=';'.join(
-['{:.2f}'.format(((price_between(minimum,price_ranges)/quantity + price_between(price_between(minimum,price_ranges)*minimum,delivery_ranges)/(quantity*minimum)) - (buy_price*poids_pieces[name]))*100.0/(buy_price*poids_pieces[name])) for i in range(1,minimum)] +
-['{:.2f}'.format(((price_between(i,price_ranges)/quantity + price_between(price_between(i,price_ranges),delivery_ranges)/(quantity*i)) - (buy_price*poids_pieces[name]))*100.0/(buy_price*poids_pieces[name])) for i in range(minimum,151)]
-                        ),
-                        delivery_fees=';'.join(['{min_}-{max_}-{price}'.format(min_=r[0],max_=r[1],price=r[2]) for r in delivery_ranges]),
-                        source=url,
-                        session_id=session_id,
-                        bullion_type=bullion_type,
-                        quantity=quantity,
-                        minimum=minimum)
+                def price_between(value, ranges):
+                    """
+                    Returns the price per unit for a given quantity.
+                    """
+                    for min_qty, max_qty, price in ranges:
+                        if min_qty <= value <= max_qty:
+                            if isinstance(price, Price):
+                                return price.amount_float
+                            else:
+                                return price
 
-            session.add(coin)
-            session.commit()
+                coin = Item(name=name,
+                            price_ranges=';'.join(['{min_}-{max_}-{price}'.format(min_=r[0],max_=r[1],price=r[2].amount_float) for r in price_ranges]),
+                            buy_premiums=';'.join(
+    ['{:.2f}'.format(((price_between(minimum,price_ranges)/quantity + price_between(price_between(minimum,price_ranges)*minimum,delivery_ranges)/(quantity*minimum)) - (buy_price*poids_pieces[name]))*100.0/(buy_price*poids_pieces[name])) for i in range(1,minimum)] +
+    ['{:.2f}'.format(((price_between(i,price_ranges)/quantity + price_between(price_between(i,price_ranges),delivery_ranges)/(quantity*i)) - (buy_price*poids_pieces[name]))*100.0/(buy_price*poids_pieces[name])) for i in range(minimum,151)]
+                            ),
+                            delivery_fees=';'.join(['{min_}-{max_}-{price}'.format(min_=r[0],max_=r[1],price=r[2]) for r in delivery_ranges]),
+                            source=url,
+                            session_id=session_id,
+                            bullion_type=bullion_type,
+                            quantity=quantity,
+                            minimum=minimum)
 
-        except Exception as e:
-            print(traceback.format_exc())
+                session.add(coin)
+                session.commit()
+
+
+            except KeyError as e:
+
+                logger.error(f"KeyError: {coin_label}")
+            # Log the coin label that caused the KeyError
+
+            except Exception as e:
+                logger.error(f"An error occurred while processing: {e}")
+                traceback.print_exc()
+
+    except requests.exceptions.RequestException as e:
+        logger.error(f"An error occurred while making the request: {e}")
+
+    except Exception as e:
+
+        logger.error(f"An error occurred: {e}")
+        traceback.print_exc()

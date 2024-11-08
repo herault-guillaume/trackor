@@ -3,12 +3,17 @@ from bs4 import BeautifulSoup
 from models.model import Item, poids_pieces
 from price_parser import Price
 import traceback
+import logging
+
+# Get a logger instance
+logger = logging.getLogger(__name__)
 
 def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
     """
     Retrieves the 'or - 20 francs fr coq marianne' coin purchase price from Goldforex using requests and BeautifulSoup.
     """
     print("https://www.abacor.fr/")
+    logger.debug(f"Scraping started for https://www.abacor.fr/") # Example debug log
 
     urls = ['https://www.abacor.fr/product-category/achat-or/pieces-d-or/','https://www.abacor.fr/product-category/achat-argent/pieces-d-argent/']
 
@@ -131,6 +136,12 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
                 session.add(coin)
                 session.commit()
 
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Request error: {e}")
+
+        except KeyError as e:
+            logger.error(f"KeyError: {product_name}")
+
         except Exception as e:
-            print(e)
+            logger.exception(f"An unexpected error occurred: {e}")  # Log the exception with traceback
             print(traceback.format_exc())

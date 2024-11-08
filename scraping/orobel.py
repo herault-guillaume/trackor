@@ -5,6 +5,10 @@ from selenium.webdriver.support import expected_conditions as EC
 from models.model import Item, poids_pieces
 from price_parser import Price
 import traceback
+import logging
+
+# Get the logger
+logger = logging.getLogger(__name__)
 
 CMN = {
     "10 Francs Français – Marianne Coq": 'or - 10 francs fr coq marianne',
@@ -51,83 +55,95 @@ def get_price_for(session, session_id,buy_price_gold,buy_price_silver,driver):
     (40000, 44999.99, 235.0),
     (45000, float('inf'), 300.0)  # For any price above 44999.99
 ]
+    try :
+        driver.get(url)
 
-    driver.get(url)
+        # Wait for the products to load (adjust the timeout as needed)
+        WebDriverWait(driver, 10).until(
+            EC.presence_of_all_elements_located((By.CLASS_NAME, "fusion-column-wrapper"))
+        )
 
-    # Wait for the products to load (adjust the timeout as needed)
-    WebDriverWait(driver, 10).until(
-        EC.presence_of_all_elements_located((By.CLASS_NAME, "fusion-column-wrapper"))
-    )
+        # Try to find and click the "Load More Produits" button once
 
-    # Try to find and click the "Load More Produits" button once
-
-    load_more_button = WebDriverWait(driver, 5).until(
-        EC.element_to_be_clickable((By.CLASS_NAME, "fusion-load-more-button"))
-    )
-    load_more_button.click()
-
-    # Wait for new products to load after clicking (adjust timeout if needed)
-    WebDriverWait(driver, 5).until(
-        EC.presence_of_all_elements_located((By.CLASS_NAME, "fusion-column-wrapper"))
-    )
-
-    # Find the product divs
-    products_div = driver.find_elements(By.CLASS_NAME, "fusion-column-wrapper")
-
-    for product in products_div:
         try:
-            price_text = product.find_element(By.CLASS_NAME, 'woocommerce-Price-amount').text
-            price = Price.fromstring(price_text)
+            # Try to find and click the "Load More Produits" button
+            load_more_button = WebDriverWait(driver, 5).until(
+                EC.element_to_be_clickable((By.CLASS_NAME, "fusion-load-more-button"))
+            )
+            load_more_button.click()
 
-            name_title = product.find_element(By.TAG_NAME, "h4")
-            url = name_title.find_element(By.TAG_NAME, 'a').get_attribute('href')
-            name = name_title.text.strip()
-
-            print(price,CMN[name],url)
-
-            minimum = 1
-            quantity = 1
-            item_data = CMN[name]
-            if isinstance(item_data, tuple):
-                name = item_data[0]
-                quantity = item_data[1]
-                bullion_type = item_data[0][:2]
-            else:
-                name = item_data
-                bullion_type = item_data[:2]
-
-            if bullion_type == 'or':
-                buy_price = buy_price_gold
-            else:
-                buy_price = buy_price_silver
-
-            price_ranges = [(minimum,999999999.9,price)]
-
-            def price_between(value, ranges):
-                """
-                Returns the price per unit for a given quantity.
-                """
-                for min_qty, max_qty, price in ranges:
-                    if min_qty <= value <= max_qty:
-                        if isinstance(price, Price):
-                            return price.amount_float
-                        else:
-                            return price
-
-            coin = Item(name=name,
-                        price_ranges=';'.join(['{min_}-{max_}-{price}'.format(min_=r[0],max_=r[1],price=r[2].amount_float) for r in price_ranges]),
-                        buy_premiums=';'.join(
-['{:.2f}'.format(((price_between(minimum,price_ranges)/quantity + price_between(price_between(minimum,price_ranges)*minimum,delivery_ranges)/(quantity*minimum)) - (buy_price*poids_pieces[name]))*100.0/(buy_price*poids_pieces[name])) for i in range(1,minimum)] +
-['{:.2f}'.format(((price_between(i,price_ranges)/quantity + price_between(price_between(i,price_ranges),delivery_ranges)/(quantity*i)) - (buy_price*poids_pieces[name]))*100.0/(buy_price*poids_pieces[name])) for i in range(minimum,151)]
-                        ),
-                        delivery_fees=';'.join(['{min_}-{max_}-{price}'.format(min_=r[0],max_=r[1],price=r[2]) for r in delivery_ranges]),
-                        source=url,
-                        session_id=session_id,
-                        bullion_type=bullion_type,
-                        quantity=quantity,
-                        minimum=minimum)
-
-            session.add(coin)
-            session.commit()
+            WebDriverWait(driver, 5).until(
+                EC.presence_of_all_elements_located((By.CLASS_NAME, "fusion-column-wrapper"))
+            )
         except Exception as e:
-            pass
+            logger.warning(f"Error finding or clicking 'Load More Produits' button: {e}")
+
+        # Find the product divs
+        products_div = driver.find_elements(By.CLASS_NAME, "fusion-column-wrapper")
+
+        for product in products_div:
+            try:
+                price_text = product.find_element(By.CLASS_NAME, 'woocommerce-Price-amount').text
+                price = Price.fromstring(price_text)
+
+                name_title = product.find_element(By.TAG_NAME, "h4")
+                url = name_title.find_element(By.TAG_NAME, 'a').get_attribute('href')
+                name = name_title.text.strip()
+
+                print(price,CMN[name],url)
+
+                minimum = 1
+                quantity = 1
+                item_data = CMN[name]
+                if isinstance(item_data, tuple):
+                    name = item_data[0]
+                    quantity = item_data[1]
+                    bullion_type = item_data[0][:2]
+                else:
+                    name = item_data
+                    bullion_type = item_data[:2]
+
+                if bullion_type == 'or':
+                    buy_price = buy_price_gold
+                else:
+                    buy_price = buy_price_silver
+
+                price_ranges = [(minimum,999999999.9,price)]
+
+                def price_between(value, ranges):
+                    """
+                    Returns the price per unit for a given quantity.
+                    """
+                    for min_qty, max_qty, price in ranges:
+                        if min_qty <= value <= max_qty:
+                            if isinstance(price, Price):
+                                return price.amount_float
+                            else:
+                                return price
+
+                coin = Item(name=name,
+                            price_ranges=';'.join(['{min_}-{max_}-{price}'.format(min_=r[0],max_=r[1],price=r[2].amount_float) for r in price_ranges]),
+                            buy_premiums=';'.join(
+    ['{:.2f}'.format(((price_between(minimum,price_ranges)/quantity + price_between(price_between(minimum,price_ranges)*minimum,delivery_ranges)/(quantity*minimum)) - (buy_price*poids_pieces[name]))*100.0/(buy_price*poids_pieces[name])) for i in range(1,minimum)] +
+    ['{:.2f}'.format(((price_between(i,price_ranges)/quantity + price_between(price_between(i,price_ranges),delivery_ranges)/(quantity*i)) - (buy_price*poids_pieces[name]))*100.0/(buy_price*poids_pieces[name])) for i in range(minimum,151)]
+                            ),
+                            delivery_fees=';'.join(['{min_}-{max_}-{price}'.format(min_=r[0],max_=r[1],price=r[2]) for r in delivery_ranges]),
+                            source=url,
+                            session_id=session_id,
+                            bullion_type=bullion_type,
+                            quantity=quantity,
+                            minimum=minimum)
+
+                session.add(coin)
+                session.commit()
+
+            except KeyError as e:
+                logger.error(f"KeyError: {name}")
+
+            except Exception as e:
+                logger.error(f"An error occurred while processing a product: {e}")
+                traceback.print_exc()
+
+    except Exception as e:
+        logger.error(f"An error occurred: {e}")
+        traceback.print_exc()

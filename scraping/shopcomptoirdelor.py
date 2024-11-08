@@ -3,8 +3,11 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from price_parser import Price
+import traceback
+import logging
 
-
+# Get the logger
+logger = logging.getLogger(__name__)
 
 CMN = {
     '50 pesos mex mexicains or diverses années' : 'or - 50 pesos mex',
@@ -88,7 +91,7 @@ def get_price_for(session, session_id,buy_price_gold,buy_price_silver,driver):
             WebDriverWait(driver, 10).until(
                 EC.presence_of_all_elements_located((By.TAG_NAME, "a"))
             )
-            WebDriverWait(driver, 10).until(
+            WebDriverWait(driver, 20).until(
                 EC.presence_of_all_elements_located((By.CLASS_NAME, "card-content-title"))
             )
             WebDriverWait(driver, 10).until(
@@ -156,9 +159,14 @@ def get_price_for(session, session_id,buy_price_gold,buy_price_silver,driver):
                     session.add(coin)
                     session.commit()
 
+
+                except KeyError as e:
+                    logger.error(f"KeyError: {name}")
+
                 except Exception as e:
-                    #print(traceback.format_exc())
-                    pass
+                    logger.error(f"An error occurred while processing a product: {e}")
+                    traceback.print_exc()
+
         except Exception as e:
-            #print(traceback.format_exc())
-            pass
+            logger.error(f"An error occurred: {e}")
+            traceback.print_exc()

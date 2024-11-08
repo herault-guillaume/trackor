@@ -7,7 +7,7 @@ import pandas as pd
 import sqlite3
 
 # Connect to your SQLite database
-db_path = r'C:\Users\guillaume.herault\PycharmProjects\trackor\models\pieces_or.db'
+db_path = r'C:\Users\Guillaume Hérault\PycharmProjects\trackor\models\pieces_or.db'
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 

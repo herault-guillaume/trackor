@@ -5,6 +5,10 @@ from numpy.random.mtrand import randint
 from models.model import Item, poids_pieces
 import traceback
 from price_parser import Price
+import logging
+
+# Get the logger
+logger = logging.getLogger(__name__)
 
 CMN = {
     '1 oz philharmonique': 'or - 1 oz philharmonique',
@@ -15,6 +19,7 @@ CMN = {
     '1 ducat or': 'or - 1 ducat',
     '8 florins 20 francs or 1892 refrappe': 'or - 8 florins 20 francs franz joseph I refrappe',
     '4 florins 10 francs 1892 refrappe': 'or - 4 florins 10 francs 1892 refrappe',
+    '5 florins or wilhelmina 1912': 'or - 5 florins wilhelmina',
     '100 couronnes or françois joseph I': 'or - 100 couronnes françois joseph I',
     '20 couronnes or françois joseph I': 'or - 20 couronnes françois joseph I',
     '10 couronnes or françois joseph I': 'or - 10 couronnes françois joseph I',
@@ -30,7 +35,7 @@ CMN = {
     'demi souverain or elizabeth II': 'or - 1/2 souverain elizabeth II',
     'demi souverain or edouard VII': 'or - 1/2 souverain edouart VII',
     'demi souverain or victoria voilée': 'or - 1/2 souverain victoria voilée',
-    '1/2 souverain or victoria jubilee arm.': 'or - 1/2 souverain victoria jubilee arm.',
+    'demi souverain or victoria jubilée armoiries.': 'or - 1/2 souverain victoria jubilee arm.',
     '20 francs or napoléon III': 'or - 20 francs fr napoléon III',
     '20 francs or coq marianne': 'or - 20 francs fr coq marianne',
     '20 francs or génie debout': 'or - 20 francs fr génie debout',
@@ -95,11 +100,13 @@ CMN = {
     '20 lire or vittorio emanuele II': 'or - 20 lire vittorio emanuele II',
     '20 lire or vittorio emanuele II ancien': 'or - 20 lire vittorio emanuele II ancien',
     '20 lire or carl albert': 'or - 20 lire carl albert',
+    '20 lire or napoléon I': 'or - 20 lire carl albert',
     '40 lire or napoléon I': 'or - 40 lire napoléon I',
     '40 lire or maria luigia': 'or - 40 lire maria luigia',
     '10 lire or vittorio emanuele II': 'or - 10 lire vittorio emanuele II',
     '20 mark or wilhelm II': 'or - 20 mark wilhelm I',
     '20 mark or wilhelm I': 'or - 20 mark wilhelm II',
+    '20 mark or ludwig II': 'or - 20 mark ludwig II',
     '10 mark or wilhelm II': 'or - 10 mark wilhelm II',
     '10 mark or wilhelm I': 'or - 10 mark wilhelm I',
     '100 pesos or liberté': 'or - 100 pesos liberté chili',
@@ -122,7 +129,8 @@ CMN = {
     '20 francs or albert I': 'or - 20 francs bel albert I',
     '50 écus or charles quint': 'or - 50 écus charles quint',
     '100 écus or': 'or - 100 écus',
-    '100 francs or albert I': 'ar - 100 francs bel albert I',
+    '100 francs or albert I': 'or - 100 francs bel albert I',
+    '100 francs or charles III': 'or - 100 francs charles III',
     '100 lire or carl albert': 'or - 100 lires carl albert',
     '20 lire pie IX 1869 R': 'or - 20 lire pie IX 1869 R',
     '20 mark or Friedrich I (Baden)': 'or - 20 mark Friedrich I (Baden)',
@@ -191,7 +199,7 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
 
     base_url = 'https://www.acheter-or-argent.fr/index2.php/categorie-produit/'
     urls = [base_url+'pieces-dor/page/{i}/'.format(i=i) for i in range(1,17)] + [base_url+'/pieces-dargent/page/{i}/'.format(i=i) for i in range(1,25)]
-
+    logger.debug(f"Scraping started for {base_url}") # Example debug log
     delivery_ranges = [
       (0.0, 500.0, 18.0),
       (500.0, 1000.0, 15.0),
@@ -279,5 +287,10 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
                 session.add(coin)
                 session.commit()
 
-            except :
-                print(traceback.format_exc())
+            except KeyError as e:
+
+                logger.error(f"KeyError: {product_name}")  # Log the product name
+
+            except Exception as e:
+                logger.error(f"An error occurred while processing: {e}")
+                traceback.print_exc()

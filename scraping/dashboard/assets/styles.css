@@ -13,7 +13,6 @@
   background-color: lightyellow !important; /* Or your preferred light gold color */
 }
 
-
 .equal-height-cards .card {
   height: 100%;  // Make cards take full height of the row
   display: flex;   // Enable flexbox for the card
@@ -38,7 +37,7 @@ body {
 
 .card-header {
   background-color: #282828; /* Darker header */
-  color: #ffd700; /* More vibrant gold */
+  color: #f4c810ff; /* More vibrant gold */
   font-weight: 600;
   border-radius: 10px 10px 0 0; /* Rounded top corners */
 }
@@ -61,8 +60,8 @@ body {
 
 /* Switch component */
 .gold-silver-switch .form-check-input:checked {
-  background-color: #ffd700;
-  border-color: #ffd700;
+  background-color: #f4c810ff;
+  border-color: #f4c810ff;
 }
 
 .gold-silver-switch .form-check-input:not(:checked) {

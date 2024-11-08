@@ -155,6 +155,8 @@ poids_pieces  = {
                         'or - 10 florins wilhelmina': 6.056, # -> CPor
                         'or - 10 florins wilhelmina cheveux longs': 6.056, # -> CPor
                         'or - 10 florins willem III': 6.056, # -> CPor
+                        'or - 10 florins willem III': 6.056, # -> CPor
+                        'or - 5 florins wilhelmina': 3.024, # -> CPor
                         'or - 10 francs fr': 2.903, # -> CPor
                         'or - 10 francs fr coq marianne': 2.903, # -> CPor
                         'or - 10 francs fr cérès 1850-1851': 2.903,
@@ -176,6 +178,7 @@ poids_pieces  = {
                         'or - 100 francs fr génie LEF': 29.02,
                         'or - 100 francs fr génie LEF': 29.02,
                         'or - 100 francs bel albert I': 29.02,
+                        'or - 100 francs charles III': 29.02,
                         'or - 100 lires carl albert': 29.02,
                         'or - 100 piastres turc': 6.61,
                         'or - 100 pesos liberté chili': 16.47,
@@ -222,9 +225,11 @@ poids_pieces  = {
                         'or - 20 lire vittorio emanuele II ancien': 5.805,
                         'or - 20 lire carl albert': 5.805,
                         'or - 20 lire pie IX 1869 R': 5.805,
+                        'or - 20 lire napoléon I': 5.805,
                         'or - 20 mark': 7.168, # -> CPor
                         'or - 20 mark wilhelm I': 7.168, # -> CPor
                         'or - 20 mark wilhelm II': 7.168, # -> CPor
+                        'or - 20 mark ludwig II': 7.168, # -> CPor
                         'or - 10 mark wilhelm I': 3.58, # -> CPor
                         'or - 10 mark wilhelm II': 3.58, # -> CPor
                         'or - 20 mark Friedrich I (Baden)': 7.168, # -> CPor
@@ -386,6 +391,6 @@ poids_pieces  = {
                     }
 
 # Configuration de la base de données
-engine = create_engine(r'sqlite:///C:\Users\guillaume.herault\PycharmProjects\trackor\models\pieces_or.db')
+engine = create_engine(r'sqlite:///C:\Users\Guillaume Hérault\PycharmProjects\trackor\models\pieces_or.db')
 Base.metadata.create_all(engine)
 Session = sessionmaker(bind=engine)
