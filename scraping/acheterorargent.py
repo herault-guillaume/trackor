@@ -1,12 +1,13 @@
 import time
 import requests
 from bs4 import BeautifulSoup
-from numpy.random.mtrand import randint
-from models.model import Item, poids_pieces
+from models.model import Item
+from models.pieces import weights
 import traceback
 from price_parser import Price
 import logging
-
+from datetime import datetime
+import pytz
 # Get the logger
 logger = logging.getLogger(__name__)
 
@@ -195,7 +196,7 @@ CMN = {
     '5 lire vittorio emanuele II argent': 'ar - 5 lire vittorio emanuele II',
 }
 
-def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
+def get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_price_silver):
 
     base_url = 'https://www.acheter-or-argent.fr/index2.php/categorie-produit/'
     urls = [base_url+'pieces-dor/page/{i}/'.format(i=i) for i in range(1,17)] + [base_url+'/pieces-dargent/page/{i}/'.format(i=i) for i in range(1,25)]
@@ -215,7 +216,8 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
     print(base_url)
 
     for url in urls :
-        time.sleep(randint(1,3))
+        time.sleep(3
+                   )
         try:
             response = requests.get(url)
             response.raise_for_status()
@@ -275,17 +277,21 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
                 coin = Item(name=name,
                             price_ranges=';'.join(['{min_}-{max_}-{price}'.format(min_=r[0],max_=r[1],price=r[2].amount_float) for r in price_ranges]),
                             buy_premiums=';'.join(
-['{:.2f}'.format(((price_between(minimum,price_ranges)/quantity + price_between(price_between(minimum,price_ranges)*minimum,delivery_ranges)/(quantity*minimum)) - (buy_price*poids_pieces[name]))*100.0/(buy_price*poids_pieces[name])) for i in range(1,minimum)] +
-['{:.2f}'.format(((price_between(i,price_ranges)/quantity + price_between(price_between(i,price_ranges),delivery_ranges)/(quantity*i)) - (buy_price*poids_pieces[name]))*100.0/(buy_price*poids_pieces[name])) for i in range(minimum,151)]
+                                ['{:.2f}'.format(((price_between(minimum,price_ranges)/quantity + price_between(price_between(minimum,price_ranges)*minimum,delivery_ranges)/(quantity*minimum)) - (buy_price * weights[name])) * 100.0 / (buy_price * weights[name])) for i in range(1, minimum)] +
+                                ['{:.2f}'.format(((price_between(i,price_ranges)/quantity + price_between(price_between(i,price_ranges),delivery_ranges)/(quantity*i)) - (buy_price * weights[name])) * 100.0 / (buy_price * weights[name])) for i in range(minimum, 151)]
                             ),
                             delivery_fees=';'.join(['{min_}-{max_}-{price}'.format(min_=r[0],max_=r[1],price=r[2]) for r in delivery_ranges]),
                             source=source,
                             session_id=session_id,
                             bullion_type=bullion_type,
                             quantity=quantity,
-                            minimum=minimum)
-                session.add(coin)
-                session.commit()
+                            minimum=minimum, timestamp=datetime.now(pytz.timezone('CET')).replace(second=0, microsecond=0)
+)
+                session_prod.add(coin)
+                session_prod.commit()
+                session_prod.expunge(coin)
+                session_staging.add(coin)
+                session_staging.commit()
 
             except KeyError as e:
 

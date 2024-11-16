@@ -1,13 +1,22 @@
 import dash
-import datetime
+from datetime import datetime
 from dash import dcc, html, Input, Output, State, dash_table, callback_context  # Import callback_context
 from dash.exceptions import PreventUpdate
 import dash_bootstrap_components as dbc
 import pandas as pd
 import sqlite3
-from models.model import poids_pieces
+from models.pieces import weights
+from sqlalchemy import create_engine
+from sqlalchemy.sql import text
+import sshtunnel
+import datetime
+import pytz
+
+sshtunnel.SSH_TIMEOUT = 10.0
+sshtunnel.TUNNEL_TIMEOUT = 10.0
 
 # Database file path
+#db_path = r'/home/Pentagruel/bullionsniper/models/models/pieces_or.db'
 db_path = r'C:\Users\Guillaume Hérault\PycharmProjects\trackor\models\pieces_or.db'
 
 def get_country_flag_image(country_code):
@@ -17,7 +26,7 @@ def get_country_flag_image(country_code):
     """
     if len(country_code) == 2:
         return html.Img(
-            src=f"https://hatscripts.github.io/circle-flags/flags/{country_code.lower()}.svg",
+            src=f"/assets/{country_code.lower()}.svg",  # Use assets folder
             alt=country_code,
             style={'width': '20px', 'margin-right': '5px'}
         )
@@ -25,46 +34,74 @@ def get_country_flag_image(country_code):
         return ""
 
 or_options_quick_filter = [
-                {'label': html.Span([get_country_flag_image('fr'), "20 francs Napoléon d'Or"]), 'value': 'or - 20 francs fr *'},
-                {'label': html.Span([get_country_flag_image('fr'), "5 francs"]), 'value': 'or - 5 francs fr *'},
-                {'label': html.Span([get_country_flag_image('fr'), "10 francs"]), 'value': 'or - 10 francs fr *'},
-                {'label': html.Span([get_country_flag_image('fr'), "40 francs"]), 'value': 'or - 40 francs fr *'},
-                {'label': html.Span([get_country_flag_image('fr'), "50 francs"]), 'value': 'or - 50 francs fr *'},
-                {'label': html.Span([get_country_flag_image('fr'), "100 francs"]), 'value': 'or - 100 francs fr *'},
-                {'label': html.Span([get_country_flag_image('ch'), "20 francs"]), 'value': 'or - 20 francs sui *'},
-                {'label': html.Span([get_country_flag_image('gb'), "1 souverain"]), 'value': 'or - 1 souverain *'},
-                {'label': html.Span([get_country_flag_image('gb'), "1/2 souverain"]), 'value': 'or - 1/2 souverain *'},
-                {'label': html.Span([get_country_flag_image('us'), "2.5 dollars"]), 'value': 'or - 2.5 dollars *'},
-                {'label': html.Span([get_country_flag_image('us'), "5 dollars"]), 'value': 'or - 5 dollars *'},
-                {'label': html.Span([get_country_flag_image('us'), "10 dollars"]), 'value': 'or - 10 dollars *'},
-                {'label': html.Span([get_country_flag_image('us'), "20 dollars"]), 'value': 'or - 20 dollars *'},
-                {'label': html.Span([get_country_flag_image('mx'), "50 pesos"]), 'value': 'or - 50 pesos *'},
-                {'label': html.Span([get_country_flag_image('it'), "20 lire"]), 'value': 'or - 20 lire *'},
-                {'label': html.Span([get_country_flag_image('de'), "20 mark"]), 'value': 'or - 20 mark *'},
-                {'label': "1 Oz", 'value': 'or - 1 oz*'},
-                {'label': "1/2 Oz", 'value': 'or - 1/2 oz*'},
-                {'label': "1/4 Oz", 'value': 'or - 1/4 oz*'},
-                {'label': "1/10 Oz", 'value': 'or - 1/10 oz*'},
-                {'label': "1/20 Oz", 'value': 'or - 1/20 oz*'},
+                {'label': html.Span([get_country_flag_image('fr'), "Toutes les 20 francs Napoléon d'Or"]), 'value': 'or - 20 francs fr *'},
+                {'label': html.Span([get_country_flag_image('fr'), "Toutes les 5 francs"]), 'value': 'or - 5 francs fr *'},
+                {'label': html.Span([get_country_flag_image('fr'), "Toutes les 10 francs"]), 'value': 'or - 10 francs fr *'},
+                {'label': html.Span([get_country_flag_image('fr'), "Toutes les 40 francs"]), 'value': 'or - 40 francs fr *'},
+                {'label': html.Span([get_country_flag_image('fr'), "Toutes les 50 francs"]), 'value': 'or - 50 francs fr *'},
+                {'label': html.Span([get_country_flag_image('fr'), "Toutes les 100 francs"]), 'value': 'or - 100 francs fr *'},
+                {'label': html.Span([get_country_flag_image('ch'), "Toutes les 20 francs"]), 'value': 'or - 20 francs sui *'},
+                {'label': html.Span([get_country_flag_image('gb'), "Toutes les 1 souverain"]), 'value': 'or - 1 souverain *'},
+                {'label': html.Span([get_country_flag_image('gb'), "Toutes les 1/2 souverain"]), 'value': 'or - 1/2 souverain *'},
+                {'label': html.Span([get_country_flag_image('us'), "Toutes les 2.5 dollars"]), 'value': 'or - 2.5 dollars *'},
+                {'label': html.Span([get_country_flag_image('us'), "Toutes les 5 dollars"]), 'value': 'or - 5 dollars *'},
+                {'label': html.Span([get_country_flag_image('us'), "Toutes les 10 dollars"]), 'value': 'or - 10 dollars *'},
+                {'label': html.Span([get_country_flag_image('us'), "Toutes les 20 dollars"]), 'value': 'or - 20 dollars *'},
+                {'label': html.Span([get_country_flag_image('mx'), "Toutes les 50 pesos"]), 'value': 'or - 50 pesos *'},
+                {'label': html.Span([get_country_flag_image('it'), "Toutes les 20 lire"]), 'value': 'or - 20 lire *'},
+                {'label': html.Span([get_country_flag_image('de'), "Toutes les 20 mark"]), 'value': 'or - 20 mark *'},
+                {'label': "Toutes les 1 Oz", 'value': 'or - 1 oz*'},
+                {'label': "Toutes les 1/2 Oz", 'value': 'or - 1/2 oz*'},
+                {'label': "Toutes les 1/4 Oz", 'value': 'or - 1/4 oz*'},
+                {'label': "Toutes les 1/10 Oz", 'value': 'or - 1/10 oz*'},
+                {'label': "Toutes les 1/20 Oz", 'value': 'or - 1/20 oz*'},
                         ]
 ar_options_quick_filter = [
-            {'label': html.Span([get_country_flag_image('fr'), "50 Cts francs"]), 'value': 'ar - 50 centimes francs fr *'},
-            {'label': html.Span([get_country_flag_image('fr'), "1 franc"]), 'value': 'ar - 1 franc fr *'},
-            {'label': html.Span([get_country_flag_image('fr'), "2 francs"]), 'value': 'ar - 2 francs fr *'},
-            {'label': html.Span([get_country_flag_image('fr'), "5 francs"]), 'value': 'ar - 5 francs fr *'},
-            {'label': html.Span([get_country_flag_image('fr'), "10 francs"]), 'value': 'ar - 10 francs fr *'},
-            {'label': html.Span([get_country_flag_image('fr'), "20 francs"]), 'value': 'ar - 20 francs fr *'},
-            {'label': html.Span([get_country_flag_image('fr'), "50 francs Hercule"]), 'value': 'ar - 50 francs fr *'},
-            {'label': html.Span([get_country_flag_image('fr'), "100 francs Hercule"]), 'value': 'ar - 100 francs fr *'},
-            {'label': "1 Oz", 'value': 'ar - 1 oz *'},
+            {'label': html.Span([get_country_flag_image('fr'), "Toutes les 50 Cts francs"]), 'value': 'ar - 50 centimes francs fr *'},
+            {'label': html.Span([get_country_flag_image('fr'), "Toutes les 1 franc"]), 'value': 'ar - 1 franc fr *'},
+            {'label': html.Span([get_country_flag_image('fr'), "Toutes les 2 francs"]), 'value': 'ar - 2 francs fr *'},
+            {'label': html.Span([get_country_flag_image('fr'), "Toutes les 5 francs"]), 'value': 'ar - 5 francs fr *'},
+            {'label': html.Span([get_country_flag_image('fr'), "Toutes les 10 francs"]), 'value': 'ar - 10 francs fr *'},
+            {'label': html.Span([get_country_flag_image('fr'), "Toutes les 20 francs"]), 'value': 'ar - 20 francs fr *'},
+            {'label': html.Span([get_country_flag_image('fr'), "Toutes les 50 francs Hercule"]), 'value': 'ar - 50 francs fr *'},
+            {'label': html.Span([get_country_flag_image('fr'), "Toutes les 100 francs Hercule"]), 'value': 'ar - 100 francs fr *'},
+            {'label': "Toutes les 1 Oz", 'value': 'ar - 1 oz *'},
 ]
 
 
 
-app = dash.Dash(__name__, external_stylesheets=[dbc.themes.DARKLY,'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css'],assets_folder='assets')
+app = dash.Dash(__name__,
+                external_stylesheets=[dbc.themes.DARKLY,'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css'],
+                assets_folder='assets',
+                update_title=None,
+                meta_tags=[
+                    {"name": "language", "content": "fr"},
+                    {"name": "title", "content": "Bullion Sniper"},
+                    {"property": "og:title", "content": "Bullion Sniper"},  # For social media sharing
+                    {"name": "description",
+                     "content": "Trouver facilement les meilleurs offres de pièces d'investissement en ligne."},
+                    {"property": "og:description",
+                     "content": "Trouver facilement les meilleurs offres de pièces d'investissement en ligne."},
+                    # For social media sharing
+                    # Add more meta tags as needed (e.g., keywords, author, etc.)
+                ]
+                )
 
-app.layout = dbc.Container([
-    html.H1("Track'Or", className="text-light mb-4"),
+
+
+def serve_layout():
+    return dbc.Container([html.Div([
+
+    dcc.Loading(
+        id="loading-1",
+        type="default",
+        children=html.Div(id="tawk-to-widget")
+    ),
+    # Rest of your Dash app layout
+]),
+
+    dbc.Row([
+        html.Img(src='/assets/logo-bullion-sniper.webp', style={'height': '150px', 'width': 'auto'}),], className="mb-4 equal-height-cards"),
 
     dbc.Row([
         dbc.Col(
@@ -87,7 +124,7 @@ app.layout = dbc.Container([
                     )
                 ],id="cardheader-budget"),
             ]),
-            xs=12, sm=12, md=6, lg=6, xl=6,xxl=6, className="mb-4"  # Adjust width for larger screens
+            xs=12, sm=12, md=6, lg=6, xl=6,xxl=7, className="mb-4"  # Adjust width for larger screens
         ),
         dbc.Col(
             dbc.Card([
@@ -230,36 +267,30 @@ app.layout = dbc.Container([
                                     [
                                         dbc.Row(
                                             [
-                                                dbc.Label("Votre nom", html_for="name-input", width=3,
-                                                          className="text-end"),
                                                 dbc.Col(
                                                     dbc.Input(type="text", id="name-input",
                                                               placeholder="Entrez votre nom"),
-                                                    width=9,
+                                                    width=12,
                                                 ),
                                             ],
                                             className="mb-3",
                                         ),
                                         dbc.Row(
                                             [
-                                                dbc.Label("Votre email", html_for="email-input", width=3,
-                                                          className="text-end"),
                                                 dbc.Col(
                                                     dbc.Input(type="email", id="email-input",
                                                               placeholder="Entrez votre email"),
-                                                    width=9,
+                                                    width=12,
                                                 ),
                                             ],
                                             className="mb-3",
                                         ),
                                         dbc.Row(
                                             [
-                                                dbc.Label("Votre message", html_for="message-input", width=3,
-                                                          className="text-end"),
                                                 dbc.Col(
                                                     dbc.Textarea(id="message-input",
                                                                  placeholder="Entrez votre message"),
-                                                    width=9,
+                                                    width=12,
                                                 ),
                                             ],
                                             className="mb-3",
@@ -299,18 +330,41 @@ app.layout = dbc.Container([
                         ),
                         dbc.CardBody([
                         "Nous attachons un soin particulier à créer et entretenir le présent site et à veiller à l’exactitude et à l’actualité de son contenu.",html.Br(),html.Br(), "Néanmoins, les éléments présentés dans ce site sont susceptibles de modifications fréquentes sans préavis. Bullion-sniper.fr ne garantit pas l’exactitude et l’actualité du contenu du site. Les éléments présentés Bullion-sniper.fr sont mis à disposition des utilisateurs sans aucune garantie d’aucune sorte et ne peuvent donner lieu à un quelconque droit à dédommagement.",
-                            html.Br(),html.Br(),"Bullion-sniper.fr x Dash ",html.I(className="fa-solid fa-heart fa-beat", style={'font-size': '22px', 'color' : 'gold'}),
                     ])], style={'text-align': 'center'}
                     )
                 ],
                 width=6)
-        ]
-    )
-]),
+        ], className="mb-4 equal-height-cards"),
 
+    html.Div([
+        "2025 - Bullion-sniper.fr x ",
+        html.A("Dash ",href="https://dash.plotly.com/"),
+        html.I(className="fa-solid fa-heart fa-beat", style={'font-size': '16px', 'color' : 'red'}),], className="text-center mb-2"),  # Add a div to display the last update info
 
+    ])
 
+app.layout = serve_layout()
 
+app.clientside_callback(
+        """
+        function(n_clicks) {
+            setTimeout(function() {
+                var s1=document.createElement("script");
+                s1.async=true;
+                s1.src='https://embed.tawk.to/673851ed4304e3196ae37e76/1icq0025a';
+                s1.charset='UTF-8';
+                s1.setAttribute('crossorigin','*');
+                document.body.appendChild(s1); // Append to the end of <body>
+
+                document.getElementById("loading-1").style.display = "none"; 
+            }, 100); // Adjust the delay as needed
+
+            return "";
+        }
+        """,
+    Output("tawk-to-widget", "children"),
+    Input("tawk-to-widget", "n_clicks"),
+)
 
 @app.callback(
     Output('cheapest-offer-table-body', 'children'),
@@ -427,49 +481,71 @@ def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_
                     return price  # Return the price directly
                 return None  # Or handle the case where quantity is outside all ranges
 
-        bullion_type = 'or' if bullion_type_switch else 'ar'
+        with sshtunnel.SSHTunnelForwarder(
+                ('ssh.pythonanywhere.com'),  # Your SSH hostname
+                ssh_username='Pentagruel',  # Your PythonAnywhere username
+                ssh_password='(US)ue%1',  # Replace with your actual password
+                remote_bind_address=('pentagruel.mysql.pythonanywhere-services.com', 3306)  # Your database hostname
+        ) as tunnel:
 
-        thirty_minutes_ago = datetime.datetime.now() - datetime.timedelta(minutes=30)
-        conn = sqlite3.connect(db_path)
+            engine = create_engine(
+                f"mysql+mysqlconnector://Pentagruel:(US)ue%1@127.0.0.1:{tunnel.local_bind_port}/Pentagruel$bullionsniper",
+                echo=True
+            )
+            with engine.connect() as conn:
+                bullion_type = 'or' if bullion_type_switch else 'ar'
 
-        query_metal_price = """
-        SELECT *
-        FROM metal_price
-        WHERE bullion_type = ?
-        AND session_id = (
-            SELECT session_id 
-            FROM metal_price
-            GROUP BY session_id 
-            HAVING MAX(timestamp) < ?
-            ORDER BY MAX(timestamp) DESC 
-            LIMIT 1
-        )
-        """
+                # Get the time zone for France
+                france_timezone = pytz.timezone('Europe/Paris')
 
-        # Execute the query with parameters
-        metal_prices_df = pd.read_sql_query(query_metal_price, conn,params=(bullion_type, thirty_minutes_ago.strftime('%Y-%m-%d %H:%M:%S')))
+                # Get the current time in France
+                now_france = datetime.datetime.now(france_timezone)
 
-        # Get buying gold and silver coin values
-        metal_price = metal_prices_df['buy_price'].iloc[0]
-        session_id = metal_prices_df['session_id'].iloc[0]
-        latest_timestamp = metal_prices_df['timestamp'].iloc[0]
-        formatted_timestamp = datetime.datetime.strptime(latest_timestamp, '%Y-%m-%d %H:%M:%S.%f').strftime('%d/%m/%Y à %Hh%M.')
+                # Calculate 30 minutes ago in France's time zone
+                thirty_minutes_ago = now_france - datetime.timedelta(minutes=1)
 
-        cheapest_offers = []
-        seen_offers = set()
-        table_rows = []
+                thirty_minutes_ago = datetime.datetime.now() - datetime.timedelta(minutes=1)
 
-        # SQL query to fetch the latest complete session and its data from both tables
-        query_item = """
-        SELECT * 
-        FROM item 
-        WHERE bullion_type = ? AND session_id = ? AND ( minimum <= ? AND quantity <= ? )
-        """
-        # WHERE (minimum <= {quantity} OR quantity <= {quantity})
+                query_metal_price = text(
+                    """
+                    SELECT *
+                    FROM metal_price
+                    WHERE bullion_type = :bullion_type
+                    AND session_id = (
+                        SELECT session_id
+                        FROM metal_price
+                        GROUP BY session_id
+                        HAVING MAX(timestamp) < :thirty_minutes_ago
+                        ORDER BY MAX(timestamp) DESC
+                        LIMIT 1
+                    )
+                    """
+                )
 
-        # Load data into Pandas DataFrames
-        items_df = pd.read_sql_query(query_item, conn, params=(bullion_type, session_id, quantity,quantity))
+                result = conn.execute(query_metal_price,
+                                      {"bullion_type": bullion_type, "thirty_minutes_ago": thirty_minutes_ago})
+                metal_prices_df = pd.DataFrame(result.fetchall(), columns=result.keys())
 
+                # Get buying gold and silver coin values
+                metal_price = metal_prices_df['buy_price'].iloc[0]
+                session_id = metal_prices_df['session_id'].iloc[0]
+                latest_timestamp = metal_prices_df['timestamp'].iloc[0]
+                formatted_timestamp = latest_timestamp.strftime('%d/%m/%Y à %Hh%M.')
+
+                cheapest_offers = []
+                seen_offers = set()
+                table_rows = []
+
+                # SQL query to fetch the latest complete session_prod and its data from both tables
+                # SQL query to fetch the latest complete session and its data from both tables
+                query_item = text("""
+                SELECT *
+                FROM item
+                WHERE bullion_type = :bullion_type AND session_id = :session_id AND ( minimum <= :quantity AND quantity <= :quantity )
+                """)
+                result = conn.execute(query_item,
+                                      {"bullion_type": 'or', "session_id": session_id, "quantity": quantity})
+                items_df = pd.DataFrame(result.fetchall(), columns=result.keys()).copy()
         if selected_coins:
             filtered_df = pd.DataFrame()  # Create an empty DataFrame to store filtered rows
             for coin in selected_coins:
@@ -501,7 +577,7 @@ def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_
             for i, row in results.iterrows():
                 try :
                     # Calculate total cost (using bullion_type)
-                    spot_cost = poids_pieces[row['name']] * metal_price
+                    spot_cost = weights[row['name']] * metal_price
                     total_cost = (spot_cost  + (row['buy_premiums']  / 100.0)*spot_cost) * (row['premium_index']+1) * float(row['quantity'])
 
                     # Check if the offer meets the budget
@@ -510,7 +586,7 @@ def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_
                             'name': row['name'].upper(),
                             'source': row['source'],
                             'premium': row['buy_premiums'] ,
-                            'quantity': int(row['premium_index'] + 1) ,
+                            'quantity': int(row['premium_index'] + 1) * row['quantity'] ,
                             'total_cost': total_cost
                         })
                         seen_offers.add((row['name'], row['source']))
@@ -559,7 +635,6 @@ def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_
         arrow_classNames['quantity-arrow'],
         arrow_classNames['total_cost-arrow'])
 
-
 @app.callback(
     Output('piece-dropdown', 'options'),  # Output to update the dropdown options
     [Input('bullion-type-switch', 'value')]
@@ -575,6 +650,7 @@ def update_piece_dropdown(bullion_type_switch):
     [Input('bullion-type-switch', 'value'),
      State('quantity-dropdown', 'value')]
 )
+
 def update_quantity_dropdown(bullion_type_switch,quantity):
     if bullion_type_switch:  # If the switch is on (gold)
         return 3  # Set quantity to 3
@@ -589,30 +665,43 @@ def update_quantity_dropdown(bullion_type_switch,quantity):
      Input('interval-component', 'n_intervals')]
 )
 def update_metal_price(bullion_type_switch, n):
-    bullion_type = 'or' if bullion_type_switch else 'ar'
 
-    thirty_minutes_ago = datetime.datetime.now() - datetime.timedelta(minutes=30)
-    conn = sqlite3.connect(db_path)
+    with sshtunnel.SSHTunnelForwarder(
+            ('ssh.pythonanywhere.com'),  # Your SSH hostname
+            ssh_username='Pentagruel',  # Your PythonAnywhere username
+            ssh_password='(US)ue%1',  # Replace with your actual password
+            remote_bind_address=('pentagruel.mysql.pythonanywhere-services.com', 3306)  # Your database hostname
+    ) as tunnel:
+        engine = create_engine(
+            f"mysql+mysqlconnector://Pentagruel:(US)ue%1@127.0.0.1:{tunnel.local_bind_port}/Pentagruel$bullionsniper"
+        )
+        with engine.connect() as conn:
+            bullion_type = 'or' if bullion_type_switch else 'ar'
 
-    query_metal_price = """
-    SELECT *
-    FROM metal_price
-    WHERE bullion_type = ?
-    AND session_id = (
-        SELECT session_id 
-        FROM metal_price
-        GROUP BY session_id 
-        HAVING MAX(timestamp) < ?
-        ORDER BY MAX(timestamp) DESC 
-        LIMIT 1
-    )
-    """
+            thirty_minutes_ago = datetime.datetime.now() - datetime.timedelta(minutes=30)
+            query_metal_price = text(
+                """
+                SELECT *
+                FROM metal_price
+                WHERE bullion_type = :bullion_type
+                AND session_id = (
+                    SELECT session_id
+                    FROM metal_price
+                    GROUP BY session_id
+                    HAVING MAX(timestamp) < :thirty_minutes_ago
+                    ORDER BY MAX(timestamp) DESC
+                    LIMIT 1
+                )
+                """
+            )
 
-    # Execute the query with parameters
-    metal_prices_df = pd.read_sql_query(query_metal_price, conn,params=(bullion_type, thirty_minutes_ago.strftime('%Y-%m-%d %H:%M:%S')))
+            result = conn.execute(query_metal_price,
+                                  {"bullion_type": bullion_type, "thirty_minutes_ago": thirty_minutes_ago})
 
-    # Get buying gold and silver coin values
-    metal_price = metal_prices_df['buy_price'].iloc[0]
+            metal_prices_df = pd.DataFrame(result.fetchall(), columns=result.keys())
+            print(metal_prices_df)
+            # Get buying gold and silver coin values
+            metal_price = metal_prices_df['buy_price'].iloc[0]
 
     return html.Div(
         [

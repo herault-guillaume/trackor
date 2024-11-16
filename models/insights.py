@@ -7,7 +7,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from urllib.parse import urlparse
-from model import poids_pieces
+from models.pieces import weights
 
 from statsmodels.tsa.arima.model import ARIMA
 from statsmodels.tsa.stattools import adfuller
@@ -61,7 +61,7 @@ for CMN in unique_coins:
             continue  # Passer à la combinaison suivante si aucune donnée n'est trouvée
 
         # Get gold weight for the current coin
-        gold_weight = poids_pieces.get(CMN)
+        gold_weight = weights.get(CMN)
         if gold_weight is None:
             print(f"Warning: Gold weight not found for coin '{CMN}'. Skipping...")
             continue

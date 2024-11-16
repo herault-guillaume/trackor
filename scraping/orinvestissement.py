@@ -1,9 +1,12 @@
 import requests
 from bs4 import BeautifulSoup
-from models.model import Item, poids_pieces
+from models.model import Item
+from models.pieces import weights
 from price_parser import Price
 import traceback
 import logging
+from datetime import datetime
+import pytz
 # Get the logger
 logger = logging.getLogger(__name__)
 
@@ -32,7 +35,7 @@ CMN = {
 }
 
 # https://or-investissement.fr/information-or-investissement/1-livraison-achat-or-investissement
-def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
+def get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_price_silver):
     """
     Retrieves the 'or - 20 francs coq marianne' coin purchase price from Or-Investissement using requests and BeautifulSoup.
     """
@@ -99,19 +102,22 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
                     coin = Item(name=name,
                                 price_ranges=';'.join(['{min_}-{max_}-{price}'.format(min_=r[0],max_=r[1],price=r[2].amount_float) for r in price_ranges]),
                                 buy_premiums=';'.join(
-        ['{:.2f}'.format(((price_between(minimum,price_ranges)/quantity + price_between(price_between(minimum,price_ranges)*minimum,delivery_ranges)/(quantity*minimum)) - (buy_price*poids_pieces[name]))*100.0/(buy_price*poids_pieces[name])) for i in range(1,minimum)] +
-        ['{:.2f}'.format(((price_between(i,price_ranges)/quantity + price_between(price_between(i,price_ranges),delivery_ranges)/(quantity*i)) - (buy_price*poids_pieces[name]))*100.0/(buy_price*poids_pieces[name])) for i in range(minimum,151)]
+                                    ['{:.2f}'.format(((price_between(minimum,price_ranges)/quantity + price_between(price_between(minimum,price_ranges)*minimum,delivery_ranges)/(quantity*minimum)) - (buy_price * weights[name])) * 100.0 / (buy_price * weights[name])) for i in range(1, minimum)] +
+                                    ['{:.2f}'.format(((price_between(i,price_ranges)/quantity + price_between(price_between(i,price_ranges),delivery_ranges)/(quantity*i)) - (buy_price * weights[name])) * 100.0 / (buy_price * weights[name])) for i in range(minimum, 151)]
                                 ),
                                 delivery_fees=';'.join(['{min_}-{max_}-{price}'.format(min_=r[0],max_=r[1],price=r[2]) for r in delivery_ranges]),
                                 source=url,
                                 session_id=session_id,
                                 bullion_type=bullion_type,
                                 quantity=quantity,
-                                minimum=minimum)
+                                minimum=minimum, timestamp=datetime.now(pytz.timezone('CET')).replace(second=0, microsecond=0)
+)
 
-                    session.add(coin)
-                    session.commit()
-
+                    session_prod.add(coin)
+                    session_prod.commit()
+                    session_prod.expunge(coin)
+                    session_staging.add(coin)
+                    session_staging.commit()
 
                 except KeyError as e:
                     logger.error(f"KeyError: {name}")

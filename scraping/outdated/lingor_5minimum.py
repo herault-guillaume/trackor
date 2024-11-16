@@ -4,7 +4,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from models.model import Item
 
-def get(session):
+def get(session_prod):
     options = webdriver.ChromeOptions()
     options.add_argument("--headless")
     driver = webdriver.Chrome(options=options)
@@ -19,8 +19,8 @@ def get(session):
     price = float(span_element.text.replace('€', '').replace(',', '.'))
 
     coin = Item(name="or - 20 francs coq marianne", prices=price, source='achatoretargent')
-    session.add(coin)
-    session.commit()
+    session_prod.add(coin)
+    session_prod.commit()
 
     if price:
         return price

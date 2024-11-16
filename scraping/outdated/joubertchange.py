@@ -1,7 +1,8 @@
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from models.model import Item, poids_pieces
+from models.model import Item
+from models.pieces import weights
 from seleniumbase import Driver
 
 from price_parser import Price
@@ -73,7 +74,7 @@ def get_delivery_price(price):
         return 25.0
 # forfait
 
-def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
+def get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_price_silver):
 
 
     urls =["https://www.joubert-change.fr/or-investissement/cours/prix.html",""]
@@ -128,15 +129,16 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
                     coin = Item(name=name,
                                 prices=price.amount_float,
                                 source=url,
-                                buy_premiums=((price.amount_float + 0.0) - (buy_price * poids_pieces[CMN])) * 100.0 / (buy_price * poids_pieces[CMN]),
+                                buy_premiums=((price.amount_float + 0.0) - (buy_price * weights[CMN])) * 100.0 / (buy_price * weights[CMN]),
                                 delivery_fee=0.0,
                                 session_id=session_id,
                                 bullion_type=CMN[:2],
                                 quantity=quantity,
-                                minimum=minimum)
+                                minimum=minimum, timestamp=datetime.now(pytz.timezone('CET')).replace(second=0, microsecond=0)
+)
 
-                    session.add(coin)
-                    session.commit()
+                    session_prod.add(coin)
+                    session_prod.commit()
 
             except Exception:
                 print(traceback.format_exc())

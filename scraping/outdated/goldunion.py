@@ -1,10 +1,12 @@
 import requests
 from bs4 import BeautifulSoup
-from models.model import Item, poids_pieces
+from models.model import Item
+from models.pieces import weights
+
 
 #gold union faq combien coute une expédition
 
-def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
+def get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_price_silver):
     """
     Retrieves the 'or - 20 francs coq marianne' coin purchase price from Oretchange using requests and BeautifulSoup.
     """
@@ -33,11 +35,11 @@ def get_price_for(session,session_id,buy_price_gold,buy_price_silver):
                     coin = Item(name="or - 20 francs coq marianne",
                                 prices=price,
                                 source='https://goldunion.fr/products/20-francs-coq',
-                                buy_premiums=((price.amount_float + get_delivery_price(price.amount_float)) - (buy_price * poids_pieces[CMN])) * 100.0 / (buy_price * poids_pieces[CMN]),
+                                buy_premiums=((price.amount_float + get_delivery_price(price.amount_float)) - (buy_price * weights[CMN])) * 100.0 / (buy_price * weights[CMN]),
 
                                 delivery_fee=20.0, session_id=session_id, bullion_type='g')
-                    session.add(coin)
-                    session.commit()
+                    session_prod.add(coin)
+                    session_prod.commit()
 
                     return price
                 except ValueError:

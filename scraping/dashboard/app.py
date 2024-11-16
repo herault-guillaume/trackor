@@ -1,5 +1,5 @@
 import dash
-import datetime
+from datetime import datetime
 from dash import dcc, html, Input, Output, State
 import dash_bootstrap_components as dbc
 import plotly.express as px
