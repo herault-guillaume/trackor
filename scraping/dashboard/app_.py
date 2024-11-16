@@ -12,8 +12,8 @@ import sshtunnel
 import datetime
 import pytz
 
-sshtunnel.SSH_TIMEOUT = 10.0
-sshtunnel.TUNNEL_TIMEOUT = 10.0
+sshtunnel.SSH_TIMEOUT = 30.0
+sshtunnel.TUNNEL_TIMEOUT = 30.0
 
 # Database file path
 #db_path = r'/home/Pentagruel/bullionsniper/models/models/pieces_or.db'
@@ -82,12 +82,14 @@ app = dash.Dash(__name__,
                      "content": "Trouver facilement les meilleurs offres de pièces d'investissement en ligne."},
                     {"property": "og:description",
                      "content": "Trouver facilement les meilleurs offres de pièces d'investissement en ligne."},
+                    {"name": "keywords",
+                     "content": "pièces d'investissement, or, argent, lingots, achat, vente, bullion, investissement, métaux précieux"},
                     # For social media sharing
                     # Add more meta tags as needed (e.g., keywords, author, etc.)
                 ]
                 )
 
-
+app.title = "Bullion Sniper"
 
 def serve_layout():
     return dbc.Container([html.Div([
@@ -489,8 +491,7 @@ def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_
         ) as tunnel:
 
             engine = create_engine(
-                f"mysql+mysqlconnector://Pentagruel:(US)ue%1@127.0.0.1:{tunnel.local_bind_port}/Pentagruel$bullionsniper",
-                echo=True
+                f"mysql+mysqlconnector://Pentagruel:(US)ue%1@127.0.0.1:{tunnel.local_bind_port}/Pentagruel$bullionsniper?connection_timeout=15"
             )
             with engine.connect() as conn:
                 bullion_type = 'or' if bullion_type_switch else 'ar'
@@ -673,7 +674,7 @@ def update_metal_price(bullion_type_switch, n):
             remote_bind_address=('pentagruel.mysql.pythonanywhere-services.com', 3306)  # Your database hostname
     ) as tunnel:
         engine = create_engine(
-            f"mysql+mysqlconnector://Pentagruel:(US)ue%1@127.0.0.1:{tunnel.local_bind_port}/Pentagruel$bullionsniper"
+            f"mysql+mysqlconnector://Pentagruel:(US)ue%1@127.0.0.1:{tunnel.local_bind_port}/Pentagruel$bullionsniper?connection_timeout=15"
         )
         with engine.connect() as conn:
             bullion_type = 'or' if bullion_type_switch else 'ar'
