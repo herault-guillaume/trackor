@@ -4,20 +4,21 @@ from dash import dcc, html, Input, Output, State, dash_table, callback_context  
 from dash.exceptions import PreventUpdate
 import dash_bootstrap_components as dbc
 import pandas as pd
-import sqlite3
 from models.pieces import weights
+from models.model import User
 from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 from sqlalchemy.sql import text
 import sshtunnel
 import datetime
 import pytz
 
-sshtunnel.SSH_TIMEOUT = 30.0
-sshtunnel.TUNNEL_TIMEOUT = 30.0
+from flask import Flask, request, redirect, url_for
+from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
+from werkzeug.security import generate_password_hash, check_password_hash
 
-# Database file path
-#db_path = r'/home/Pentagruel/bullionsniper/models/models/pieces_or.db'
-db_path = r'C:\Users\Guillaume Hérault\PycharmProjects\trackor\models\pieces_or.db'
+sshtunnel.SSH_TIMEOUT = 60.0
+sshtunnel.TUNNEL_TIMEOUT = 60.0
 
 def get_country_flag_image(country_code):
     """
@@ -68,9 +69,10 @@ ar_options_quick_filter = [
             {'label': "Toutes les 1 Oz", 'value': 'ar - 1 oz *'},
 ]
 
-
+server = Flask(__name__)
 
 app = dash.Dash(__name__,
+                server=server,
                 external_stylesheets=[dbc.themes.DARKLY,'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css'],
                 assets_folder='assets',
                 update_title=None,
@@ -84,23 +86,133 @@ app = dash.Dash(__name__,
                      "content": "Trouver facilement les meilleurs offres de pièces d'investissement en ligne."},
                     {"name": "keywords",
                      "content": "pièces d'investissement, or, argent, lingots, achat, vente, bullion, investissement, métaux précieux"},
-                    # For social media sharing
-                    # Add more meta tags as needed (e.g., keywords, author, etc.)
                 ]
                 )
 
 app.title = "Bullion Sniper"
+# Config
+server.config.update(
+    SECRET_KEY='your_secret_key'  # Replace with a strong, random key
+)
+
+# Flask-Login setup
+login_manager = LoginManager()
+login_manager.init_app(server)
+login_manager.login_view = '/login'
+
+# User loader
+@login_manager.user_loader
+def load_user(user_id):
+    with sshtunnel.SSHTunnelForwarder(
+        ('ssh.pythonanywhere.com'),  # Your SSH hostname
+        ssh_username='Pentagruel',  # Your PythonAnywhere username
+        ssh_password='(US)ue%1',  # Replace with your actual password
+        remote_bind_address=('pentagruel.mysql.pythonanywhere-services.com', 3306)  # Your database hostname
+    ) as tunnel:
+
+        engine = create_engine(
+            f"mysql+mysqlconnector://Pentagruel:(US)ue%1@127.0.0.1:{tunnel.local_bind_port}/staging-Pentagruel$bullionsniper?connection_timeout=15"
+        )
+        Session = sessionmaker(bind=engine)
+        session = Session()
+        try:
+            user = session.query(User).get(int(user_id))
+            session.close()
+            return user
+        except:  # Catch any potential exceptions during database access
+            session.close()
+            return None
+
+# Logout route
+@server.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('index'))  # Redirect to your main page
+
+
+# Login form with Dash (updated)
+login_form = dbc.Form(
+    [
+        dbc.Row(
+            [
+                dbc.Label("Username", html_for="username-input", width=3),
+                dbc.Col(
+                    dbc.Input(type="text", id="username-input", placeholder="Enter your username"),
+                    width=9,
+                ),
+            ],
+            className="mb-3",
+        ),
+        dbc.Row(
+            [
+                dbc.Label("Password", html_for="password-input", width=3),
+                dbc.Col(
+                    dbc.Input(type="password", id="password-input", placeholder="Enter your password"),
+                    width=9,
+                ),
+            ],
+            className="mb-3",
+        ),
+        dbc.Button("Log In", id="login-button", color="primary", className="mr-2"),
+        html.Div(id="login-output"),  # For displaying messages
+    ]
+)
+
+app.layout = html.Div([
+    dcc.Location(id='url', refresh=False),
+    html.Div(id='page-content', children=login_form)  # Initially show the login form
+])
+
+# Callback to handle login and set the initial layout
+# Callback to handle login
+@app.callback(
+    Output("login-output", "children"),
+    Output("content-container", "children"),
+    Input("login-button", "n_clicks"),
+    State("username-input", "value"),
+    State("password-input", "value"),
+)
+def login_callback(n_clicks, username, password):
+    if n_clicks is None:
+        raise PreventUpdate
+
+    with sshtunnel.SSHTunnelForwarder(
+        ('ssh.pythonanywhere.com'),  # Your SSH hostname
+        ssh_username='Pentagruel',  # Your PythonAnywhere username
+        ssh_password='(US)ue%1',  # Replace with your actual password
+        remote_bind_address=('pentagruel.mysql.pythonanywhere-services.com', 3306)  # Your database hostname
+    ) as tunnel:
+
+        engine = create_engine(
+            f"mysql+mysqlconnector://Pentagruel:(US)ue%1@127.0.0.1:{tunnel.local_bind_port}/staging-Pentagruel$bullionsniper?connection_timeout=15"
+        )
+
+    Session = sessionmaker(bind=engine)
+    session = Session()
+
+    try:
+        user = session.query(User).filter_by(username=username).first()
+        if user and check_password_hash(user.password, password):
+            login_user(user)
+            session.close()
+            return html.Div(), serve_layout()
+        else:
+            session.close()
+            return dbc.Alert("Invalid credentials", color="danger"), dash.no_update
+    except:  # Catch any exceptions during database access
+        session.close()
+        return dbc.Alert("Database error", color="danger"), dash.no_update
+
 
 def serve_layout():
-    return dbc.Container([html.Div([
 
-    dcc.Loading(
-        id="loading-1",
-        type="default",
-        children=html.Div(id="tawk-to-widget")
-    ),
+    return dbc.Container([
+        html.Div([
+
+    dcc.Loading(id="loading-1",type="default",children=html.Div(id="tawk-to-widget")),
     # Rest of your Dash app layout
-]),
+    ]),
 
     dbc.Row([
         html.Img(src='/assets/logo-bullion-sniper.webp', style={'height': '150px', 'width': 'auto'}),], className="mb-4 equal-height-cards"),
@@ -345,29 +457,6 @@ def serve_layout():
 
     ])
 
-app.layout = serve_layout()
-
-app.clientside_callback(
-        """
-        function(n_clicks) {
-            setTimeout(function() {
-                var s1=document.createElement("script");
-                s1.async=true;
-                s1.src='https://embed.tawk.to/673851ed4304e3196ae37e76/1icq0025a';
-                s1.charset='UTF-8';
-                s1.setAttribute('crossorigin','*');
-                document.body.appendChild(s1); // Append to the end of <body>
-
-                document.getElementById("loading-1").style.display = "none"; 
-            }, 100); // Adjust the delay as needed
-
-            return "";
-        }
-        """,
-    Output("tawk-to-widget", "children"),
-    Input("tawk-to-widget", "n_clicks"),
-)
-
 @app.callback(
     Output('cheapest-offer-table-body', 'children'),
     Output('last-update-info', 'children'),
@@ -491,7 +580,7 @@ def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_
         ) as tunnel:
 
             engine = create_engine(
-                f"mysql+mysqlconnector://Pentagruel:(US)ue%1@127.0.0.1:{tunnel.local_bind_port}/Pentagruel$bullionsniper?connection_timeout=15"
+                f"mysql+mysqlconnector://Pentagruel:(US)ue%1@127.0.0.1:{tunnel.local_bind_port}/staging-Pentagruel$bullionsniper?connection_timeout=15"
             )
             with engine.connect() as conn:
                 bullion_type = 'or' if bullion_type_switch else 'ar'
@@ -637,7 +726,7 @@ def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_
         arrow_classNames['total_cost-arrow'])
 
 @app.callback(
-    Output('piece-dropdown', 'options'),  # Output to update the dropdown options
+    Output('piece-dropdown', 'options'),
     [Input('bullion-type-switch', 'value')]
 )
 def update_piece_dropdown(bullion_type_switch):
@@ -647,34 +736,31 @@ def update_piece_dropdown(bullion_type_switch):
         return ar_options_quick_filter
 
 @app.callback(
-    Output('quantity-dropdown', 'value'),  # Output to update the quantity dropdown
+    Output('quantity-dropdown', 'value'),
     [Input('bullion-type-switch', 'value'),
      State('quantity-dropdown', 'value')]
 )
-
 def update_quantity_dropdown(bullion_type_switch,quantity):
-    if bullion_type_switch:  # If the switch is on (gold)
-        return 3  # Set quantity to 3
+    if bullion_type_switch:
+        return 3
     else:
         return quantity
-    # No need to return anything if the switch is off (silver)
-    # The quantity dropdown will keep its current value
 
 @app.callback(
-    Output('metal-price-output', 'children'),  # Output to update the price display
+    Output('metal-price-output', 'children'),
     [Input('bullion-type-switch', 'value'),
      Input('interval-component', 'n_intervals')]
 )
 def update_metal_price(bullion_type_switch, n):
 
     with sshtunnel.SSHTunnelForwarder(
-            ('ssh.pythonanywhere.com'),  # Your SSH hostname
-            ssh_username='Pentagruel',  # Your PythonAnywhere username
-            ssh_password='(US)ue%1',  # Replace with your actual password
-            remote_bind_address=('pentagruel.mysql.pythonanywhere-services.com', 3306)  # Your database hostname
+            ('ssh.pythonanywhere.com'),
+            ssh_username='Pentagruel',
+            ssh_password='(US)ue%1',
+            remote_bind_address=('pentagruel.mysql.pythonanywhere-services.com', 3306)
     ) as tunnel:
         engine = create_engine(
-            f"mysql+mysqlconnector://Pentagruel:(US)ue%1@127.0.0.1:{tunnel.local_bind_port}/Pentagruel$bullionsniper?connection_timeout=15"
+            f"mysql+mysqlconnector://Pentagruel:(US)ue%1@127.0.0.1:{tunnel.local_bind_port}/Pentagruel$staging-bullionsniper?connection_timeout=15"
         )
         with engine.connect() as conn:
             bullion_type = 'or' if bullion_type_switch else 'ar'
@@ -711,6 +797,28 @@ def update_metal_price(bullion_type_switch, n):
         ]
     )
 
-    return current_table  # Return the sorted table rows
+    return current_table
+
+app.clientside_callback(
+        """
+        function(n_clicks) {
+            setTimeout(function() {
+                var s1=document.createElement("script");
+                s1.async=true;
+                s1.src='https://embed.tawk.to/673851ed4304e3196ae37e76/1icq0025a';
+                s1.charset='UTF-8';
+                s1.setAttribute('crossorigin','*');
+                document.body.appendChild(s1); // Append to the end of <body>
+
+                document.getElementById("loading-1").style.display = "none"; 
+            }, 100); // Adjust the delay as needed
+
+            return "";
+        }
+        """,
+    Output("tawk-to-widget", "children"),
+    Input("tawk-to-widget", "n_clicks"),
+)
+
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(debug=False)

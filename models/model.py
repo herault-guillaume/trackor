@@ -1,9 +1,6 @@
 from sqlalchemy import Column, Integer, String, Float, DateTime
-from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from datetime import datetime
-import pytz
 import sshtunnel
 from sqlalchemy import create_engine
 import logging
@@ -12,6 +9,7 @@ sshtunnel.TUNNEL_TIMEOUT = 30.0
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)  # Set the logging level to DEBUG for detailed output
 sshtunnel.create_logger(loglevel=1)
+from flask_login import UserMixin
 
 # with sshtunnel.SSHTunnelForwarder(
 #     ('ssh.pythonanywhere.com',22),
@@ -47,9 +45,17 @@ class MetalPrice(Base):
     session_id = Column(String(36), index=True)
     bullion_type = Column(String(2),nullable=True, index=True)
 
+class User(Base, UserMixin):
+    __tablename__ = 'users'
+
+    id = Column(Integer, primary_key=True)
+    username = Column(String(80), unique=True,nullable=False)
+    password = Column(String(120), nullable=False)
+    def __repr__(self):  # Add a __repr__ method
+        return f"<User(id={self.id}, username='{self.username}')>"
 
     # engine = create_engine(
-    #     f"mysql+mysqlconnector://Pentagruel:(US)ue%251@127.0.0.1:{tunnel.local_bind_port}/Pentagruel$bullionsniper?connect_timeout=10"
+    #     f"mysql+mysqlconnector://Pentagruel:(US)ue%251@127.0.0.1:{tunnel.local_bind_port}/Pentagruel$staging-bullionsniper?connect_timeout=10"
     # )
     #
     # Base.metadata.create_all(engine)
