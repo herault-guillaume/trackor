@@ -12,13 +12,14 @@ from sqlalchemy.sql import text
 import sshtunnel
 import datetime
 import pytz
+import re
 
 from flask import Flask, request, redirect, url_for
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 
-sshtunnel.SSH_TIMEOUT = 60.0
-sshtunnel.TUNNEL_TIMEOUT = 60.0
+sshtunnel.SSH_TIMEOUT = 3600.0
+sshtunnel.TUNNEL_TIMEOUT = 3600.0
 
 def get_country_flag_image(country_code):
     """
@@ -130,39 +131,131 @@ def logout():
     logout_user()
     return redirect(url_for('index'))  # Redirect to your main page
 
+# Sign in/login form with Dash (cardboard style)
 
-# Login form with Dash (updated)
-login_form = dbc.Form(
-    [
-        dbc.Row(
-            [
-                dbc.Label("Username", html_for="username-input", width=3),
-                dbc.Col(
-                    dbc.Input(type="text", id="username-input", placeholder="Enter your username"),
-                    width=9,
-                ),
-            ],
-            className="mb-3",
-        ),
-        dbc.Row(
-            [
-                dbc.Label("Password", html_for="password-input", width=3),
-                dbc.Col(
-                    dbc.Input(type="password", id="password-input", placeholder="Enter your password"),
-                    width=9,
-                ),
-            ],
-            className="mb-3",
-        ),
-        dbc.Button("Log In", id="login-button", color="primary", className="mr-2"),
-        html.Div(id="login-output"),  # For displaying messages
-    ]
-)
-
-app.layout = html.Div([
+index_layout = html.Div([
     dcc.Location(id='url', refresh=False),
-    html.Div(id='page-content', children=login_form)  # Initially show the login form
+    dbc.Container([
+        dbc.Row([html.Img(src='/assets/logo-bullion-sniper.webp', style={'height': '150px', 'width': 'auto'},)  ],
+                className="mb-4 mt-4",justify="center"),
+        dbc.Row([
+            dbc.Col(
+                dbc.Card(
+                    [
+                        dbc.CardHeader(
+                            [
+                                html.I(className="fa-solid fa-user-plus", style={'font-size': '18px'}),
+                                "  S'inscrire"
+                            ],
+                            style={'text-align': 'center'}
+                        ),
+                        dbc.CardBody(
+                            [
+                                dbc.Row(
+                                    [
+                                        dbc.Col(
+                                            dbc.Input(type="text", id="signin-username-input", placeholder="Entrez votre email"),
+                                            width=9,
+                                        ),
+                                    ],
+                                    className="mb-3",
+                                ),
+                                dbc.Row(
+                                    [
+                                        dbc.Col(
+                                            dbc.Input(type="password", id="signin-password-input", placeholder="Entrez votre mot de passe"),
+                                            width=9,
+                                        ),
+                                    ],
+                                    className="mb-3",
+                                ),
+                                dbc.Row(
+                                    [
+                                        dbc.Col(
+                                            dbc.Input(type="password", id="signin-confirm-password-input", placeholder="Confirmez votre mot de passe"),
+                                            width=9,
+                                        ),
+                                    ],
+                                    className="mb-3",
+                                ),
+                                dbc.Button("Sign In", id="signin-button", color="secondary", className="mr-2"),
+                                html.Div(id="signin-output"),  # For displaying messages
+                            ]
+                        ),
+                    ],
+                    style={'text-align': 'center'},
+                    className="mb-2"
+                ),
+                width=3  # 6 columns for sign in form
+            ),
+            dbc.Col(
+                dbc.Card(
+                    [
+                        dbc.CardHeader(
+                            [
+                                html.I(className="fa-solid fa-right-to-bracket", style={'font-size': '18px'}),
+                                "  Se connecter"
+                            ],
+                            style={'text-align': 'center'}
+                        ),
+                        dbc.CardBody(
+                            [
+                                dbc.Row(
+                                    [
+                                        dbc.Col(
+                                            dbc.Input(type="text", id="login-username-input", placeholder="Entrez votre email"),
+                                            width=9,
+                                        ),
+                                    ],
+                                    className="mb-3",
+                                ),
+                                dbc.Row(
+                                    [
+                                        dbc.Col(
+                                            dbc.Input(type="password", id="login-password-input", placeholder="Confirmez votre mot de passe"),
+                                            width=9,
+                                        ),
+                                    ],
+                                    className="mb-3",
+                                ),
+                                dbc.Button("Log In", id="login-button", color="secondary", className="mr-2"),
+                                html.Div(id="login-output"),  # For displaying messages
+                            ]
+                        ),
+                    ],
+                    style={'text-align': 'center'},
+                    className="mb-2"
+                ),
+                width=3
+            )
+        ], className="equal-height-cards",justify='center'),
+    ])
 ])
+
+
+app.layout = index_layout
+
+@app.callback(
+    Output("signin-username-input", "valid"),  # Update validity of email input
+    Output("signin-password-input", "valid"),  # Update validity of password input
+    Output("signin-confirm-password-input", "valid"),  # Update validity of confirm password input
+    Input("signin-button", "n_clicks"),
+    State("signin-username-input", "value"),
+    State("signin-password-input", "value"),
+    State("signin-confirm-password-input", "value"),
+)
+def signin_callback(n_clicks, username, password, confirm_password):
+    if n_clicks is None:
+        raise PreventUpdate
+
+    # Email validation
+    email_valid = re.match(r"[^@]+@[^@]+\.[^@]+", username) is not None
+
+    # Password validation
+    password_valid = len(password) >= 10 if password else False
+    confirm_password_valid = password == confirm_password if password and confirm_password else False
+
+    return email_valid, password_valid, confirm_password_valid
 
 # Callback to handle login and set the initial layout
 # Callback to handle login
@@ -214,8 +307,7 @@ def serve_layout():
     # Rest of your Dash app layout
     ]),
 
-    dbc.Row([
-        html.Img(src='/assets/logo-bullion-sniper.webp', style={'height': '150px', 'width': 'auto'}),], className="mb-4 equal-height-cards"),
+    dbc.Row([html.Img(src='/assets/logo-bullion-sniper.webp', style={'height': '150px', 'width': 'auto'}),], className="mb-4",justify="center"),
 
     dbc.Row([
         dbc.Col(
