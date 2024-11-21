@@ -4,22 +4,20 @@ from dash import dcc, html, Input, Output, State, dash_table, callback_context  
 from dash.exceptions import PreventUpdate
 import dash_bootstrap_components as dbc
 import pandas as pd
+from database import create_session
 from models.pieces import weights
-from models.model import User
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.sql import text
-import sshtunnel
+from models.model import User,MetalPrice, Item
+from models.model import Item
+
 import datetime
-import pytz
 import re
+import logging
 
 from flask import Flask, request, redirect, url_for
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 
-sshtunnel.SSH_TIMEOUT = 3600.0
-sshtunnel.TUNNEL_TIMEOUT = 3600.0
+
 
 def get_country_flag_image(country_code):
     """
@@ -104,25 +102,15 @@ login_manager.login_view = '/login'
 # User loader
 @login_manager.user_loader
 def load_user(user_id):
-    with sshtunnel.SSHTunnelForwarder(
-        ('ssh.pythonanywhere.com'),  # Your SSH hostname
-        ssh_username='Pentagruel',  # Your PythonAnywhere username
-        ssh_password='(US)ue%1',  # Replace with your actual password
-        remote_bind_address=('pentagruel.mysql.pythonanywhere-services.com', 3306)  # Your database hostname
-    ) as tunnel:
-
-        engine = create_engine(
-            f"mysql+mysqlconnector://Pentagruel:(US)ue%1@127.0.0.1:{tunnel.local_bind_port}/staging-Pentagruel$bullionsniper?connection_timeout=15"
-        )
-        Session = sessionmaker(bind=engine)
-        session = Session()
-        try:
-            user = session.query(User).get(int(user_id))
-            session.close()
-            return user
-        except:  # Catch any potential exceptions during database access
-            session.close()
-            return None
+    session, tunnel = create_session()
+    try:
+        user = session.query(User).get(int(user_id))
+        session.close()
+        tunnel.stop()
+        return user
+    except:  # Catch any potential exceptions during database access
+        session.close()
+        return None
 
 # Logout route
 @server.route('/logout')
@@ -133,173 +121,348 @@ def logout():
 
 # Sign in/login form with Dash (cardboard style)
 
-index_layout = html.Div([
-    dcc.Location(id='url', refresh=False),
-    dbc.Container([
-        dbc.Row([html.Img(src='/assets/logo-bullion-sniper.webp', style={'height': '150px', 'width': 'auto'},)  ],
-                className="mb-4 mt-4",justify="center"),
-        dbc.Row([
-            dbc.Col(
-                dbc.Card(
+index_layout = html.Div(
+    [
+        dcc.Location(id="url", refresh=False),
+        dbc.Container(
+            [
+                dbc.Row(
                     [
-                        dbc.CardHeader(
-                            [
-                                html.I(className="fa-solid fa-user-plus", style={'font-size': '18px'}),
-                                "  S'inscrire"
-                            ],
-                            style={'text-align': 'center'}
+                        html.Img(
+                            src="/assets/logo-bullion-sniper.webp",
+                            style={"height": "150px", "width": "auto"},
+                        )
+                    ],
+                    className="mb-4 mt-4",
+                    justify="center",
+                ),
+                dbc.Row(
+                    [
+                        dbc.Col(
+                            dbc.Card(
+                                [
+                                    dbc.CardHeader(
+                                        [
+                                            html.I(
+                                                className="fa-solid fa-user-plus",
+                                                style={"font-size": "18px"},
+                                            ),
+                                            "  S'inscrire",
+                                        ],
+                                        style={"text-align": "center"},
+                                    ),
+                                    dbc.CardBody(
+                                        [
+                                            # Email input with form feedback
+                                            html.Div(
+                                                [
+                                                    dbc.Input(
+                                                        type="text",
+                                                        id="signin-username-input",
+                                                        placeholder="Entrez votre email",
+                                                        valid=False,
+                                                    ),
+                                                    dbc.FormFeedback(
+                                                        "Format d'email invalide",
+                                                        type="invalid",
+                                                    ),
+                                                ],
+                                                className="mb-3",
+                                            ),
+                                            # Password input with form feedback
+                                            html.Div(
+                                                [
+                                                    dbc.Input(
+                                                        type="password",
+                                                        id="signin-password-input",
+                                                        placeholder="Entrez votre mot de passe",
+                                                        valid=False,
+                                                    ),
+                                                    dbc.FormFeedback(
+                                                        "Votre mot de passe doit faire 10 caractères",
+                                                        type="invalid",
+                                                    ),
+                                                ],
+                                                className="mb-3",
+                                            ),
+                                            # Confirm password input with form feedback
+                                            html.Div(
+                                                [
+                                                    dbc.Input(
+                                                        type="password",
+                                                        id="signin-confirm-password-input",
+                                                        placeholder="Confirmez votre mot de passe",
+                                                        valid=False,
+                                                    ),
+                                                    dbc.FormFeedback(
+                                                        "Les mots de passe ne correspondent pas.",
+                                                        type="invalid",
+                                                    ),
+                                                ],
+                                                className="mb-3",
+                                            ),
+                                            dbc.Button(
+                                                "Sign In",
+                                                id="signin-button",
+                                                color="secondary",
+                                                className="mr-2",
+                                            ),
+                                            html.Div(id="signin-output"),
+                                        ]
+                                    ),
+                                ],
+                                style={"text-align": "center"},
+                                className="mb-2",
+                            ),
+                            width=3,
                         ),
-                        dbc.CardBody(
-                            [
-                                dbc.Row(
-                                    [
-                                        dbc.Col(
-                                            dbc.Input(type="text", id="signin-username-input", placeholder="Entrez votre email"),
-                                            width=9,
-                                        ),
-                                    ],
-                                    className="mb-3",
-                                ),
-                                dbc.Row(
-                                    [
-                                        dbc.Col(
-                                            dbc.Input(type="password", id="signin-password-input", placeholder="Entrez votre mot de passe"),
-                                            width=9,
-                                        ),
-                                    ],
-                                    className="mb-3",
-                                ),
-                                dbc.Row(
-                                    [
-                                        dbc.Col(
-                                            dbc.Input(type="password", id="signin-confirm-password-input", placeholder="Confirmez votre mot de passe"),
-                                            width=9,
-                                        ),
-                                    ],
-                                    className="mb-3",
-                                ),
-                                dbc.Button("Sign In", id="signin-button", color="secondary", className="mr-2"),
-                                html.Div(id="signin-output"),  # For displaying messages
-                            ]
+                        dbc.Col(
+                            dbc.Card(
+                                [
+                                    dbc.CardHeader(
+                                        [
+                                            html.I(
+                                                className="fa-solid fa-right-to-bracket",
+                                                style={"font-size": "18px"},
+                                            ),
+                                            "  Se connecter",
+                                        ],
+                                        style={"text-align": "center"},
+                                    ),
+                                    dbc.CardBody(
+                                        [
+                                            # Email input with form feedback
+                                            html.Div(
+                                                [
+                                                    dbc.Input(
+                                                        type="text",
+                                                        id="login-username-input",
+                                                        placeholder="Entrez votre email",
+                                                    ),
+                                                    dbc.FormFeedback(
+                                                        "Format d'email invalide",
+                                                        type="invalid",
+                                                    ),
+                                                ],
+                                                className="mb-3",
+                                            ),
+                                            # Password input with form feedback
+                                            html.Div(
+                                                [
+                                                    dbc.Input(
+                                                        type="password",
+                                                        id="login-password-input",
+                                                        placeholder="Entrez votre mot de passe",
+                                                    ),
+                                                    dbc.FormFeedback(
+                                                        "Votre mot de passe contient minimum 10 caractères",
+                                                        type="invalid",
+                                                    ),
+                                                ],
+                                                className="mb-3",
+                                            ),
+                                            dbc.Button(
+                                                "Se connecter",
+                                                id="login-button",
+                                                color="secondary",
+                                                className="mr-2",
+                                            ),
+                                            html.Div(id="login-output"),
+                                        ]
+                                    ),
+                                ],
+                                style={"text-align": "center"},
+                                className="mb-2",
+                            ),
+                            width=3,
                         ),
                     ],
-                    style={'text-align': 'center'},
-                    className="mb-2"
+                    className="equal-height-cards",
+                    justify="center",
                 ),
-                width=3  # 6 columns for sign in form
-            ),
-            dbc.Col(
-                dbc.Card(
-                    [
-                        dbc.CardHeader(
-                            [
-                                html.I(className="fa-solid fa-right-to-bracket", style={'font-size': '18px'}),
-                                "  Se connecter"
-                            ],
-                            style={'text-align': 'center'}
-                        ),
-                        dbc.CardBody(
-                            [
-                                dbc.Row(
-                                    [
-                                        dbc.Col(
-                                            dbc.Input(type="text", id="login-username-input", placeholder="Entrez votre email"),
-                                            width=9,
-                                        ),
-                                    ],
-                                    className="mb-3",
-                                ),
-                                dbc.Row(
-                                    [
-                                        dbc.Col(
-                                            dbc.Input(type="password", id="login-password-input", placeholder="Confirmez votre mot de passe"),
-                                            width=9,
-                                        ),
-                                    ],
-                                    className="mb-3",
-                                ),
-                                dbc.Button("Log In", id="login-button", color="secondary", className="mr-2"),
-                                html.Div(id="login-output"),  # For displaying messages
-                            ]
-                        ),
-                    ],
-                    style={'text-align': 'center'},
-                    className="mb-2"
-                ),
-                width=3
-            )
-        ], className="equal-height-cards",justify='center'),
-    ])
-])
+            ],id='page-content'
+        ),
+    ]
+)
 
 
 app.layout = index_layout
 
+# Callback for signin username input
 @app.callback(
-    Output("signin-username-input", "valid"),  # Update validity of email input
-    Output("signin-password-input", "valid"),  # Update validity of password input
-    Output("signin-confirm-password-input", "valid"),  # Update validity of confirm password input
+    Output("signin-username-input", "valid"),
+    Output("signin-username-input", "invalid"),
+    Input("signin-username-input", "value"),
+)
+def validate_signin_username(username):
+    if username is None:
+        raise PreventUpdate
+    email_valid = re.match(r"[^@]+@[^@]+\.[^@]+", username) is not None
+    return email_valid, not email_valid
+
+
+# Callback for signin password input
+@app.callback(
+    Output("signin-password-input", "valid"),
+    Output("signin-password-input", "invalid"),
+    Input("signin-password-input", "value"),
+)
+def validate_signin_password(password):
+    if password is None:
+        raise PreventUpdate
+    password_valid = len(password) >= 10 if password else False
+    return password_valid, not password_valid
+
+
+# Callback for signin confirm password input
+@app.callback(
+    Output("signin-confirm-password-input", "valid"),
+    Output("signin-confirm-password-input", "invalid"),
+    Input("signin-confirm-password-input", "value"),
+    State("signin-password-input", "value"),
+)
+def validate_signin_confirm_password(confirm_password, password):
+    if confirm_password is None:
+        raise PreventUpdate
+    confirm_password_valid = (
+        confirm_password == password if password and confirm_password else False
+    )
+    return confirm_password_valid, not confirm_password_valid
+
+
+# Callback for login username input
+@app.callback(
+    Output("login-username-input", "valid"),
+    Output("login-username-input", "invalid"),
+    Input("login-username-input", "value"),
+)
+def validate_login_username(username):
+    if username is None:
+        raise PreventUpdate
+    email_valid = re.match(r"[^@]+@[^@]+\.[^@]+", username) is not None
+    return email_valid, not email_valid
+
+
+# Callback for login password input
+@app.callback(
+    Output("login-password-input", "valid"),
+    Output("login-password-input", "invalid"),
+    Input("login-password-input", "value"),
+)
+def validate_login_password(password):
+    if password is None:
+        raise PreventUpdate
+    password_valid = len(password) >= 10 if password else False
+    return password_valid, not password_valid
+
+# Callback for signin button click (to handle database interaction)
+@app.callback(
+    Output("signin-output", "children"),
     Input("signin-button", "n_clicks"),
     State("signin-username-input", "value"),
     State("signin-password-input", "value"),
     State("signin-confirm-password-input", "value"),
+    State("signin-username-input", "valid"),
+    State("signin-password-input", "valid"),
+    State("signin-confirm-password-input", "valid"),
 )
-def signin_callback(n_clicks, username, password, confirm_password):
+def signin_button_click(n_clicks, username, password, confirm_password, email_valid, password_valid, confirm_valid):
     if n_clicks is None:
         raise PreventUpdate
 
-    # Email validation
-    email_valid = re.match(r"[^@]+@[^@]+\.[^@]+", username) is not None
+    if not all([email_valid, password_valid, confirm_valid]):
+        return dbc.Alert(
+            "Veuillez remplir correctement tous les champs.",
+            id="alert-invalid-fields",
+            is_open=True,
+            color="error",
+        )
+    try :
+        session, tunnel = create_session()
 
-    # Password validation
-    password_valid = len(password) >= 10 if password else False
-    confirm_password_valid = password == confirm_password if password and confirm_password else False
+        if User.get_user_by_username(session,username):
+            session.close()
+            tunnel.stop()
+            return html.Div([  # Wrap the Alert in an html.Div
+                dbc.Alert(
+                    "Un utilisateur avec cet email existe déjà.",
+                    id="alert-user-exists",
+                    is_open=True,
+                    color="error",
+                )
+            ])
+        else:
+            new_user = User(username=username.lower(), password=generate_password_hash(password))
+            session.add(new_user)
+            session.commit()
+            session.close()
+            tunnel.stop()
+            # Commit the changes to add the user
+            return dbc.Alert(
+                "Inscription réussie !",
+                id="alert-inscription-success",
+                is_open=True,
+                color="success",
+            )
+    except Exception as e:
+        session.rollback()
+        return dbc.Alert(
+            f"Une erreur s'est produite: {e}",  # Include the error message in the alert
+            id="alert-inscription-error",
+            is_open=True,
+            color="error",
+        )
+    finally:
+        tunnel.stop()
+        session.close()
 
-    return email_valid, password_valid, confirm_password_valid
-
-# Callback to handle login and set the initial layout
-# Callback to handle login
+# Callback for login button click (to handle database interaction)
 @app.callback(
     Output("login-output", "children"),
-    Output("content-container", "children"),
+    Output("page-content", "children"),
     Input("login-button", "n_clicks"),
-    State("username-input", "value"),
-    State("password-input", "value"),
+    State("login-username-input", "value"),
+    State("login-password-input", "value"),
+    State("login-username-input", "valid"),
+    State("login-password-input", "valid"),
 )
-def login_callback(n_clicks, username, password):
+def login_button_click(n_clicks, username, password, username_valid, password_valid):
     if n_clicks is None:
         raise PreventUpdate
 
-    with sshtunnel.SSHTunnelForwarder(
-        ('ssh.pythonanywhere.com'),  # Your SSH hostname
-        ssh_username='Pentagruel',  # Your PythonAnywhere username
-        ssh_password='(US)ue%1',  # Replace with your actual password
-        remote_bind_address=('pentagruel.mysql.pythonanywhere-services.com', 3306)  # Your database hostname
-    ) as tunnel:
-
-        engine = create_engine(
-            f"mysql+mysqlconnector://Pentagruel:(US)ue%1@127.0.0.1:{tunnel.local_bind_port}/staging-Pentagruel$bullionsniper?connection_timeout=15"
+    if not all([username_valid, password_valid]):
+        return (
+            dbc.Alert(
+                "Veuillez remplir correctement tous les champs.",
+                id="alert-invalid-fields-login",
+                is_open=True,
+                color="error",
+            ),
+            dash.no_update,
         )
-
-    Session = sessionmaker(bind=engine)
-    session = Session()
-
-    try:
-        user = session.query(User).filter_by(username=username).first()
+    try :
+        session, tunnel = create_session()
+        user = User.get_user_by_username(session,username)
+        session.close()
+        tunnel.stop()
         if user and check_password_hash(user.password, password):
             login_user(user)
-            session.close()
-            return html.Div(), serve_layout()
+            return dbc.Alert("Connecté !", color="succes"), serve_layout()  # No alert on successful login
         else:
-            session.close()
-            return dbc.Alert("Invalid credentials", color="danger"), dash.no_update
-    except:  # Catch any exceptions during database access
-        session.close()
-        return dbc.Alert("Database error", color="danger"), dash.no_update
+            return dbc.Alert("Identifiants invalides.", color="danger"), dash.no_update
 
+    except Exception as e:
+        return dbc.Alert(
+            f"Une erreur s'est produite: {e}",
+            id="alert-login-error",
+            is_open=True,
+            color="danger",
+        ), dash.no_update
+
+    finally:
+        session.close()
 
 def serve_layout():
-
     return dbc.Container([
         html.Div([
 
@@ -307,7 +470,7 @@ def serve_layout():
     # Rest of your Dash app layout
     ]),
 
-    dbc.Row([html.Img(src='/assets/logo-bullion-sniper.webp', style={'height': '150px', 'width': 'auto'}),], className="mb-4",justify="center"),
+    dbc.Row([html.Img(src='/assets/logo-bullion-sniper.webp', style={'height': '150px', 'width': 'auto'}),], className="mb-4 mt-4",justify="center"),
 
     dbc.Row([
         dbc.Col(
@@ -569,6 +732,24 @@ def serve_layout():
      Input('total_cost-header', 'n_clicks')],
     [State('cheapest-offer-table-body', 'children')]
 )
+def get_price(ranges, quantity):
+    """
+    Calculates the price based on the quantity and given ranges.
+
+    Args:
+    ranges: A string of ranges in the format '1-9;10-48;49-98;99-9999999999.9'.
+    quantity: The quantity of the item.
+
+    Returns:
+    The price as a float.
+    """
+    ranges = ranges.split(';')
+
+    for r in ranges:
+        lower, upper, price = map(float, r.split('-'))
+        if lower <= quantity < upper:
+            return price  # Return the price directly
+        return None  # Or handle the case where quantity is outside all ranges
 
 def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_coins, n,
                           source_clicks, name_clicks, premium_clicks, quantity_clicks, total_cost_clicks,
@@ -601,8 +782,6 @@ def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_
         elif triggered_id == 'total_cost-header':
             column_index = 4
             sort_key = 'total_cost'
-        else:
-            pass
 
         if sort_key == 'total_cost':
             # Extract numeric values from the 'Total FDPI (€)' column
@@ -645,89 +824,30 @@ def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_
                 arrow_classNames['premium-arrow'], arrow_classNames['quantity-arrow'],
                 arrow_classNames['total_cost-arrow'])
     else :
-        def get_price(ranges, quantity):
-            """
-            Calculates the price based on the quantity and given ranges.
 
-            Args:
-            ranges: A string of ranges in the format '1-9;10-48;49-98;99-9999999999.9'.
-            quantity: The quantity of the item.
+        session, tunnel = create_session()
 
-            Returns:
-            The price as a float.
-            """
-            ranges = ranges.split(';')
+        bullion_type = 'or' if bullion_type_switch else 'ar'
 
-            for r in ranges:
-                lower, upper, price = map(float, r.split('-'))
-                if lower <= quantity < upper:
-                    return price  # Return the price directly
-                return None  # Or handle the case where quantity is outside all ranges
+        result = MetalPrice.get_previous_price()
+        metal_prices_df = pd.DataFrame(result)
+        print(metal_prices_df)
+        # Get buying gold and silver coin values
+        metal_price = metal_prices_df['buy_price'].iloc[0]
+        session_id = metal_prices_df['session_id'].iloc[0]
+        latest_timestamp = metal_prices_df['timestamp'].iloc[0]
+        formatted_timestamp = latest_timestamp.strftime('%d/%m/%Y à %Hh%M.')
 
-        with sshtunnel.SSHTunnelForwarder(
-                ('ssh.pythonanywhere.com'),  # Your SSH hostname
-                ssh_username='Pentagruel',  # Your PythonAnywhere username
-                ssh_password='(US)ue%1',  # Replace with your actual password
-                remote_bind_address=('pentagruel.mysql.pythonanywhere-services.com', 3306)  # Your database hostname
-        ) as tunnel:
+        cheapest_offers = []
+        seen_offers = set()
+        table_rows = []
 
-            engine = create_engine(
-                f"mysql+mysqlconnector://Pentagruel:(US)ue%1@127.0.0.1:{tunnel.local_bind_port}/staging-Pentagruel$bullionsniper?connection_timeout=15"
-            )
-            with engine.connect() as conn:
-                bullion_type = 'or' if bullion_type_switch else 'ar'
-
-                # Get the time zone for France
-                france_timezone = pytz.timezone('Europe/Paris')
-
-                # Get the current time in France
-                now_france = datetime.datetime.now(france_timezone)
-
-                # Calculate 30 minutes ago in France's time zone
-                thirty_minutes_ago = now_france - datetime.timedelta(minutes=1)
-
-                thirty_minutes_ago = datetime.datetime.now() - datetime.timedelta(minutes=1)
-
-                query_metal_price = text(
-                    """
-                    SELECT *
-                    FROM metal_price
-                    WHERE bullion_type = :bullion_type
-                    AND session_id = (
-                        SELECT session_id
-                        FROM metal_price
-                        GROUP BY session_id
-                        HAVING MAX(timestamp) < :thirty_minutes_ago
-                        ORDER BY MAX(timestamp) DESC
-                        LIMIT 1
-                    )
-                    """
-                )
-
-                result = conn.execute(query_metal_price,
-                                      {"bullion_type": bullion_type, "thirty_minutes_ago": thirty_minutes_ago})
-                metal_prices_df = pd.DataFrame(result.fetchall(), columns=result.keys())
-
-                # Get buying gold and silver coin values
-                metal_price = metal_prices_df['buy_price'].iloc[0]
-                session_id = metal_prices_df['session_id'].iloc[0]
-                latest_timestamp = metal_prices_df['timestamp'].iloc[0]
-                formatted_timestamp = latest_timestamp.strftime('%d/%m/%Y à %Hh%M.')
-
-                cheapest_offers = []
-                seen_offers = set()
-                table_rows = []
-
-                # SQL query to fetch the latest complete session_prod and its data from both tables
-                # SQL query to fetch the latest complete session and its data from both tables
-                query_item = text("""
-                SELECT *
-                FROM item
-                WHERE bullion_type = :bullion_type AND session_id = :session_id AND ( minimum <= :quantity AND quantity <= :quantity )
-                """)
-                result = conn.execute(query_item,
-                                      {"bullion_type": 'or', "session_id": session_id, "quantity": quantity})
-                items_df = pd.DataFrame(result.fetchall(), columns=result.keys()).copy()
+        # SQL query to fetch the latest complete session and its data from both tables
+        result = Item.get_items_by_bullion_type_and_quantity(session,bullion_type,session_id,quantity)
+        items_df = pd.DataFrame(result).copy()
+        print(items_df)
+        session.close()
+        tunnel.stop()
         if selected_coins:
             filtered_df = pd.DataFrame()  # Create an empty DataFrame to store filtered rows
             for coin in selected_coins:
@@ -775,47 +895,49 @@ def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_
                 except IndexError as e :
                     print(e)  # Skip if the quantity index is out of range
 
-        # Sort offers by premium (lowest first)
-        cheapest_offers.sort(key=lambda x: x['premium'])
+    session.close()
 
-        conn.close()
+    # Sort offers by premium (lowest first)
+    cheapest_offers.sort(key=lambda x: x['premium'])
 
-        for offer in cheapest_offers[:20]:
-            table_rows.append(
-                html.Tr([
-                    html.Td(
-                        html.A(
-                            html.I(className="fas fa-external-link-alt", style={'color': 'gold'}),  # External link icon
-                            href=offer['source'],  # URL of the source
-                            target="_blank",  # Open link in a new tab
-                            style={'text-decoration': 'none', 'text_align':'center'}  # Remove underline from the link
-                        ),
-                        style={'text-align': 'center'}
+    for offer in cheapest_offers[:20]:
+        table_rows.append(
+            html.Tr([
+                html.Td(
+                    html.A(
+                        html.I(className="fas fa-external-link-alt", style={'color': 'gold'}),  # External link icon
+                        href=offer['source'],  # URL of the source
+                        target="_blank",  # Open link in a new tab
+                        style={'text-decoration': 'none', 'text_align':'center'}  # Remove underline from the link
                     ),
-                    html.Td(offer['name'][4:]),
-                    html.Td(offer['premium'],style={'text-align': 'center'}),
-                    html.Td(offer['quantity'],style={'text-align': 'center'}),
-                    html.Td(f"{offer['total_cost']:.2f} €",style={'text-align': 'center'})
-                ])
-            )
+                    style={'text-align': 'center'}
+                ),
+                html.Td(offer['name'][4:]),
+                html.Td(offer['premium'],style={'text-align': 'center'}),
+                html.Td(offer['quantity'],style={'text-align': 'center'}),
+                html.Td(f"{offer['total_cost']:.2f} €",style={'text-align': 'center'})
+            ])
+        )
 
         if table_rows == []:
-            warning_icon = html.I(className="fas fa-triangle-exclamation", style={'color': 'orange', 'font-size': '16px'})  # Adjust color and size as needed
+            DEBUG_icon = html.I(className="fas fa-triangle-exclamation", style={'color': 'orange', 'font-size': '16px'})  # Adjust color and size as needed
             table_rows.append(
                 html.Tr([
-                    html.Td(warning_icon, style={'text-align': 'center'}),
+                    html.Td(DEBUG_icon, style={'text-align': 'center'}),
                     html.Td("Veuillez augmenter votre budget pour voir les offres."),
-                    html.Td(warning_icon, style={'text-align': 'center'}),
-                    html.Td(warning_icon, style={'text-align': 'center'}),
-                    html.Td(warning_icon, style={'text-align': 'center'})
+                    html.Td(DEBUG_icon, style={'text-align': 'center'}),
+                    html.Td(DEBUG_icon, style={'text-align': 'center'}),
+                    html.Td(DEBUG_icon, style={'text-align': 'center'})
                 ])
             )
 
-        return (table_rows, html.P(f"Dernière mise à jour le {formatted_timestamp}", style={'font-size': '0.8em'}),        arrow_classNames['source-arrow'],
-        arrow_classNames['name-arrow'],
-        arrow_classNames['premium-arrow'],
-        arrow_classNames['quantity-arrow'],
-        arrow_classNames['total_cost-arrow'])
+        return (table_rows,
+                html.P(f"Dernière mise à jour le {formatted_timestamp}", style={'font-size': '0.8em'}),
+                arrow_classNames['source-arrow'],
+                arrow_classNames['name-arrow'],
+                arrow_classNames['premium-arrow'],
+                arrow_classNames['quantity-arrow'],
+                arrow_classNames['total_cost-arrow'])
 
 @app.callback(
     Output('piece-dropdown', 'options'),
@@ -844,43 +966,16 @@ def update_quantity_dropdown(bullion_type_switch,quantity):
      Input('interval-component', 'n_intervals')]
 )
 def update_metal_price(bullion_type_switch, n):
+    session, tunnel = create_session()
 
-    with sshtunnel.SSHTunnelForwarder(
-            ('ssh.pythonanywhere.com'),
-            ssh_username='Pentagruel',
-            ssh_password='(US)ue%1',
-            remote_bind_address=('pentagruel.mysql.pythonanywhere-services.com', 3306)
-    ) as tunnel:
-        engine = create_engine(
-            f"mysql+mysqlconnector://Pentagruel:(US)ue%1@127.0.0.1:{tunnel.local_bind_port}/Pentagruel$staging-bullionsniper?connection_timeout=15"
-        )
-        with engine.connect() as conn:
-            bullion_type = 'or' if bullion_type_switch else 'ar'
+    bullion_type = 'or' if bullion_type_switch else 'ar'
 
-            thirty_minutes_ago = datetime.datetime.now() - datetime.timedelta(minutes=30)
-            query_metal_price = text(
-                """
-                SELECT *
-                FROM metal_price
-                WHERE bullion_type = :bullion_type
-                AND session_id = (
-                    SELECT session_id
-                    FROM metal_price
-                    GROUP BY session_id
-                    HAVING MAX(timestamp) < :thirty_minutes_ago
-                    ORDER BY MAX(timestamp) DESC
-                    LIMIT 1
-                )
-                """
-            )
-
-            result = conn.execute(query_metal_price,
-                                  {"bullion_type": bullion_type, "thirty_minutes_ago": thirty_minutes_ago})
-
-            metal_prices_df = pd.DataFrame(result.fetchall(), columns=result.keys())
-            print(metal_prices_df)
-            # Get buying gold and silver coin values
-            metal_price = metal_prices_df['buy_price'].iloc[0]
+    result = MetalPrice.get_previous_price(session,bullion_type)
+    print(result)
+    metal_prices_df = pd.DataFrame(result)
+    print(metal_prices_df)
+    # Get buying gold and silver coin values
+    metal_price = metal_prices_df['buy_price'].iloc[0]
 
     return html.Div(
         [
@@ -888,7 +983,8 @@ def update_metal_price(bullion_type_switch, n):
             html.P(f"{metal_price:.3f} €/g ", style={'font-size': '0.8em', 'margin-bottom': '0','text-align':'center'})
         ]
     )
-
+    session.close()
+    tunnel.stop()
     return current_table
 
 app.clientside_callback(
@@ -912,5 +1008,26 @@ app.clientside_callback(
     Input("tawk-to-widget", "n_clicks"),
 )
 
+
 if __name__ == '__main__':
-    app.run_server(debug=False)
+
+    app.run_server(debug=True)
+
+    # Configure logging level (DEBUG, INFO, DEBUG, ERROR, CRITICAL)
+    app.logger.setLevel('DEBUG')
+
+    # Create a file handler and set the logging level
+    file_handler = logging.FileHandler('app.log')  # Create a file handler for 'app.log'
+    file_handler.setLevel('DEBUG')
+
+    # Create a formatter for the log messages
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+    file_handler.setFormatter(formatter)
+
+    # Add the file handler to the app's logger
+    app.logger.addHandler(file_handler)
+
+
+    # Example of logging a message
+    app.logger.info('App started')
