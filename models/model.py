@@ -1,21 +1,22 @@
-from sqlalchemy import Column, Integer, String, Float, DateTime
+from sqlalchemy import Column, Integer, String, Float, DateTime, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import func
+from sqlalchemy.inspection import inspect
+from collections import defaultdict
+
 import sshtunnel
 import pytz
 import datetime
 from sqlalchemy import create_engine
 import logging
-sshtunnel.SSH_TIMEOUT = 30.0
-sshtunnel.TUNNEL_TIMEOUT = 30.0
+
+sshtunnel.SSH_TIMEOUT = 45.0
+sshtunnel.TUNNEL_TIMEOUT = 45.0
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)  # Set the logging level to DEBUG for detailed output
 sshtunnel.create_logger(loglevel=1)
 from flask_login import UserMixin
-
-
-
 
 # with sshtunnel.SSHTunnelForwarder(
 #     ('ssh.pythonanywhere.com',22),
@@ -24,8 +25,16 @@ from flask_login import UserMixin
 #     remote_bind_address=('Pentagruel.mysql.pythonanywhere-services.com', 3306)
 # ) as tunnel:
 
+def query_to_dict(rset):
+    result = defaultdict(list)
+    for obj in rset:
+        instance = inspect(obj)
+        for key, x in instance.attrs.items():
+            result[key].append(x.value)
+    return result
 
 Base = declarative_base()
+
 class Item(Base):
     __tablename__ = 'item'
 
@@ -56,7 +65,7 @@ class Item(Base):
         Returns:
             A list of Item objects that match the criteria.
         """
-        return (
+        return query_to_dict(
             session.query(cls)
             .filter(
                 cls.bullion_type == bullion_type,
@@ -109,7 +118,7 @@ class MetalPrice(Base):
             )
         )
 
-        return query.all()
+        return query_to_dict(query.all())
 
 class User(Base, UserMixin):
     __tablename__ = 'users'
@@ -117,6 +126,10 @@ class User(Base, UserMixin):
     id = Column(Integer, primary_key=True)
     username = Column(String(255), unique=True,nullable=False)
     password = Column(String(255), nullable=False)
+    phone_number = Column(String(20))  # Add the phone_number column
+    confirmed = Column(Boolean, default=False, nullable=False)  # Whether the account is confirmed
+    confirmation_token = Column(String(255), unique=True, nullable=True)  # Unique token for confirmation
+    confirmation_sent_at = Column(DateTime)  # When the confirmation email was sent
     def __repr__(self):  # Add a __repr__ method
         return f"<User(id={self.id}, username='{self.username}')>"
 
@@ -133,9 +146,9 @@ class User(Base, UserMixin):
             The User object if found, otherwise None.
         """
         return session.query(cls).filter(func.lower(cls.username) == func.lower(cls.username) == func.lower(username)).first()
-    # engine = create_engine(
-    #     f"mysql+mysqlconnector://Pentagruel:(US)ue%251@127.0.0.1:{tunnel.local_bind_port}/Pentagruel$staging-bullionsniper?connect_timeout=10"
-    # )
-    #
-    # Base.metadata.create_all(engine)
-    # Session = sessionmaker(bind=engine)
+
+# engine = create_engine(
+#     f"mysql+mysqlconnector://Pentagruel:(US)ue%1@127.0.0.1:{tunnel.local_bind_port}/Pentagruel$bullionsniper?connect_timeout=60"
+# )
+#
+# Base.metadata.create_all(engine)

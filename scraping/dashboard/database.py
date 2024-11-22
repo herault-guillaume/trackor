@@ -2,6 +2,8 @@ import sshtunnel
 import pytz
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+import os
+
 
 def create_session():
     """
@@ -16,22 +18,22 @@ def create_session():
         SSH_HOST,
         ssh_username=SSH_USERNAME,
         ssh_password=SSH_PASSWORD,
-        remote_bind_address=REMOTE_BIND_ADDRESS,
-        logger=None,
+        remote_bind_address=(REMOTE_BIND_ADDRESS,REMOTE_PORT_ADDRESS),
     )
     tunnel.start()  # Démarrer le tunnel manuellement
 
-    engine = create_engine(DATABASE_URL.format(tunnel.local_bind_port), connect_args={"connect_timeout": 60})
+    engine = create_engine(DATABASE_URL.format(tunnel.local_bind_port), connect_args={"connect_timeout": 60},echo=True)
     Session = sessionmaker(bind=engine)
     session = Session()
     return session, tunnel
 
-sshtunnel.SSH_TIMEOUT = 3600.0
-sshtunnel.TUNNEL_TIMEOUT = 3600.0
+sshtunnel.SSH_TIMEOUT = float(os.environ['SSH_TIMEOUT'])
+sshtunnel.TUNNEL_TIMEOUT = float(os.environ['TUNNEL_TIMEOUT'])
 
 # Database connection details
-SSH_HOST = "ssh.pythonanywhere.com"
-SSH_USERNAME = "Pentagruel"
-SSH_PASSWORD = "(US)ue%1"
-REMOTE_BIND_ADDRESS = ("pentagruel.mysql.pythonanywhere-services.com", 3306)
-DATABASE_URL = "mysql+mysqlconnector://Pentagruel:(US)ue%1@127.0.0.1:{}/Pentagruel$staging-bullionsniper"
+SSH_HOST = os.environ['SSH_HOST']
+SSH_USERNAME = os.environ['SSH_USERNAME']
+SSH_PASSWORD = os.environ['SSH_PASSWORD']
+REMOTE_BIND_ADDRESS = os.environ['REMOTE_BIND_ADDRESS']
+REMOTE_PORT_ADDRESS = int(os.environ['REMOTE_PORT_ADDRESS'])
+DATABASE_URL = os.environ['DATABASE_URL']

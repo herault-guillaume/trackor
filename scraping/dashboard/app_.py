@@ -1,3 +1,4 @@
+import config
 import dash
 from datetime import datetime
 from dash import dcc, html, Input, Output, State, dash_table, callback_context  # Import callback_context
@@ -7,17 +8,42 @@ import pandas as pd
 from database import create_session
 from models.pieces import weights
 from models.model import User,MetalPrice, Item
-from models.model import Item
 
+import os
 import datetime
 import re
 import logging
 
-from flask import Flask, request, redirect, url_for
+from flask import Flask, request, redirect, url_for, render_template, flash
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
+from flask_login import current_user
+
 from werkzeug.security import generate_password_hash, check_password_hash
 
+from flask_mail import Mail, Message
+from itsdangerous import URLSafeTimedSerializer
 
+
+
+
+def get_price(ranges, quantity):
+    """
+    Calculates the price based on the quantity and given ranges.
+
+    Args:
+    ranges: A string of ranges in the format '1-9;10-48;49-98;99-9999999999.9'.
+    quantity: The quantity of the item.
+
+    Returns:
+    The price as a float.
+    """
+    ranges = ranges.split(';')
+
+    for r in ranges:
+        lower, upper, price = map(float, r.split('-'))
+        if lower <= quantity < upper:
+            return price  # Return the price directly
+        return None  # Or handle the case where quantity is outside all ranges
 
 def get_country_flag_image(country_code):
     """
@@ -68,11 +94,16 @@ ar_options_quick_filter = [
             {'label': "Toutes les 1 Oz", 'value': 'ar - 1 oz *'},
 ]
 
+# Define a hidden Div to store the confirmation status
+hidden_div = html.Div(id='confirmation-status', style={'display': 'none'})
+
 server = Flask(__name__)
 
 app = dash.Dash(__name__,
                 server=server,
                 external_stylesheets=[dbc.themes.DARKLY,'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css'],
+
+rue,
                 assets_folder='assets',
                 update_title=None,
                 meta_tags=[
@@ -91,8 +122,16 @@ app = dash.Dash(__name__,
 app.title = "Bullion Sniper"
 # Config
 server.config.update(
-    SECRET_KEY='your_secret_key'  # Replace with a strong, random key
+    SECRET_KEY=os.environ['APP_KEY']  # Replace with a strong, random key
 )
+app.server.config['MAIL_SERVER'] = os.environ['MAIL_SERVER']
+app.server.config['MAIL_PORT'] = int(os.environ['MAIL_PORT'])
+app.server.config['MAIL_USERNAME'] = os.environ['MAIL_USERNAME']
+app.server.config['MAIL_PASSWORD'] = os.environ['MAIL_PASSWORD']
+app.server.config['MAIL_USE_TLS'] = False
+app.server.config['MAIL_USE_SSL'] = bool(os.environ['MAIL_USE_SSL'])
+
+mail = Mail(app.server)
 
 # Flask-Login setup
 login_manager = LoginManager()
@@ -119,10 +158,106 @@ def logout():
     logout_user()
     return redirect(url_for('index'))  # Redirect to your main page
 
-# Sign in/login form with Dash (cardboard style)
+def generate_confirmation_token(user):
+    serializer = URLSafeTimedSerializer(os.environ['APP_KEY'])  # Use a secret key
+    return serializer.dumps(user.username, salt='email-confirm')  # Generate a token
+
+def confirm_token(token, expiration=3600):  # 1 hour expiration
+    serializer = URLSafeTimedSerializer(os.environ['APP_KEY'])
+    try:
+        username = serializer.loads(
+            token,
+            salt='email-confirm',
+            max_age=expiration
+        )
+    except:
+        return False
+    return username
+
+def generate_confirmation_link(user):
+    token = generate_confirmation_token(user)
+    confirm_url = url_for('confirm_email', token=token, _external=True)  # Use url_for
+    return confirm_url,token
+
+def send_auth_email(session, user):
+    confirm_url, token = generate_confirmation_link(user)
+    subject = "[Bullion-Sniper] Confirmez votre email !"
+    # Render the HTML template with the user's name and confirmation link
+    html_content = render_template('confirm_email.html', username=user.username, confirm_url=confirm_url)
+    msg = Message(subject, sender='noreply@bullion-sniper.fr', recipients=[user.username], html=html_content)
+    try:
+        mail.send(msg)
+        user.confirmation_sent_at = datetime.datetime.utcnow()
+        user.confirmation_token = token  # Store the token in the database
+        session.commit()
+        print(f"Email d'authentification envoyé à {user.username}")
+    except Exception as e:
+        raise e
+@app.server.route('/')
+def index():
+    return app.index()
+
+@app.server.route('/confirm/<token>')
+def confirm_email(token):
+    session = None  # Initialize session variable
+    tunnel = None  # Initialize tunnel variable
+    try:
+        session, tunnel = create_session()
+        username = confirm_token(token)
+        if username:
+            user = User.get_user_by_username(session, username)
+            if user.confirmed:
+                flash('Account already confirmed. Please login.', 'info')
+            else:
+                user.confirmed = True
+                user.confirmation_token = None
+                session.commit()
+                login_user(user)  # Log in the user after confirmation
+
+                # Access the user session through current_user
+                if current_user.is_authenticated:
+                    current_user.confirmation_success = True
+                show_confirmation_alert(session)
+
+                flash('You have confirmed your account. Thanks!', 'success')
+        else:
+            flash('The confirmation link is invalid or has expired.', 'danger')
+    except Exception as e:
+        # Handle exceptions (e.g., database errors)
+        print(f"Error confirming email: {e}")
+        flash('An error occurred. Please try again later.', 'danger')
+    finally:
+        if session:
+            session.close()
+        if tunnel:
+            tunnel.stop()
+
+    app.layout = serve_layout()
+    return redirect(url_for('index'))
+
+# Callback to show the confirmation alert
+@app.callback(
+    Output('confirmation-alert-container', 'children'),
+    [Input('confirmation-status', 'children'), Input('url', 'pathname')]
+)
+def show_confirmation_alert(_, pathname):
+    if current_user.is_authenticated and current_user.confirmation_success and pathname == '/':
+        delattr(current_user, 'confirmation_success')  # Remove the flag after displaying the alert
+        return dbc.Alert(
+        "Votre compte a été confirmé avec succès !",
+        color="success",
+        is_open=True,
+        dismissable=True,  # Allow users to dismiss the alert
+        fade=True,
+        className="mt-4",
+        duration=3000  # Auto-dismiss after 3 seconds (3000 milliseconds)
+    )
+    else:
+        return ""
 
 index_layout = html.Div(
     [
+        hidden_div,
         dcc.Location(id="url", refresh=False),
         dbc.Container(
             [
@@ -388,29 +523,41 @@ def signin_button_click(n_clicks, username, password, confirm_password, email_va
                     "Un utilisateur avec cet email existe déjà.",
                     id="alert-user-exists",
                     is_open=True,
-                    color="error",
+                    dismissable=True,
+                    fade=True,
+                    color="dark",
+                    className="mt-4"
                 )
             ])
         else:
             new_user = User(username=username.lower(), password=generate_password_hash(password))
             session.add(new_user)
             session.commit()
+            send_auth_email(session,new_user)  # Send the confirmation email
             session.close()
             tunnel.stop()
-            # Commit the changes to add the user
             return dbc.Alert(
-                "Inscription réussie !",
-                id="alert-inscription-success",
-                is_open=True,
+                [
+                    html.P("Inscription réussie !"),
+                    html.P("Un email de confirmation a été envoyé à votre adresse.")
+                ],
                 color="success",
+                is_open=True,
+                dismissable=True,
+                fade=True,
+                className="mt-4"
             )
+
     except Exception as e:
         session.rollback()
         return dbc.Alert(
             f"Une erreur s'est produite: {e}",  # Include the error message in the alert
             id="alert-inscription-error",
             is_open=True,
-            color="error",
+            dismissable=True,
+            fade=True,
+            color="danger",
+            className="mt-4"
         )
     finally:
         tunnel.stop()
@@ -436,31 +583,40 @@ def login_button_click(n_clicks, username, password, username_valid, password_va
                 "Veuillez remplir correctement tous les champs.",
                 id="alert-invalid-fields-login",
                 is_open=True,
-                color="error",
+                dismissable=True,
+                fade=True,
+                color="dark",
+                className="mt-4"
             ),
             dash.no_update,
         )
-    try :
-        session, tunnel = create_session()
-        user = User.get_user_by_username(session,username)
-        session.close()
-        tunnel.stop()
-        if user and check_password_hash(user.password, password):
-            login_user(user)
-            return dbc.Alert("Connecté !", color="succes"), serve_layout()  # No alert on successful login
-        else:
-            return dbc.Alert("Identifiants invalides.", color="danger"), dash.no_update
+    session, tunnel = create_session()
+    user = User.get_user_by_username(session,username)
+    if user is None:  # Check if user exists before accessing username
+        return dbc.Alert("Identifiants invalides.", color="danger", is_open=True, dismissable=True, fade=True,
+                         className="mt-4"), dash.no_update
+    session.close()
+    tunnel.stop()
 
-    except Exception as e:
-        return dbc.Alert(
-            f"Une erreur s'est produite: {e}",
-            id="alert-login-error",
-            is_open=True,
-            color="danger",
-        ), dash.no_update
+    if user and check_password_hash(user.password, password):
+        login_user(user)
+        return dbc.Alert("Connecté !",
+                         color="success",
+                         is_open=True,
+                         dismissable=True,
+                         fade=True,
+                         className="mt-4"
+                         ), serve_layout()  # No alert on successful login
+    else:
+        return dbc.Alert("Identifiants invalides.",
+                         is_open=True,
+                         dismissable=True,
+                         fade=True,
+                         color="dark",
+                         className="mt-4"
+                         ), dash.no_update
 
-    finally:
-        session.close()
+    session.close()
 
 def serve_layout():
     return dbc.Container([
@@ -481,7 +637,7 @@ def serve_layout():
                         id='budget-slider',
                         min=0,
                         max=12500,
-                        step=250,
+                        step=100,
                         value=[0, 1000],  # Default range
                         marks={
                             0: '0 €',
@@ -517,6 +673,7 @@ def serve_layout():
                         {'label': '13', 'value': 13},
                         {'label': '14', 'value': 14},
                         {'label': '15', 'value': 15},
+                        {'label': '15', 'value': 25},
                         {'label': '50', 'value': 50},
                         {'label': '100', 'value': 100},
                         {'label': '150', 'value': 150},
@@ -732,25 +889,6 @@ def serve_layout():
      Input('total_cost-header', 'n_clicks')],
     [State('cheapest-offer-table-body', 'children')]
 )
-def get_price(ranges, quantity):
-    """
-    Calculates the price based on the quantity and given ranges.
-
-    Args:
-    ranges: A string of ranges in the format '1-9;10-48;49-98;99-9999999999.9'.
-    quantity: The quantity of the item.
-
-    Returns:
-    The price as a float.
-    """
-    ranges = ranges.split(';')
-
-    for r in ranges:
-        lower, upper, price = map(float, r.split('-'))
-        if lower <= quantity < upper:
-            return price  # Return the price directly
-        return None  # Or handle the case where quantity is outside all ranges
-
 def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_coins, n,
                           source_clicks, name_clicks, premium_clicks, quantity_clicks, total_cost_clicks,
                           current_table):
@@ -829,10 +967,9 @@ def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_
 
         bullion_type = 'or' if bullion_type_switch else 'ar'
 
-        result = MetalPrice.get_previous_price()
-        metal_prices_df = pd.DataFrame(result)
-        print(metal_prices_df)
-        # Get buying gold and silver coin values
+        results = MetalPrice.get_previous_price(session,bullion_type)
+        metal_prices_df = pd.DataFrame(results)
+
         metal_price = metal_prices_df['buy_price'].iloc[0]
         session_id = metal_prices_df['session_id'].iloc[0]
         latest_timestamp = metal_prices_df['timestamp'].iloc[0]
@@ -843,9 +980,9 @@ def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_
         table_rows = []
 
         # SQL query to fetch the latest complete session and its data from both tables
-        result = Item.get_items_by_bullion_type_and_quantity(session,bullion_type,session_id,quantity)
-        items_df = pd.DataFrame(result).copy()
-        print(items_df)
+        results = Item.get_items_by_bullion_type_and_quantity(session,bullion_type,session_id,quantity)
+        items_df = pd.DataFrame(results).copy()
+
         session.close()
         tunnel.stop()
         if selected_coins:
@@ -861,8 +998,6 @@ def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_
 
         for q_max in reversed(range(1,quantity+1)):
             df_copy = items_df.copy()
-
-            # Use .loc to modify the DataFrame (without text parsing)
 
             df_copy.loc[:, ['buy_premiums', 'premium_index']] = df_copy['buy_premiums'].apply(
                 lambda x: pd.Series({
@@ -880,7 +1015,7 @@ def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_
                 try :
                     # Calculate total cost (using bullion_type)
                     spot_cost = weights[row['name']] * metal_price
-                    total_cost = (spot_cost  + (row['buy_premiums']  / 100.0)*spot_cost) * (row['premium_index']+1) * float(row['quantity'])
+                    total_cost = (spot_cost  + (row['buy_premiums']  / 100.0)*spot_cost) * (row['premium_index']+1) * float(row['quantity']) if row['minimum'] == row['quantity'] == 1 else (spot_cost  + (row['buy_premiums']  / 100.0)*spot_cost) * (row['premium_index']+1) * quantity
 
                     # Check if the offer meets the budget
                     if (row['name'], row['source']) not in seen_offers and budget_min <= total_cost <= budget_max and quantity >= row['minimum'] and quantity >= row['quantity'] :
@@ -888,7 +1023,7 @@ def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_
                             'name': row['name'].upper(),
                             'source': row['source'],
                             'premium': row['buy_premiums'] ,
-                            'quantity': int(row['premium_index'] + 1) * row['quantity'] ,
+                            'quantity': int(row['premium_index'] + 1) * row['quantity'] if row['minimum'] == row['quantity'] == 1 else quantity,
                             'total_cost': total_cost
                         })
                         seen_offers.add((row['name'], row['source']))
@@ -900,7 +1035,7 @@ def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_
     # Sort offers by premium (lowest first)
     cheapest_offers.sort(key=lambda x: x['premium'])
 
-    for offer in cheapest_offers[:20]:
+    for offer in cheapest_offers[:30]:
         table_rows.append(
             html.Tr([
                 html.Td(
@@ -919,25 +1054,25 @@ def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_
             ])
         )
 
-        if table_rows == []:
-            DEBUG_icon = html.I(className="fas fa-triangle-exclamation", style={'color': 'orange', 'font-size': '16px'})  # Adjust color and size as needed
-            table_rows.append(
-                html.Tr([
-                    html.Td(DEBUG_icon, style={'text-align': 'center'}),
-                    html.Td("Veuillez augmenter votre budget pour voir les offres."),
-                    html.Td(DEBUG_icon, style={'text-align': 'center'}),
-                    html.Td(DEBUG_icon, style={'text-align': 'center'}),
-                    html.Td(DEBUG_icon, style={'text-align': 'center'})
-                ])
-            )
+    if table_rows == []:
+        DEBUG_icon = html.I(className="fas fa-triangle-exclamation", style={'color': 'orange', 'font-size': '16px'})  # Adjust color and size as needed
+        table_rows.append(
+            html.Tr([
+                html.Td(DEBUG_icon, style={'text-align': 'center'}),
+                html.Td("Veuillez augmenter votre budget pour voir les offres."),
+                html.Td(DEBUG_icon, style={'text-align': 'center'}),
+                html.Td(DEBUG_icon, style={'text-align': 'center'}),
+                html.Td(DEBUG_icon, style={'text-align': 'center'})
+            ])
+        )
 
-        return (table_rows,
-                html.P(f"Dernière mise à jour le {formatted_timestamp}", style={'font-size': '0.8em'}),
-                arrow_classNames['source-arrow'],
-                arrow_classNames['name-arrow'],
-                arrow_classNames['premium-arrow'],
-                arrow_classNames['quantity-arrow'],
-                arrow_classNames['total_cost-arrow'])
+    return (table_rows,
+            html.P(f"Dernière mise à jour le {formatted_timestamp}", style={'font-size': '0.8em'}),
+            arrow_classNames['source-arrow'],
+            arrow_classNames['name-arrow'],
+            arrow_classNames['premium-arrow'],
+            arrow_classNames['quantity-arrow'],
+            arrow_classNames['total_cost-arrow'])
 
 @app.callback(
     Output('piece-dropdown', 'options'),
@@ -970,9 +1105,9 @@ def update_metal_price(bullion_type_switch, n):
 
     bullion_type = 'or' if bullion_type_switch else 'ar'
 
-    result = MetalPrice.get_previous_price(session,bullion_type)
-    print(result)
-    metal_prices_df = pd.DataFrame(result)
+    results = MetalPrice.get_previous_price(session,bullion_type)
+    metal_prices_df = pd.DataFrame(results)
+
     print(metal_prices_df)
     # Get buying gold and silver coin values
     metal_price = metal_prices_df['buy_price'].iloc[0]
@@ -1007,6 +1142,7 @@ app.clientside_callback(
     Output("tawk-to-widget", "children"),
     Input("tawk-to-widget", "n_clicks"),
 )
+
 
 
 if __name__ == '__main__':
