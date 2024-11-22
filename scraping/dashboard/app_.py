@@ -1,30 +1,26 @@
 import config
-import dash
-from datetime import datetime
-from dash import dcc, html, Input, Output, State, dash_table, callback_context  # Import callback_context
-from dash.exceptions import PreventUpdate
-import dash_bootstrap_components as dbc
-import pandas as pd
 from database import create_session
 from models.pieces import weights
-from models.model import User,MetalPrice, Item
+from models.model import User, MetalPrice, Item
 
 import os
 import datetime
 import re
 import logging
+import pandas as pd
+
+import dash
+from dash import dcc, html, Input, Output, State, dash_table, callback_context
+from dash.exceptions import PreventUpdate
+import dash_bootstrap_components as dbc
 
 from flask import Flask, request, redirect, url_for, render_template, flash
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from flask_login import current_user
 
 from werkzeug.security import generate_password_hash, check_password_hash
-
 from flask_mail import Mail, Message
 from itsdangerous import URLSafeTimedSerializer
-
-
-
 
 def get_price(ranges, quantity):
     """
@@ -102,8 +98,7 @@ server = Flask(__name__)
 app = dash.Dash(__name__,
                 server=server,
                 external_stylesheets=[dbc.themes.DARKLY,'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css'],
-
-rue,
+                suppress_callback_exceptions=True,
                 assets_folder='assets',
                 update_title=None,
                 meta_tags=[
@@ -124,6 +119,7 @@ app.title = "Bullion Sniper"
 server.config.update(
     SECRET_KEY=os.environ['APP_KEY']  # Replace with a strong, random key
 )
+
 app.server.config['MAIL_SERVER'] = os.environ['MAIL_SERVER']
 app.server.config['MAIL_PORT'] = int(os.environ['MAIL_PORT'])
 app.server.config['MAIL_USERNAME'] = os.environ['MAIL_USERNAME']
@@ -144,12 +140,15 @@ def load_user(user_id):
     session, tunnel = create_session()
     try:
         user = session.query(User).get(int(user_id))
-        session.close()
-        tunnel.stop()
         return user
-    except:  # Catch any potential exceptions during database access
-        session.close()
+    except Exception as e:
+        print(f"Error loading user: {e}")  # Log the error
         return None
+    finally:  # Ensure the session and tunnel are closed in all cases
+        if session:
+            session.close()
+        if tunnel:
+            tunnel.stop()
 
 # Logout route
 @server.route('/logout')
@@ -217,7 +216,9 @@ def confirm_email(token):
                 # Access the user session through current_user
                 if current_user.is_authenticated:
                     current_user.confirmation_success = True
-                show_confirmation_alert(session)
+                    app.layout = serve_layout()
+                    app.layout[0].append(show_confirmation_alert(session))
+                    return redirect(url_for('index'))
 
                 flash('You have confirmed your account. Thanks!', 'success')
         else:
@@ -232,8 +233,7 @@ def confirm_email(token):
         if tunnel:
             tunnel.stop()
 
-    app.layout = serve_layout()
-    return redirect(url_for('index'))
+
 
 # Callback to show the confirmation alert
 @app.callback(
@@ -600,6 +600,7 @@ def login_button_click(n_clicks, username, password, username_valid, password_va
 
     if user and check_password_hash(user.password, password):
         login_user(user)
+
         return dbc.Alert("Connecté !",
                          color="success",
                          is_open=True,

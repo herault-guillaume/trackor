@@ -13,10 +13,12 @@ import logging
 
 sshtunnel.SSH_TIMEOUT = 45.0
 sshtunnel.TUNNEL_TIMEOUT = 45.0
+
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)  # Set the logging level to DEBUG for detailed output
 sshtunnel.create_logger(loglevel=1)
-from flask_login import UserMixin
+
+from flask_security import UserMixin, RoleMixin
 
 # with sshtunnel.SSHTunnelForwarder(
 #     ('ssh.pythonanywhere.com',22),
@@ -120,33 +122,31 @@ class MetalPrice(Base):
 
         return query_to_dict(query.all())
 
+class Role(Base, RoleMixin):
+    __tablename__ = 'role'
+    id = Column(Integer(), primary_key=True)
+    name = Column(String(80), unique=True)
+    description = Column(String(255))
+
 class User(Base, UserMixin):
-    __tablename__ = 'users'
-
+    __tablename__ = 'user'
     id = Column(Integer, primary_key=True)
-    username = Column(String(255), unique=True,nullable=False)
+    email = Column(String(255), unique=True, nullable=False)  # Use 'email' instead of 'username'
     password = Column(String(255), nullable=False)
-    phone_number = Column(String(20))  # Add the phone_number column
-    confirmed = Column(Boolean, default=False, nullable=False)  # Whether the account is confirmed
-    confirmation_token = Column(String(255), unique=True, nullable=True)  # Unique token for confirmation
-    confirmation_sent_at = Column(DateTime)  # When the confirmation email was sent
-    def __repr__(self):  # Add a __repr__ method
-        return f"<User(id={self.id}, username='{self.username}')>"
+    active = Column(Boolean())  # Add 'active' column
+    confirmed_at = Column(DateTime())  # Add 'confirmed_at' column
+    roles = relationship('Role', secondary='roles_users',
+                            backref=db.backref('users', lazy='dynamic'))  # Define the relationship to roles
 
-    @classmethod
-    def get_user_by_username(cls, session, username):
-        """
-        Fetches a user from the database by their username, case-insensitively.
+    # ... (remove the phone_number, confirmed, confirmation_token, and confirmation_sent_at columns) ...
 
-        Args:
-            session: SQLAlchemy session object.
-            username: The username of the user to fetch.
+    # ... (remove the __repr__ and get_user_by_username methods) ...
 
-        Returns:
-            The User object if found, otherwise None.
-        """
-        return session.query(cls).filter(func.lower(cls.username) == func.lower(cls.username) == func.lower(username)).first()
-
+# Define the roles_users association table
+roles_users = db.Table(
+    'roles_users',
+    db.Column('user_id', db.Integer(), db.ForeignKey('user.id')),
+    db.Column('role_id', db.Integer(), db.ForeignKey('role.id'))
 # engine = create_engine(
 #     f"mysql+mysqlconnector://Pentagruel:(US)ue%1@127.0.0.1:{tunnel.local_bind_port}/Pentagruel$bullionsniper?connect_timeout=60"
 # )
