@@ -5,8 +5,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException, InvalidSessionIdException
-from models.model import Item
-from models.pieces import weights
+from scraping.dashboard.database import Item
+from scraping.dashboard.pieces import weights
 from seleniumbase import Driver
 from price_parser import Price
 import traceback

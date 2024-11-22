@@ -5,7 +5,7 @@ import pytz
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from models.model import MetalPrice
+from scraping.dashboard.database import MetalPrice
 
 def get(session_prod,session_staging,session_id,driver):
     """Uses Selenium to click the currency button, then scrapes the 1 kg gold price in Euros."""

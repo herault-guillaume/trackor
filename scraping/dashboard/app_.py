@@ -1,26 +1,83 @@
 import config
-from database import create_session
-from models.pieces import weights
-from models.model import User, MetalPrice, Item
+
+from scraping.dashboard.pieces import weights
+from scraping.dashboard.database import db, User, Role, MetalPrice, Item, create_session, query_to_dict
 
 import os
 import datetime
 import re
 import logging
 import pandas as pd
+import sshtunnel
 
 import dash
-from dash import dcc, html, Input, Output, State, dash_table, callback_context
+from dash import dcc, html, Input, Output, State, callback_context
 from dash.exceptions import PreventUpdate
 import dash_bootstrap_components as dbc
 
-from flask import Flask, request, redirect, url_for, render_template, flash
-from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
-from flask_login import current_user
+from flask import Flask, request
+from flask_security import Security, SQLAlchemyUserDatastore, login_required, current_user, anonymous_user_required
+from flask_security.forms import LoginForm, RegisterForm
+from wtforms import StringField, PasswordField, SubmitField
+from wtforms.validators import DataRequired, Email, EqualTo
 
-from werkzeug.security import generate_password_hash, check_password_hash
-from flask_mail import Mail, Message
-from itsdangerous import URLSafeTimedSerializer
+server = Flask(__name__)
+
+# Database connection details
+SSH_HOST = os.environ['SSH_HOST']
+SSH_USERNAME = os.environ['SSH_USERNAME']
+SSH_PASSWORD = os.environ['SSH_PASSWORD']
+REMOTE_BIND_ADDRESS = os.environ['REMOTE_BIND_ADDRESS']
+REMOTE_PORT_ADDRESS = int(os.environ['REMOTE_PORT_ADDRESS'])
+DATABASE_URL = os.environ['SQLALCHEMY_DATABASE_URI']
+
+# Establish the SSH tunnel first
+tunnel = sshtunnel.SSHTunnelForwarder(
+    SSH_HOST,
+    ssh_username=SSH_USERNAME,
+    ssh_password=SSH_PASSWORD,
+    remote_bind_address=(REMOTE_BIND_ADDRESS, REMOTE_PORT_ADDRESS),
+    logger=None,
+)
+tunnel.start()
+
+server.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL.format(tunnel.local_bind_port)
+server.config['SECRET_KEY'] = os.environ['SECRET_KEY']
+server.config['SECURITY_PASSWORD_SALT'] = os.environ['MAIL_SERVER']
+server.config['MAIL_SERVER'] = os.environ['MAIL_SERVER']
+server.config['MAIL_PORT'] = int(os.environ['MAIL_PORT'])
+server.config['MAIL_USERNAME'] = os.environ['MAIL_USERNAME']
+server.config['MAIL_PASSWORD'] = os.environ['MAIL_PASSWORD']
+server.config['MAIL_USE_SSL'] = bool(os.environ['MAIL_USE_SSL'])
+server.config['SECURITY_REGISTERABLE'] = bool(os.environ['SECURITY_REGISTERABLE'])
+server.config['SECURITY_CONFIRMABLE'] = bool(os.environ['SECURITY_CONFIRMABLE'])
+server.config['SECURITY_RECOVERABLE'] = bool(os.environ['SECURITY_RECOVERABLE'])
+server.config['SECURITY_CHANGEABLE'] = bool(os.environ['SECURITY_CHANGEABLE'])
+server.config['SECURITY_TRACKABLE'] = bool(os.environ['SECURITY_TRACKABLE'])
+
+db.init_app(server)
+
+user_datastore = SQLAlchemyUserDatastore(db, User, Role)
+security = Security(server, user_datastore)
+
+app = dash.Dash(__name__,
+                server=server,
+                title="Bullion Sniper",
+                external_stylesheets=[dbc.themes.DARKLY,'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css'],
+                suppress_callback_exceptions=True,
+                assets_folder='assets',
+                meta_tags=[
+                    {"name": "language", "content": "fr"},
+                    {"name": "title", "content": "Bullion Sniper"},
+                    {"property": "og:title", "content": "Bullion Sniper"},  # For social media sharing
+                    {"name": "description",
+                     "content": "Trouver facilement les meilleurs offres de pièces d'investissement en ligne."},
+                    {"property": "og:description",
+                     "content": "Trouver facilement les meilleurs offres de pièces d'investissement en ligne."},
+                    {"name": "keywords",
+                     "content": "pièces d'investissement, or, argent, lingots, achat, vente, bullion, investissement, métaux précieux"},
+                ]
+                )
 
 def get_price(ranges, quantity):
     """
@@ -90,174 +147,46 @@ ar_options_quick_filter = [
             {'label': "Toutes les 1 Oz", 'value': 'ar - 1 oz *'},
 ]
 
-# Define a hidden Div to store the confirmation status
-hidden_div = html.Div(id='confirmation-status', style={'display': 'none'})
+class ExtendedLoginForm(LoginForm):
+    email = StringField('Email', validators=[DataRequired(), Email()], render_kw={'id': 'login-username-input'})
+    password = PasswordField('Password', validators=[DataRequired()], render_kw={'id': 'login-password-input'})
+    submit = SubmitField('Log In', render_kw={'id': 'login-button', 'class_name': 'btn btn-secondary'})
 
-server = Flask(__name__)
+class ExtendedRegisterForm(RegisterForm):
+    email = StringField('Email', validators=[DataRequired(), Email()], render_kw={'id': 'signin-username-input'})
+    password = PasswordField('Password', validators=[DataRequired()], render_kw={'id': 'signin-password-input'})
+    password_confirm = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')], render_kw={'id': 'signin-confirm-password-input'})
+    submit = SubmitField('Sign In', render_kw={'id': 'signin-button', 'class_name': 'btn btn-secondary'})
 
-app = dash.Dash(__name__,
-                server=server,
-                external_stylesheets=[dbc.themes.DARKLY,'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css'],
-                suppress_callback_exceptions=True,
-                assets_folder='assets',
-                update_title=None,
-                meta_tags=[
-                    {"name": "language", "content": "fr"},
-                    {"name": "title", "content": "Bullion Sniper"},
-                    {"property": "og:title", "content": "Bullion Sniper"},  # For social media sharing
-                    {"name": "description",
-                     "content": "Trouver facilement les meilleurs offres de pièces d'investissement en ligne."},
-                    {"property": "og:description",
-                     "content": "Trouver facilement les meilleurs offres de pièces d'investissement en ligne."},
-                    {"name": "keywords",
-                     "content": "pièces d'investissement, or, argent, lingots, achat, vente, bullion, investissement, métaux précieux"},
-                ]
-                )
-
-app.title = "Bullion Sniper"
-# Config
-server.config.update(
-    SECRET_KEY=os.environ['APP_KEY']  # Replace with a strong, random key
-)
-
-app.server.config['MAIL_SERVER'] = os.environ['MAIL_SERVER']
-app.server.config['MAIL_PORT'] = int(os.environ['MAIL_PORT'])
-app.server.config['MAIL_USERNAME'] = os.environ['MAIL_USERNAME']
-app.server.config['MAIL_PASSWORD'] = os.environ['MAIL_PASSWORD']
-app.server.config['MAIL_USE_TLS'] = False
-app.server.config['MAIL_USE_SSL'] = bool(os.environ['MAIL_USE_SSL'])
-
-mail = Mail(app.server)
-
-# Flask-Login setup
-login_manager = LoginManager()
-login_manager.init_app(server)
-login_manager.login_view = '/login'
-
-# User loader
-@login_manager.user_loader
-def load_user(user_id):
-    session, tunnel = create_session()
-    try:
-        user = session.query(User).get(int(user_id))
-        return user
-    except Exception as e:
-        print(f"Error loading user: {e}")  # Log the error
-        return None
-    finally:  # Ensure the session and tunnel are closed in all cases
-        if session:
-            session.close()
-        if tunnel:
-            tunnel.stop()
-
-# Logout route
-@server.route('/logout')
-@login_required
-def logout():
-    logout_user()
-    return redirect(url_for('index'))  # Redirect to your main page
-
-def generate_confirmation_token(user):
-    serializer = URLSafeTimedSerializer(os.environ['APP_KEY'])  # Use a secret key
-    return serializer.dumps(user.username, salt='email-confirm')  # Generate a token
-
-def confirm_token(token, expiration=3600):  # 1 hour expiration
-    serializer = URLSafeTimedSerializer(os.environ['APP_KEY'])
-    try:
-        username = serializer.loads(
-            token,
-            salt='email-confirm',
-            max_age=expiration
-        )
-    except:
-        return False
-    return username
-
-def generate_confirmation_link(user):
-    token = generate_confirmation_token(user)
-    confirm_url = url_for('confirm_email', token=token, _external=True)  # Use url_for
-    return confirm_url,token
-
-def send_auth_email(session, user):
-    confirm_url, token = generate_confirmation_link(user)
-    subject = "[Bullion-Sniper] Confirmez votre email !"
-    # Render the HTML template with the user's name and confirmation link
-    html_content = render_template('confirm_email.html', username=user.username, confirm_url=confirm_url)
-    msg = Message(subject, sender='noreply@bullion-sniper.fr', recipients=[user.username], html=html_content)
-    try:
-        mail.send(msg)
-        user.confirmation_sent_at = datetime.datetime.utcnow()
-        user.confirmation_token = token  # Store the token in the database
-        session.commit()
-        print(f"Email d'authentification envoyé à {user.username}")
-    except Exception as e:
-        raise e
 @app.server.route('/')
+@anonymous_user_required  # Require anonymous user for this route
 def index():
-    return app.index()
+    with request.context():  # Use request context
+        return app.index() # Render the Dash app's index layout
 
-@app.server.route('/confirm/<token>')
-def confirm_email(token):
-    session = None  # Initialize session variable
-    tunnel = None  # Initialize tunnel variable
-    try:
-        session, tunnel = create_session()
-        username = confirm_token(token)
-        if username:
-            user = User.get_user_by_username(session, username)
-            if user.confirmed:
-                flash('Account already confirmed. Please login.', 'info')
-            else:
-                user.confirmed = True
-                user.confirmation_token = None
-                session.commit()
-                login_user(user)  # Log in the user after confirmation
+# Define the layout
+app.layout = html.Div([
+    dcc.Location(id='url', refresh=False),
+    html.Div(id='page-content')
+])
 
-                # Access the user session through current_user
-                if current_user.is_authenticated:
-                    current_user.confirmation_success = True
-                    app.layout = serve_layout()
-                    app.layout[0].append(show_confirmation_alert(session))
-                    return redirect(url_for('index'))
-
-                flash('You have confirmed your account. Thanks!', 'success')
+@app.callback(Output('page-content', 'children'),
+              [Input('url', 'pathname')])
+def display_page(pathname):
+    with request.context():
+        if pathname == '/profile':
+            # This is a protected view
+            @login_required
+            def profile():
+                return html.Div([
+                    html.H1('Profile Page'),
+                    html.P(f'Welcome, {current_user.email}!')
+                ])
+            return profile()
         else:
-            flash('The confirmation link is invalid or has expired.', 'danger')
-    except Exception as e:
-        # Handle exceptions (e.g., database errors)
-        print(f"Error confirming email: {e}")
-        flash('An error occurred. Please try again later.', 'danger')
-    finally:
-        if session:
-            session.close()
-        if tunnel:
-            tunnel.stop()
-
-
-
-# Callback to show the confirmation alert
-@app.callback(
-    Output('confirmation-alert-container', 'children'),
-    [Input('confirmation-status', 'children'), Input('url', 'pathname')]
-)
-def show_confirmation_alert(_, pathname):
-    if current_user.is_authenticated and current_user.confirmation_success and pathname == '/':
-        delattr(current_user, 'confirmation_success')  # Remove the flag after displaying the alert
-        return dbc.Alert(
-        "Votre compte a été confirmé avec succès !",
-        color="success",
-        is_open=True,
-        dismissable=True,  # Allow users to dismiss the alert
-        fade=True,
-        className="mt-4",
-        duration=3000  # Auto-dismiss after 3 seconds (3000 milliseconds)
-    )
-    else:
-        return ""
-
-index_layout = html.Div(
+            # Render your index_layout with the forms
+            return html.Div(
     [
-        hidden_div,
         dcc.Location(id="url", refresh=False),
         dbc.Container(
             [
@@ -287,7 +216,7 @@ index_layout = html.Div(
                                         style={"text-align": "center"},
                                     ),
                                     dbc.CardBody(
-                                        [
+                                        [   ExtendedRegisterForm(),
                                             # Email input with form feedback
                                             html.Div(
                                                 [
@@ -365,7 +294,7 @@ index_layout = html.Div(
                                         style={"text-align": "center"},
                                     ),
                                     dbc.CardBody(
-                                        [
+                                        [   ExtendedLoginForm(),
                                             # Email input with form feedback
                                             html.Div(
                                                 [
@@ -421,7 +350,7 @@ index_layout = html.Div(
 )
 
 
-app.layout = index_layout
+
 
 # Callback for signin username input
 @app.callback(
@@ -435,7 +364,6 @@ def validate_signin_username(username):
     email_valid = re.match(r"[^@]+@[^@]+\.[^@]+", username) is not None
     return email_valid, not email_valid
 
-
 # Callback for signin password input
 @app.callback(
     Output("signin-password-input", "valid"),
@@ -447,7 +375,6 @@ def validate_signin_password(password):
         raise PreventUpdate
     password_valid = len(password) >= 10 if password else False
     return password_valid, not password_valid
-
 
 # Callback for signin confirm password input
 @app.callback(
@@ -463,7 +390,6 @@ def validate_signin_confirm_password(confirm_password, password):
         confirm_password == password if password and confirm_password else False
     )
     return confirm_password_valid, not confirm_password_valid
-
 
 # Callback for login username input
 @app.callback(
@@ -1144,7 +1070,9 @@ app.clientside_callback(
     Input("tawk-to-widget", "n_clicks"),
 )
 
-
+# Create the database tables
+with app.server.app_context():
+    db.create_all()
 
 if __name__ == '__main__':
 
@@ -1164,7 +1092,6 @@ if __name__ == '__main__':
 
     # Add the file handler to the app's logger
     app.logger.addHandler(file_handler)
-
 
     # Example of logging a message
     app.logger.info('App started')

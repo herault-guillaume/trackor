@@ -1,5 +1,3 @@
-from models.model import Item
-from models.pieces import weights
 import time
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger

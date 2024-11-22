@@ -1,8 +1,8 @@
 import time
 import requests
 from bs4 import BeautifulSoup
-from models.model import Item
-from models.pieces import weights
+from scraping.dashboard.database import Item
+from scraping.dashboard.pieces import weights
 import traceback
 from price_parser import Price
 import logging

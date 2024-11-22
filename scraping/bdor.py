@@ -1,8 +1,8 @@
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from models.model import Item
-from models.pieces import weights
+from scraping.dashboard.database import Item
+from scraping.dashboard.pieces import weights
 from price_parser import Price
 import traceback
 import re

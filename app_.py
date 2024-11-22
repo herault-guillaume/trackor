@@ -1,11 +1,10 @@
 import dash
 import datetime
-from dash import dcc, html, Input, Output, State, dash_table, callback_context  # Import callback_context
-from dash.exceptions import PreventUpdate
+from dash import dcc, html, Input, Output, State, callback_context  # Import callback_context
 import dash_bootstrap_components as dbc
 import pandas as pd
 import sqlite3
-from models.pieces import weights
+from scraping.dashboard.pieces import weights
 
 # Database file path
 db_path = r'C:\Users\Guillaume Hérault\PycharmProjects\trackor\models\pieces_or.db'

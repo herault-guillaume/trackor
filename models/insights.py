@@ -1,18 +1,11 @@
 import pandas as pd
 from sqlalchemy import create_engine
-import pandas as pd
-import numpy as np
-from scipy import signal
-from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from urllib.parse import urlparse
-from models.pieces import weights
+from scraping.dashboard.pieces import weights
 
-from statsmodels.tsa.arima.model import ARIMA
 from statsmodels.tsa.stattools import adfuller
-from sklearn.metrics import mean_squared_error
-
 
 # Configuration de la base de données
 # Permanently changes the pandas settings
