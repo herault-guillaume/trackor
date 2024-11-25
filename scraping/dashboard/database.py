@@ -1,46 +1,9 @@
-import os
-import sshtunnel
 import pytz
 import datetime
-import logging
 
 from flask_sqlalchemy import SQLAlchemy
-from flask_security import UserMixin, RoleMixin
-
-# Database connection details
-SSH_HOST = os.environ['SSH_HOST']
-SSH_USERNAME = os.environ['SSH_USERNAME']
-SSH_PASSWORD = os.environ['SSH_PASSWORD']
-REMOTE_BIND_ADDRESS = os.environ['REMOTE_BIND_ADDRESS']
-REMOTE_PORT_ADDRESS = int(os.environ['REMOTE_PORT_ADDRESS'])
-SQLALCHEMY_DATABASE_URI = os.environ['SQLALCHEMY_DATABASE_URI']
 
 db = SQLAlchemy()
-def create_session(app):
-    """
-    Establishes an SSH tunnel and creates a Flask-SQLAlchemy session.
-    The tunnel needs to be closed manually after usage.
-
-    Returns:
-        A SQLAlchemy session object and the SSH tunnel object.
-    """
-
-    tunnel = sshtunnel.SSHTunnelForwarder(
-        SSH_HOST,
-        ssh_username=SSH_USERNAME,
-        ssh_password=SSH_PASSWORD,
-        remote_bind_address=(REMOTE_BIND_ADDRESS, REMOTE_PORT_ADDRESS),
-        logger=None,
-    )
-    tunnel.start()
-
-    # Use the existing SQLAlchemy instance to create a session
-    app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI.format(tunnel.local_bind_port)
-    app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {"connect_args": {"connect_timeout": 60}, "echo": True}
-    db.init_app(app)  # Initialize the SQLAlchemy instance with the app
-    with app.app_context():
-        session = db.session  # Get the session from the SQLAlchemy instance
-        return session, tunnel
 
 def query_to_dict(rset):
     """
@@ -149,25 +112,3 @@ class MetalPrice(db.Model):
         )
 
         return query_to_dict(query.all())
-
-class Role(db.Model, RoleMixin):
-    __tablename__ = 'role'
-    id = db.Column(db.Integer(), primary_key=True)
-    name = db.Column(db.String(80), unique=True)
-    description = db.Column(db.String(255))
-
-class User(db.Model, UserMixin):
-    __tablename__ = 'user'
-    id = db.Column(db.Integer, primary_key=True)
-    fs_uniquifier = db.Column(db.String(255), unique=True, nullable=False)
-    email = db.Column(db.String(255), unique=True, nullable=False)
-    password = db.Column(db.String(255), nullable=False)
-    active = db.Column(db.Boolean())
-    confirmed_at = db.Column(db.DateTime())
-    roles = db.relationship('Role', secondary='roles_users',backref=db.backref('users', lazy='dynamic'))
-
-roles_users = db.Table(
-    'roles_users',
-    db.Column('user_id', db.Integer(), db.ForeignKey('user.id')),
-    db.Column('role_id', db.Integer(), db.ForeignKey('role.id'))
-)

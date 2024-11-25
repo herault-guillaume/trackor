@@ -54,10 +54,10 @@ def fetch_and_update_data():
         ) as tunnel):
 
             engine_prod = create_engine(
-                f"mysql+mysqlconnector://Pentagruel:(US)ue%1@127.0.0.1:{tunnel.local_bind_port}/Pentagruel$bullionsniper",echo=True
+                f"mysql+mysqlconnector://Pentagruel:(US)ue%1@127.0.0.1:{tunnel.local_bind_port}/Pentagruel$bullionsniper"
             )
             engine_staging = create_engine(
-                f"mysql+mysqlconnector://Pentagruel:(US)ue%1@127.0.0.1:{tunnel.local_bind_port}/Pentagruel$staging-bullionsniper",echo=True
+                f"mysql+mysqlconnector://Pentagruel:(US)ue%1@127.0.0.1:{tunnel.local_bind_port}/Pentagruel$staging-bullionsniper"
             )
 
             driver = Driver(uc=True, headless=True)

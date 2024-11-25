@@ -1,64 +1,51 @@
-import config
+from dotenv import load_dotenv
+load_dotenv()
 
 from scraping.dashboard.pieces import weights
-from scraping.dashboard.database import db, User, Role, MetalPrice, Item, create_session, query_to_dict
+from scraping.dashboard.database import db, MetalPrice, Item
 
 import os
-import datetime
-import re
-import logging
 import pandas as pd
-import sshtunnel
+#import sshtunnel
 
 import dash
 from dash import dcc, html, Input, Output, State, callback_context
-from dash.exceptions import PreventUpdate
 import dash_bootstrap_components as dbc
 
-from flask import Flask, request
-from flask_security import Security, SQLAlchemyUserDatastore, login_required, current_user, anonymous_user_required
-from flask_security.forms import LoginForm, RegisterForm
-from wtforms import StringField, PasswordField, SubmitField
-from wtforms.validators import DataRequired, Email, EqualTo
+from flask import Flask, request, session
 
 server = Flask(__name__)
 
-# Database connection details
-SSH_HOST = os.environ['SSH_HOST']
-SSH_USERNAME = os.environ['SSH_USERNAME']
-SSH_PASSWORD = os.environ['SSH_PASSWORD']
-REMOTE_BIND_ADDRESS = os.environ['REMOTE_BIND_ADDRESS']
-REMOTE_PORT_ADDRESS = int(os.environ['REMOTE_PORT_ADDRESS'])
-DATABASE_URL = os.environ['SQLALCHEMY_DATABASE_URI']
+# SSH tunnel config
+# server.config['SECRET_KEY'] = os.getenv('FLASK_SECRET_KEY')
+# server.config['SSH_HOST'] = os.getenv('SSH_HOST')
+# server.config['SSH_USERNAME'] = os.getenv('SSH_USERNAME')
+# server.config['SSH_PASSWORD'] = os.getenv('SSH_PASSWORD')
+# server.config['REMOTE_BIND_ADDRESS'] = os.getenv('REMOTE_BIND_ADDRESS')
+# server.config['REMOTE_PORT_ADDRESS'] = int(os.getenv('REMOTE_PORT_ADDRESS', 3306))
+# sshtunnel.SSH_TIMEOUT = float(os.getenv('SSH_TIMEOUT', 3600.0))
+# sshtunnel.TUNNEL_TIMEOUT = float(os.getenv('TUNNEL_TIMEOUT', 3600.0))
+#
+# def create_tunnel():
+#     return sshtunnel.SSHTunnelForwarder(
+#         (os.getenv('SSH_HOST')),
+#         ssh_username=os.getenv('SSH_USERNAME'),
+#         ssh_password=os.getenv('SSH_PASSWORD'),
+#         remote_bind_address=(os.getenv('REMOTE_BIND_ADDRESS'), int(os.getenv('REMOTE_PORT_ADDRESS', 3306)))
+#     )
 
-# Establish the SSH tunnel first
-tunnel = sshtunnel.SSHTunnelForwarder(
-    SSH_HOST,
-    ssh_username=SSH_USERNAME,
-    ssh_password=SSH_PASSWORD,
-    remote_bind_address=(REMOTE_BIND_ADDRESS, REMOTE_PORT_ADDRESS),
-    logger=None,
-)
+# def create_and_attach_session_throught_tunnel(db,tunnel):
+#     conn_str = os.getenv('SQLALCHEMY_DATABASE_URI').format(tunnel.local_bind_port)
+#     engine = db.create_engine(conn_str, echo=True)  # echo=False to disable logging SQL queries
+#     Session = db.scoped_session(db.sessionmaker(autocommit=False, autoflush=False, bind=engine))
+#     return Session()  # Set the db.session
+
+tunnel = create_tunnel()
 tunnel.start()
 
-server.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL.format(tunnel.local_bind_port)
-server.config['SECRET_KEY'] = os.environ['SECRET_KEY']
-server.config['SECURITY_PASSWORD_SALT'] = os.environ['MAIL_SERVER']
-server.config['MAIL_SERVER'] = os.environ['MAIL_SERVER']
-server.config['MAIL_PORT'] = int(os.environ['MAIL_PORT'])
-server.config['MAIL_USERNAME'] = os.environ['MAIL_USERNAME']
-server.config['MAIL_PASSWORD'] = os.environ['MAIL_PASSWORD']
-server.config['MAIL_USE_SSL'] = bool(os.environ['MAIL_USE_SSL'])
-server.config['SECURITY_REGISTERABLE'] = bool(os.environ['SECURITY_REGISTERABLE'])
-server.config['SECURITY_CONFIRMABLE'] = bool(os.environ['SECURITY_CONFIRMABLE'])
-server.config['SECURITY_RECOVERABLE'] = bool(os.environ['SECURITY_RECOVERABLE'])
-server.config['SECURITY_CHANGEABLE'] = bool(os.environ['SECURITY_CHANGEABLE'])
-server.config['SECURITY_TRACKABLE'] = bool(os.environ['SECURITY_TRACKABLE'])
-
-db.init_app(server)
-
-user_datastore = SQLAlchemyUserDatastore(db, User, Role)
-security = Security(server, user_datastore)
+# Configuration using environment variables
+# server.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI').format(tunnel.local_bind_port)
+server.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI').format(tunnel.local_bind_port)
 
 app = dash.Dash(__name__,
                 server=server,
@@ -79,471 +66,7 @@ app = dash.Dash(__name__,
                 ]
                 )
 
-def get_price(ranges, quantity):
-    """
-    Calculates the price based on the quantity and given ranges.
-
-    Args:
-    ranges: A string of ranges in the format '1-9;10-48;49-98;99-9999999999.9'.
-    quantity: The quantity of the item.
-
-    Returns:
-    The price as a float.
-    """
-    ranges = ranges.split(';')
-
-    for r in ranges:
-        lower, upper, price = map(float, r.split('-'))
-        if lower <= quantity < upper:
-            return price  # Return the price directly
-        return None  # Or handle the case where quantity is outside all ranges
-
-def get_country_flag_image(country_code):
-    """
-    Generates an HTML img tag for a country flag image from a 2-letter country code.
-    Uses images from the provided URL with the format "https://hatscripts.github.io/circle-flags/flags/{code}.svg".
-    """
-    if len(country_code) == 2:
-        return html.Img(
-            src=f"/assets/{country_code.lower()}.svg",  # Use assets folder
-            alt=country_code,
-            style={'width': '20px', 'margin-right': '5px'}
-        )
-    else:
-        return ""
-
-or_options_quick_filter = [
-                {'label': html.Span([get_country_flag_image('fr'), "Toutes les 20 francs Napoléon d'Or"]), 'value': 'or - 20 francs fr *'},
-                {'label': html.Span([get_country_flag_image('fr'), "Toutes les 5 francs"]), 'value': 'or - 5 francs fr *'},
-                {'label': html.Span([get_country_flag_image('fr'), "Toutes les 10 francs"]), 'value': 'or - 10 francs fr *'},
-                {'label': html.Span([get_country_flag_image('fr'), "Toutes les 40 francs"]), 'value': 'or - 40 francs fr *'},
-                {'label': html.Span([get_country_flag_image('fr'), "Toutes les 50 francs"]), 'value': 'or - 50 francs fr *'},
-                {'label': html.Span([get_country_flag_image('fr'), "Toutes les 100 francs"]), 'value': 'or - 100 francs fr *'},
-                {'label': html.Span([get_country_flag_image('ch'), "Toutes les 20 francs"]), 'value': 'or - 20 francs sui *'},
-                {'label': html.Span([get_country_flag_image('gb'), "Toutes les 1 souverain"]), 'value': 'or - 1 souverain *'},
-                {'label': html.Span([get_country_flag_image('gb'), "Toutes les 1/2 souverain"]), 'value': 'or - 1/2 souverain *'},
-                {'label': html.Span([get_country_flag_image('us'), "Toutes les 2.5 dollars"]), 'value': 'or - 2.5 dollars *'},
-                {'label': html.Span([get_country_flag_image('us'), "Toutes les 5 dollars"]), 'value': 'or - 5 dollars *'},
-                {'label': html.Span([get_country_flag_image('us'), "Toutes les 10 dollars"]), 'value': 'or - 10 dollars *'},
-                {'label': html.Span([get_country_flag_image('us'), "Toutes les 20 dollars"]), 'value': 'or - 20 dollars *'},
-                {'label': html.Span([get_country_flag_image('mx'), "Toutes les 50 pesos"]), 'value': 'or - 50 pesos *'},
-                {'label': html.Span([get_country_flag_image('it'), "Toutes les 20 lire"]), 'value': 'or - 20 lire *'},
-                {'label': html.Span([get_country_flag_image('de'), "Toutes les 20 mark"]), 'value': 'or - 20 mark *'},
-                {'label': "Toutes les 1 Oz", 'value': 'or - 1 oz*'},
-                {'label': "Toutes les 1/2 Oz", 'value': 'or - 1/2 oz*'},
-                {'label': "Toutes les 1/4 Oz", 'value': 'or - 1/4 oz*'},
-                {'label': "Toutes les 1/10 Oz", 'value': 'or - 1/10 oz*'},
-                {'label': "Toutes les 1/20 Oz", 'value': 'or - 1/20 oz*'},
-                        ]
-ar_options_quick_filter = [
-            {'label': html.Span([get_country_flag_image('fr'), "Toutes les 50 Cts francs"]), 'value': 'ar - 50 centimes francs fr *'},
-            {'label': html.Span([get_country_flag_image('fr'), "Toutes les 1 franc"]), 'value': 'ar - 1 franc fr *'},
-            {'label': html.Span([get_country_flag_image('fr'), "Toutes les 2 francs"]), 'value': 'ar - 2 francs fr *'},
-            {'label': html.Span([get_country_flag_image('fr'), "Toutes les 5 francs"]), 'value': 'ar - 5 francs fr *'},
-            {'label': html.Span([get_country_flag_image('fr'), "Toutes les 10 francs"]), 'value': 'ar - 10 francs fr *'},
-            {'label': html.Span([get_country_flag_image('fr'), "Toutes les 20 francs"]), 'value': 'ar - 20 francs fr *'},
-            {'label': html.Span([get_country_flag_image('fr'), "Toutes les 50 francs Hercule"]), 'value': 'ar - 50 francs fr *'},
-            {'label': html.Span([get_country_flag_image('fr'), "Toutes les 100 francs Hercule"]), 'value': 'ar - 100 francs fr *'},
-            {'label': "Toutes les 1 Oz", 'value': 'ar - 1 oz *'},
-]
-
-class ExtendedLoginForm(LoginForm):
-    email = StringField('Email', validators=[DataRequired(), Email()], render_kw={'id': 'login-username-input'})
-    password = PasswordField('Password', validators=[DataRequired()], render_kw={'id': 'login-password-input'})
-    submit = SubmitField('Log In', render_kw={'id': 'login-button', 'class_name': 'btn btn-secondary'})
-
-class ExtendedRegisterForm(RegisterForm):
-    email = StringField('Email', validators=[DataRequired(), Email()], render_kw={'id': 'signin-username-input'})
-    password = PasswordField('Password', validators=[DataRequired()], render_kw={'id': 'signin-password-input'})
-    password_confirm = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')], render_kw={'id': 'signin-confirm-password-input'})
-    submit = SubmitField('Sign In', render_kw={'id': 'signin-button', 'class_name': 'btn btn-secondary'})
-
-@app.server.route('/')
-@anonymous_user_required  # Require anonymous user for this route
-def index():
-    with request.context():  # Use request context
-        return app.index() # Render the Dash app's index layout
-
-# Define the layout
-app.layout = html.Div([
-    dcc.Location(id='url', refresh=False),
-    html.Div(id='page-content')
-])
-
-@app.callback(Output('page-content', 'children'),
-              [Input('url', 'pathname')])
-def display_page(pathname):
-    with request.context():
-        if pathname == '/profile':
-            # This is a protected view
-            @login_required
-            def profile():
-                return html.Div([
-                    html.H1('Profile Page'),
-                    html.P(f'Welcome, {current_user.email}!')
-                ])
-            return profile()
-        else:
-            # Render your index_layout with the forms
-            return html.Div(
-    [
-        dcc.Location(id="url", refresh=False),
-        dbc.Container(
-            [
-                dbc.Row(
-                    [
-                        html.Img(
-                            src="/assets/logo-bullion-sniper.webp",
-                            style={"height": "150px", "width": "auto"},
-                        )
-                    ],
-                    className="mb-4 mt-4",
-                    justify="center",
-                ),
-                dbc.Row(
-                    [
-                        dbc.Col(
-                            dbc.Card(
-                                [
-                                    dbc.CardHeader(
-                                        [
-                                            html.I(
-                                                className="fa-solid fa-user-plus",
-                                                style={"font-size": "18px"},
-                                            ),
-                                            "  S'inscrire",
-                                        ],
-                                        style={"text-align": "center"},
-                                    ),
-                                    dbc.CardBody(
-                                        [   ExtendedRegisterForm(),
-                                            # Email input with form feedback
-                                            html.Div(
-                                                [
-                                                    dbc.Input(
-                                                        type="text",
-                                                        id="signin-username-input",
-                                                        placeholder="Entrez votre email",
-                                                        valid=False,
-                                                    ),
-                                                    dbc.FormFeedback(
-                                                        "Format d'email invalide",
-                                                        type="invalid",
-                                                    ),
-                                                ],
-                                                className="mb-3",
-                                            ),
-                                            # Password input with form feedback
-                                            html.Div(
-                                                [
-                                                    dbc.Input(
-                                                        type="password",
-                                                        id="signin-password-input",
-                                                        placeholder="Entrez votre mot de passe",
-                                                        valid=False,
-                                                    ),
-                                                    dbc.FormFeedback(
-                                                        "Votre mot de passe doit faire 10 caractères",
-                                                        type="invalid",
-                                                    ),
-                                                ],
-                                                className="mb-3",
-                                            ),
-                                            # Confirm password input with form feedback
-                                            html.Div(
-                                                [
-                                                    dbc.Input(
-                                                        type="password",
-                                                        id="signin-confirm-password-input",
-                                                        placeholder="Confirmez votre mot de passe",
-                                                        valid=False,
-                                                    ),
-                                                    dbc.FormFeedback(
-                                                        "Les mots de passe ne correspondent pas.",
-                                                        type="invalid",
-                                                    ),
-                                                ],
-                                                className="mb-3",
-                                            ),
-                                            dbc.Button(
-                                                "Sign In",
-                                                id="signin-button",
-                                                color="secondary",
-                                                className="mr-2",
-                                            ),
-                                            html.Div(id="signin-output"),
-                                        ]
-                                    ),
-                                ],
-                                style={"text-align": "center"},
-                                className="mb-2",
-                            ),
-                            width=3,
-                        ),
-                        dbc.Col(
-                            dbc.Card(
-                                [
-                                    dbc.CardHeader(
-                                        [
-                                            html.I(
-                                                className="fa-solid fa-right-to-bracket",
-                                                style={"font-size": "18px"},
-                                            ),
-                                            "  Se connecter",
-                                        ],
-                                        style={"text-align": "center"},
-                                    ),
-                                    dbc.CardBody(
-                                        [   ExtendedLoginForm(),
-                                            # Email input with form feedback
-                                            html.Div(
-                                                [
-                                                    dbc.Input(
-                                                        type="text",
-                                                        id="login-username-input",
-                                                        placeholder="Entrez votre email",
-                                                    ),
-                                                    dbc.FormFeedback(
-                                                        "Format d'email invalide",
-                                                        type="invalid",
-                                                    ),
-                                                ],
-                                                className="mb-3",
-                                            ),
-                                            # Password input with form feedback
-                                            html.Div(
-                                                [
-                                                    dbc.Input(
-                                                        type="password",
-                                                        id="login-password-input",
-                                                        placeholder="Entrez votre mot de passe",
-                                                    ),
-                                                    dbc.FormFeedback(
-                                                        "Votre mot de passe contient minimum 10 caractères",
-                                                        type="invalid",
-                                                    ),
-                                                ],
-                                                className="mb-3",
-                                            ),
-                                            dbc.Button(
-                                                "Se connecter",
-                                                id="login-button",
-                                                color="secondary",
-                                                className="mr-2",
-                                            ),
-                                            html.Div(id="login-output"),
-                                        ]
-                                    ),
-                                ],
-                                style={"text-align": "center"},
-                                className="mb-2",
-                            ),
-                            width=3,
-                        ),
-                    ],
-                    className="equal-height-cards",
-                    justify="center",
-                ),
-            ],id='page-content'
-        ),
-    ]
-)
-
-
-
-
-# Callback for signin username input
-@app.callback(
-    Output("signin-username-input", "valid"),
-    Output("signin-username-input", "invalid"),
-    Input("signin-username-input", "value"),
-)
-def validate_signin_username(username):
-    if username is None:
-        raise PreventUpdate
-    email_valid = re.match(r"[^@]+@[^@]+\.[^@]+", username) is not None
-    return email_valid, not email_valid
-
-# Callback for signin password input
-@app.callback(
-    Output("signin-password-input", "valid"),
-    Output("signin-password-input", "invalid"),
-    Input("signin-password-input", "value"),
-)
-def validate_signin_password(password):
-    if password is None:
-        raise PreventUpdate
-    password_valid = len(password) >= 10 if password else False
-    return password_valid, not password_valid
-
-# Callback for signin confirm password input
-@app.callback(
-    Output("signin-confirm-password-input", "valid"),
-    Output("signin-confirm-password-input", "invalid"),
-    Input("signin-confirm-password-input", "value"),
-    State("signin-password-input", "value"),
-)
-def validate_signin_confirm_password(confirm_password, password):
-    if confirm_password is None:
-        raise PreventUpdate
-    confirm_password_valid = (
-        confirm_password == password if password and confirm_password else False
-    )
-    return confirm_password_valid, not confirm_password_valid
-
-# Callback for login username input
-@app.callback(
-    Output("login-username-input", "valid"),
-    Output("login-username-input", "invalid"),
-    Input("login-username-input", "value"),
-)
-def validate_login_username(username):
-    if username is None:
-        raise PreventUpdate
-    email_valid = re.match(r"[^@]+@[^@]+\.[^@]+", username) is not None
-    return email_valid, not email_valid
-
-
-# Callback for login password input
-@app.callback(
-    Output("login-password-input", "valid"),
-    Output("login-password-input", "invalid"),
-    Input("login-password-input", "value"),
-)
-def validate_login_password(password):
-    if password is None:
-        raise PreventUpdate
-    password_valid = len(password) >= 10 if password else False
-    return password_valid, not password_valid
-
-# Callback for signin button click (to handle database interaction)
-@app.callback(
-    Output("signin-output", "children"),
-    Input("signin-button", "n_clicks"),
-    State("signin-username-input", "value"),
-    State("signin-password-input", "value"),
-    State("signin-confirm-password-input", "value"),
-    State("signin-username-input", "valid"),
-    State("signin-password-input", "valid"),
-    State("signin-confirm-password-input", "valid"),
-)
-def signin_button_click(n_clicks, username, password, confirm_password, email_valid, password_valid, confirm_valid):
-    if n_clicks is None:
-        raise PreventUpdate
-
-    if not all([email_valid, password_valid, confirm_valid]):
-        return dbc.Alert(
-            "Veuillez remplir correctement tous les champs.",
-            id="alert-invalid-fields",
-            is_open=True,
-            color="error",
-        )
-    try :
-        session, tunnel = create_session()
-
-        if User.get_user_by_username(session,username):
-            session.close()
-            tunnel.stop()
-            return html.Div([  # Wrap the Alert in an html.Div
-                dbc.Alert(
-                    "Un utilisateur avec cet email existe déjà.",
-                    id="alert-user-exists",
-                    is_open=True,
-                    dismissable=True,
-                    fade=True,
-                    color="dark",
-                    className="mt-4"
-                )
-            ])
-        else:
-            new_user = User(username=username.lower(), password=generate_password_hash(password))
-            session.add(new_user)
-            session.commit()
-            send_auth_email(session,new_user)  # Send the confirmation email
-            session.close()
-            tunnel.stop()
-            return dbc.Alert(
-                [
-                    html.P("Inscription réussie !"),
-                    html.P("Un email de confirmation a été envoyé à votre adresse.")
-                ],
-                color="success",
-                is_open=True,
-                dismissable=True,
-                fade=True,
-                className="mt-4"
-            )
-
-    except Exception as e:
-        session.rollback()
-        return dbc.Alert(
-            f"Une erreur s'est produite: {e}",  # Include the error message in the alert
-            id="alert-inscription-error",
-            is_open=True,
-            dismissable=True,
-            fade=True,
-            color="danger",
-            className="mt-4"
-        )
-    finally:
-        tunnel.stop()
-        session.close()
-
-# Callback for login button click (to handle database interaction)
-@app.callback(
-    Output("login-output", "children"),
-    Output("page-content", "children"),
-    Input("login-button", "n_clicks"),
-    State("login-username-input", "value"),
-    State("login-password-input", "value"),
-    State("login-username-input", "valid"),
-    State("login-password-input", "valid"),
-)
-def login_button_click(n_clicks, username, password, username_valid, password_valid):
-    if n_clicks is None:
-        raise PreventUpdate
-
-    if not all([username_valid, password_valid]):
-        return (
-            dbc.Alert(
-                "Veuillez remplir correctement tous les champs.",
-                id="alert-invalid-fields-login",
-                is_open=True,
-                dismissable=True,
-                fade=True,
-                color="dark",
-                className="mt-4"
-            ),
-            dash.no_update,
-        )
-    session, tunnel = create_session()
-    user = User.get_user_by_username(session,username)
-    if user is None:  # Check if user exists before accessing username
-        return dbc.Alert("Identifiants invalides.", color="danger", is_open=True, dismissable=True, fade=True,
-                         className="mt-4"), dash.no_update
-    session.close()
-    tunnel.stop()
-
-    if user and check_password_hash(user.password, password):
-        login_user(user)
-
-        return dbc.Alert("Connecté !",
-                         color="success",
-                         is_open=True,
-                         dismissable=True,
-                         fade=True,
-                         className="mt-4"
-                         ), serve_layout()  # No alert on successful login
-    else:
-        return dbc.Alert("Identifiants invalides.",
-                         is_open=True,
-                         dismissable=True,
-                         fade=True,
-                         color="dark",
-                         className="mt-4"
-                         ), dash.no_update
-
-    session.close()
+# Create the database tables
 
 def serve_layout():
     return dbc.Container([
@@ -600,9 +123,11 @@ def serve_layout():
                         {'label': '13', 'value': 13},
                         {'label': '14', 'value': 14},
                         {'label': '15', 'value': 15},
-                        {'label': '15', 'value': 25},
+                        {'label': '25', 'value': 25},
                         {'label': '50', 'value': 50},
+                        {'label': '75', 'value': 75},
                         {'label': '100', 'value': 100},
+                        {'label': '125', 'value': 125},
                         {'label': '150', 'value': 150},
 
                         # Add more options as needed
@@ -643,7 +168,7 @@ def serve_layout():
         ),
         dbc.Col(
             dbc.Card([
-                dbc.CardHeader([html.I(className="fa-solid fa-magnifying-glass", style={'font-size': '16px'}), "  Effigie/Année indifférenciées", dbc.Tooltip("Je récupère les offres pour un ou plusieurs types de pièce.", target="cardheader-years")], style={'text-align': 'center'}),  # New card for name selection
+                dbc.CardHeader([html.I(className="fa-solid fa-magnifying-glass", style={'font-size': '16px'}), "  Effigie/Année", dbc.Tooltip("Je récupère les offres pour un ou plusieurs types de pièce.", target="cardheader-years")], style={'text-align': 'center'}),  # New card for name selection
                 dbc.CardBody([
                     dcc.Dropdown(
                         id='piece-dropdown',
@@ -684,12 +209,17 @@ def serve_layout():
                             html.I(className="fa-solid fa-chart-line", style={'font-size': '16px'}),
                             "  Quantité min. (U)",
                             html.Span(id='quantity-arrow', className="fa fa-sort ms-2"),
-                            dbc.Tooltip("Quantité minimum pour obtenir le prix affiché.", target="quantity-header")
+                            dbc.Tooltip("Quantité minimum pour obtenir la prime affichée.", target="quantity-header")
                         ],
                         id="quantity-header",
                         style={'text-align': 'center'}, n_clicks=0),
-                    html.Th([html.I(className="fa-solid fa-tag", style={'font-size': '16px'}),"  Total FDPI (€)",
-                             html.Span(id='total_cost-arrow', className="fa fa-sort ms-2"),], style={'text-align': 'center'}, id='total_cost-header', n_clicks=0)
+                    html.Th([html.I(className="fa-solid fa-tag", style={'font-size': '16px'}),"  Total FDPI",
+                             html.Span(id='total_cost-arrow', className="fa fa-sort ms-2"),], style={'text-align': 'center'}, id='total_cost-header', n_clicks=0),
+
+                    html.Th([html.I(className="fa-solid fa-truck fa-tag", style={'font-size': '16px'}), "  FDP",
+                             html.Span(id='delivery-arrow', className="fa fa-sort ms-2"), ],
+                            style={'text-align': 'center'}, id='delivery-header', n_clicks=0),
+
                 ])
             , id='table-header'), # Apply spinner only to the tbody
                     html.Tbody(id='cheapest-offer-table-body'),
@@ -704,72 +234,6 @@ def serve_layout():
 
     dbc.Row(
         [
-            dbc.Col(
-                dbc.Card(
-                    [
-                        dbc.CardHeader(
-                            [
-                                html.I(className="fa-solid fa-envelope", style={'font-size': '22px'}),
-                                "  Contactez nous !",
-
-                            ],
-                        ),
-                        dbc.CardBody(
-                            [
-                                dbc.Form(
-                                    [
-                                        dbc.Row(
-                                            [
-                                                dbc.Col(
-                                                    dbc.Input(type="text", id="name-input",
-                                                              placeholder="Entrez votre nom"),
-                                                    width=12,
-                                                ),
-                                            ],
-                                            className="mb-3",
-                                        ),
-                                        dbc.Row(
-                                            [
-                                                dbc.Col(
-                                                    dbc.Input(type="email", id="email-input",
-                                                              placeholder="Entrez votre email"),
-                                                    width=12,
-                                                ),
-                                            ],
-                                            className="mb-3",
-                                        ),
-                                        dbc.Row(
-                                            [
-                                                dbc.Col(
-                                                    dbc.Textarea(id="message-input",
-                                                                 placeholder="Entrez votre message"),
-                                                    width=12,
-                                                ),
-                                            ],
-                                            className="mb-3",
-                                        ),
-                                        dbc.Row(
-                                            [
-                                                dbc.Col(
-                                                    dbc.Button("Envoyer", id="submit-button", className="me-2",
-                                                               color='dark', ),
-                                                    width="auto",
-                                                ),
-                                                dbc.Col(
-                                                    html.Div(id="output", className="mt-3"),
-                                                    width="auto",
-                                                ),
-                                            ],
-                                            justify="end",
-                                        ),
-                                    ]
-                                ),
-                            ]
-                        ),
-                    ], style={'text-align': 'center'}
-                ),
-                width=6  # Takes up half of the grid (6 out of 12 columns)
-            ),
             dbc.Col(
                 [
                     dbc.Card(
@@ -786,7 +250,7 @@ def serve_layout():
                     ])], style={'text-align': 'center'}
                     )
                 ],
-                width=6)
+                width=12)
         ], className="mb-4 equal-height-cards"),
 
     html.Div([
@@ -804,6 +268,7 @@ def serve_layout():
     Output('premium-arrow', 'className'),  # Output for the arrow icon's className
     Output('quantity-arrow', 'className'),  # Output for the arrow icon's className
     Output('total_cost-arrow', 'className'),
+    Output('delivery-arrow', 'className'),
     [Input('budget-slider', 'value'),
      Input('quantity-dropdown', 'value'),
      Input('bullion-type-switch', 'value'),
@@ -813,11 +278,12 @@ def serve_layout():
      Input('name-header', 'n_clicks'),
      Input('premium-header', 'n_clicks'),
      Input('quantity-header', 'n_clicks'),
-     Input('total_cost-header', 'n_clicks')],
+     Input('total_cost-header', 'n_clicks'),
+     Input('delivery-header', 'n_clicks')],
     [State('cheapest-offer-table-body', 'children')]
 )
 def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_coins, n,
-                          source_clicks, name_clicks, premium_clicks, quantity_clicks, total_cost_clicks,
+                          source_clicks, name_clicks, premium_clicks, quantity_clicks, total_cost_clicks,delivery_clicks,
                           current_table):
     ctx = callback_context
     triggered_id, triggered_prop = ctx.triggered[0]['prop_id'].split('.')
@@ -828,7 +294,8 @@ def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_
         'name-arrow': "fa fa-sort ms-2",
         'premium-arrow': "fa fa-sort ms-2",
         'quantity-arrow': "fa fa-sort ms-2",
-        'total_cost-arrow': "fa fa-sort ms-2"
+        'total_cost-arrow': "fa fa-sort ms-2",
+        'delivery-arrow': "fa fa-sort ms-2"
     }
 
     if triggered_prop == 'n_clicks':
@@ -847,6 +314,9 @@ def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_
         elif triggered_id == 'total_cost-header':
             column_index = 4
             sort_key = 'total_cost'
+        elif triggered_id == 'delivery-header':
+            column_index = 5
+            sort_key = 'delivery_fees'
 
         if sort_key == 'total_cost':
             # Extract numeric values from the 'Total FDPI (€)' column
@@ -887,14 +357,12 @@ def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_
 
         return (current_table, dash.no_update, arrow_classNames['source-arrow'], arrow_classNames['name-arrow'],
                 arrow_classNames['premium-arrow'], arrow_classNames['quantity-arrow'],
-                arrow_classNames['total_cost-arrow'])
+                arrow_classNames['total_cost-arrow'],arrow_classNames['delivery-arrow'])
     else :
-
-        session, tunnel = create_session()
 
         bullion_type = 'or' if bullion_type_switch else 'ar'
 
-        results = MetalPrice.get_previous_price(session,bullion_type)
+        results = MetalPrice.get_previous_price(db.session,bullion_type)
         metal_prices_df = pd.DataFrame(results)
 
         metal_price = metal_prices_df['buy_price'].iloc[0]
@@ -907,11 +375,9 @@ def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_
         table_rows = []
 
         # SQL query to fetch the latest complete session and its data from both tables
-        results = Item.get_items_by_bullion_type_and_quantity(session,bullion_type,session_id,quantity)
+        results = Item.get_items_by_bullion_type_and_quantity(db.session,bullion_type,session_id,quantity)
         items_df = pd.DataFrame(results).copy()
 
-        session.close()
-        tunnel.stop()
         if selected_coins:
             filtered_df = pd.DataFrame()  # Create an empty DataFrame to store filtered rows
             for coin in selected_coins:
@@ -951,13 +417,12 @@ def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_
                             'source': row['source'],
                             'premium': row['buy_premiums'] ,
                             'quantity': int(row['premium_index'] + 1) * row['quantity'] if row['minimum'] == row['quantity'] == 1 else quantity,
+                            'delivery_fees': get_price(row['delivery_fees'],quantity),
                             'total_cost': total_cost
                         })
                         seen_offers.add((row['name'], row['source']))
                 except IndexError as e :
                     print(e)  # Skip if the quantity index is out of range
-
-    session.close()
 
     # Sort offers by premium (lowest first)
     cheapest_offers.sort(key=lambda x: x['premium'])
@@ -977,7 +442,8 @@ def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_
                 html.Td(offer['name'][4:]),
                 html.Td(offer['premium'],style={'text-align': 'center'}),
                 html.Td(offer['quantity'],style={'text-align': 'center'}),
-                html.Td(f"{offer['total_cost']:.2f} €",style={'text-align': 'center'})
+                html.Td(f"{offer['total_cost']:.2f} €",style={'text-align': 'center'}),
+                html.Td(f"{offer['delivery_fees']:.2f} €",style={'text-align': 'center'})
             ])
         )
 
@@ -999,7 +465,9 @@ def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_
             arrow_classNames['name-arrow'],
             arrow_classNames['premium-arrow'],
             arrow_classNames['quantity-arrow'],
-            arrow_classNames['total_cost-arrow'])
+            arrow_classNames['total_cost-arrow'],
+            arrow_classNames['delivery-arrow'],
+            )
 
 @app.callback(
     Output('piece-dropdown', 'options'),
@@ -1028,11 +496,9 @@ def update_quantity_dropdown(bullion_type_switch,quantity):
      Input('interval-component', 'n_intervals')]
 )
 def update_metal_price(bullion_type_switch, n):
-    session, tunnel = create_session()
-
     bullion_type = 'or' if bullion_type_switch else 'ar'
 
-    results = MetalPrice.get_previous_price(session,bullion_type)
+    results = MetalPrice.get_previous_price(db.session,bullion_type)
     metal_prices_df = pd.DataFrame(results)
 
     print(metal_prices_df)
@@ -1045,8 +511,7 @@ def update_metal_price(bullion_type_switch, n):
             html.P(f"{metal_price:.3f} €/g ", style={'font-size': '0.8em', 'margin-bottom': '0','text-align':'center'})
         ]
     )
-    session.close()
-    tunnel.stop()
+
     return current_table
 
 app.clientside_callback(
@@ -1070,28 +535,126 @@ app.clientside_callback(
     Input("tawk-to-widget", "n_clicks"),
 )
 
-# Create the database tables
+def get_price(ranges, quantity):
+    """
+    Calculates the price based on the quantity and given ranges.
+
+    Args:
+    ranges: A string of ranges in the format '1-9;10-48;49-98;99-9999999999.9'.
+    quantity: The quantity of the item.
+
+    Returns:
+    The price as a float.
+    """
+    ranges = ranges.split(';')
+
+    for r in ranges:
+        lower, upper, price = map(float, r.split('-'))
+        if lower <= quantity < upper:
+            return price  # Return the price directly
+        return None  # Or handle the case where quantity is outside all ranges
+
+def get_country_flag_image(country_code):
+    """
+    Generates an HTML img tag for a country flag image from a 2-letter country code.
+    Uses images from the provided URL with the format "https://hatscripts.github.io/circle-flags/flags/{code}.svg".
+    """
+    if len(country_code) == 2:
+        return html.Img(
+            src=f"/assets/{country_code.lower()}.svg",  # Use assets folder
+            alt=country_code,
+            style={'width': '20px', 'margin-right': '5px'}
+        )
+    else:
+        return ""
+
+
+
+
 with app.server.app_context():
+    db.init_app(server)
     db.create_all()
+
+    # Simplified layout and callback
+    app.layout = serve_layout()
+
+    results = MetalPrice.get_previous_price(db.session, 'or')
+    metal_prices_df = pd.DataFrame(results)
+
+    metal_price = metal_prices_df['buy_price'].iloc[0]
+    session_id = metal_prices_df['session_id'].iloc[0]
+    # SQL query to fetch the latest complete session and its data from both tables
+    results = Item.get_items_by_bullion_type_and_quantity(db.session, 'or', session_id, 150)
+    items_df = pd.DataFrame(results).copy()
+    items_df.drop_duplicates(subset=['name'], inplace=True)
+    items_df.sort_values(by='name', inplace=True)
+    or_options_quick_filter = [
+                                  {'label': html.Span(
+                                      [get_country_flag_image('fr'), "Toutes les 20 francs Napoléon d'Or"]),
+                                   'value': 'or - 20 francs fr *'},
+                                  {'label': html.Span([get_country_flag_image('fr'), "Toutes les 5 francs"]),
+                                   'value': 'or - 5 francs fr *'},
+                                  {'label': html.Span([get_country_flag_image('fr'), "Toutes les 10 francs"]),
+                                   'value': 'or - 10 francs fr *'},
+                                  {'label': html.Span([get_country_flag_image('fr'), "Toutes les 40 francs"]),
+                                   'value': 'or - 40 francs fr *'},
+                                  {'label': html.Span([get_country_flag_image('fr'), "Toutes les 50 francs"]),
+                                   'value': 'or - 50 francs fr *'},
+                                  {'label': html.Span([get_country_flag_image('fr'), "Toutes les 100 francs"]),
+                                   'value': 'or - 100 francs fr *'},
+                                  {'label': html.Span([get_country_flag_image('ch'), "Toutes les 20 francs"]),
+                                   'value': 'or - 20 francs sui *'},
+                                  {'label': html.Span([get_country_flag_image('gb'), "Toutes les 1 souverain"]),
+                                   'value': 'or - 1 souverain *'},
+                                  {'label': html.Span([get_country_flag_image('gb'), "Toutes les 1/2 souverain"]),
+                                   'value': 'or - 1/2 souverain *'},
+                                  {'label': html.Span([get_country_flag_image('us'), "Toutes les 2.5 dollars"]),
+                                   'value': 'or - 2.5 dollars *'},
+                                  {'label': html.Span([get_country_flag_image('us'), "Toutes les 5 dollars"]),
+                                   'value': 'or - 5 dollars *'},
+                                  {'label': html.Span([get_country_flag_image('us'), "Toutes les 10 dollars"]),
+                                   'value': 'or - 10 dollars *'},
+                                  {'label': html.Span([get_country_flag_image('us'), "Toutes les 20 dollars"]),
+                                   'value': 'or - 20 dollars *'},
+                                  {'label': html.Span([get_country_flag_image('mx'), "Toutes les 50 pesos"]),
+                                   'value': 'or - 50 pesos *'},
+                                  {'label': html.Span([get_country_flag_image('it'), "Toutes les 20 lire"]),
+                                   'value': 'or - 20 lire *'},
+                                  {'label': html.Span([get_country_flag_image('de'), "Toutes les 20 mark"]),
+                                   'value': 'or - 20 mark *'},
+                                  {'label': "Toutes les 1 Oz", 'value': 'or - 1 oz*'},
+                                  {'label': "Toutes les 1/2 Oz", 'value': 'or - 1/2 oz*'},
+                                  {'label': "Toutes les 1/4 Oz", 'value': 'or - 1/4 oz*'},
+                                  {'label': "Toutes les 1/10 Oz", 'value': 'or - 1/10 oz*'},
+                                  {'label': "Toutes les 1/20 Oz", 'value': 'or - 1/20 oz*'},
+                              ] + [{'label': html.Span(row['name'][4:].upper()), 'value': row['name']} for _, row in
+                                   items_df.iterrows()]
+
+    results = Item.get_items_by_bullion_type_and_quantity(db.session, 'ar', session_id, 150)
+    items_df = pd.DataFrame(results).copy()
+    items_df.drop_duplicates(subset=['name'], inplace=True)
+    items_df.sort_values(by='name', inplace=True)
+    ar_options_quick_filter = [
+                                  {'label': html.Span([get_country_flag_image('fr'), "Toutes les 50 Cts francs"]),
+                                   'value': 'ar - 50 centimes francs fr *'},
+                                  {'label': html.Span([get_country_flag_image('fr'), "Toutes les 1 franc"]),
+                                   'value': 'ar - 1 franc fr *'},
+                                  {'label': html.Span([get_country_flag_image('fr'), "Toutes les 2 francs"]),
+                                   'value': 'ar - 2 francs fr *'},
+                                  {'label': html.Span([get_country_flag_image('fr'), "Toutes les 5 francs"]),
+                                   'value': 'ar - 5 francs fr *'},
+                                  {'label': html.Span([get_country_flag_image('fr'), "Toutes les 10 francs"]),
+                                   'value': 'ar - 10 francs fr *'},
+                                  {'label': html.Span([get_country_flag_image('fr'), "Toutes les 20 francs"]),
+                                   'value': 'ar - 20 francs fr *'},
+                                  {'label': html.Span([get_country_flag_image('fr'), "Toutes les 50 francs Hercule"]),
+                                   'value': 'ar - 50 francs fr *'},
+                                  {'label': html.Span([get_country_flag_image('fr'), "Toutes les 100 francs Hercule"]),
+                                   'value': 'ar - 100 francs fr *'},
+                                  {'label': "Toutes les 1 Oz", 'value': 'ar - 1 oz *'},
+                              ] + [{'label': html.Span(row['name'][4:].upper()), 'value': row['name']} for _, row in
+                                   items_df.iterrows()]
 
 if __name__ == '__main__':
 
     app.run_server(debug=True)
-
-    # Configure logging level (DEBUG, INFO, DEBUG, ERROR, CRITICAL)
-    app.logger.setLevel('DEBUG')
-
-    # Create a file handler and set the logging level
-    file_handler = logging.FileHandler('app.log')  # Create a file handler for 'app.log'
-    file_handler.setLevel('DEBUG')
-
-    # Create a formatter for the log messages
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-
-    file_handler.setFormatter(formatter)
-
-    # Add the file handler to the app's logger
-    app.logger.addHandler(file_handler)
-
-    # Example of logging a message
-    app.logger.info('App started')
