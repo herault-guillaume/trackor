@@ -14,6 +14,7 @@ import achatoretargent
 import capornumismatique
 import changedelabourse
 import changevivienne
+import comptoirdestuileries
 import bdor
 import orinvestissement
 import lcdor
@@ -54,7 +55,7 @@ def fetch_and_update_data():
         ) as tunnel):
 
             engine_prod = create_engine(
-                f"mysql+mysqlconnector://Pentagruel:(US)ue%1@127.0.0.1:{tunnel.local_bind_port}/Pentagruel$bullionsniper"
+                f"mysql+mysqlconnector://Pentagruel:(US)ue%1@127.0.0.1:{tunnel.local_bind_port}/Pentagruel$staging-bullionsniper"
             )
             engine_staging = create_engine(
                 f"mysql+mysqlconnector://Pentagruel:(US)ue%1@127.0.0.1:{tunnel.local_bind_port}/Pentagruel$staging-bullionsniper"
@@ -72,30 +73,31 @@ def fetch_and_update_data():
                 session_prod = Session_prod()
                 session_staging = Session_staging()
 
-                buy_price_gold,g_sell_price_eur,buy_price_silver,s_sell_price_eur = bullionvault.get(session_prod,session_staging,session_id,driver)
-                #buy_price_gold,g_sell_price_eur,buy_price_silver,s_sell_price_eur = 81.57, 81.42, 1.022, 1.019
+                # buy_price_gold,g_sell_price_eur,buy_price_silver,s_sell_price_eur = bullionvault.get(session_prod,session_staging,session_id,driver)
+                buy_price_gold,g_sell_price_eur,buy_price_silver,s_sell_price_eur = 81.57, 81.42, 1.022, 1.019
 
-                abacor.get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_price_silver)
-                achatoretargent.get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_price_silver,driver)
-                acheterorargent.get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_price_silver)
-                aucoffre.get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_price_silver)
-                bdor.get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_price_silver,driver)
-                bullionbypost.get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_price_silver,driver)
-                capornumismatique.get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_price_silver)
-                changedelabourse.get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_price_silver)
-                changerichelieu.get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_price_silver)
-                changevivienne.get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_price_silver)
-                gold.get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_price_silver)
-                goldavenue.get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_price_silver,driver)
-                goldforex.get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_price_silver)
-                goldreserve.get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_price_silver)
-                lcdor.get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_price_silver)
-                lmp.get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_price_silver)
-                merson.get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_price_silver)
-                monlingot.get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_price_silver)
-                oretchange.get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_price_silver)
-                orinvestissement.get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_price_silver)
-                orobel.get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_price_silver,driver)
+                # abacor.get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_price_silver)
+                # achatoretargent.get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_price_silver,driver)
+                # acheterorargent.get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_price_silver)
+                # aucoffre.get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_price_silver)
+                # bdor.get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_price_silver,driver)
+                # bullionbypost.get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_price_silver,driver)
+                # capornumismatique.get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_price_silver)
+                # changedelabourse.get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_price_silver)
+                # changerichelieu.get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_price_silver)
+                # changevivienne.get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_price_silver)
+                # comptoirdestuileries.get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_price_silver)
+                # gold.get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_price_silver)
+                # goldavenue.get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_price_silver,driver)
+                # goldforex.get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_price_silver)
+                # goldreserve.get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_price_silver)
+                # lcdor.get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_price_silver)
+                # lmp.get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_price_silver)
+                # merson.get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_price_silver)
+                # monlingot.get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_price_silver)
+                # oretchange.get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_price_silver)
+                # orinvestissement.get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_price_silver)
+                # orobel.get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_price_silver,driver)
                 shopcomptoirdelor.get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_price_silver,driver)
 
                 # goldunion.get(session,session_id)  # arnaque?
@@ -122,20 +124,44 @@ except Exception as e :
 # Schedule the jobs at 11 AM and 7 PM with randomization
 scheduler.add_job(
     fetch_and_update_data,
-    CronTrigger(hour=12, minute=random.randint(0,30)),  # Adjust for minutes
-    id='job_at_12am'
-)
-
-scheduler.add_job(
-    fetch_and_update_data,
-    CronTrigger(hour=19, minute=random.randint(0,30)),  # Adjust for minutes
-    id='job_at_9pm'
+    CronTrigger(hour=7, minute=random.randint(0,30)),  # Adjust for minutes
+    id='job_at_7am'
 )
 
 scheduler.add_job(
     fetch_and_update_data,
     CronTrigger(hour=9, minute=random.randint(0,30)),  # Adjust for minutes
-    id='job_at_9am'
+    id='job_at_9pm'
+)
+
+scheduler.add_job(
+    fetch_and_update_data,
+    CronTrigger(hour=11, minute=random.randint(0,30)),  # Adjust for minutes
+    id='job_at_11am'
+)
+
+scheduler.add_job(
+    fetch_and_update_data,
+    CronTrigger(hour=13, minute=random.randint(0,30)),  # Adjust for minutes
+    id='job_at_1_pm'
+)
+
+scheduler.add_job(
+    fetch_and_update_data,
+    CronTrigger(hour=15, minute=random.randint(0,30)),  # Adjust for minutes
+    id='job_at_3pm'
+)
+
+scheduler.add_job(
+    fetch_and_update_data,
+    CronTrigger(hour=17, minute=random.randint(0,30)),  # Adjust for minutes
+    id='job_at_5pm'
+)
+
+scheduler.add_job(
+    fetch_and_update_data,
+    CronTrigger(hour=19, minute=random.randint(0,30)),  # Adjust for minutes
+    id='job_at_7pm'
 )
 
 scheduler.start()

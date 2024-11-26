@@ -1,3 +1,5 @@
+import time
+
 from scraping.dashboard.database import Item
 from scraping.dashboard.pieces import weights
 from selenium.webdriver.common.by import By
@@ -83,31 +85,31 @@ def get_price_for(session_prod,session_staging, session_id,buy_price_gold,buy_pr
     for url in urls:
         try :
             driver.get(url)
-
+            time.sleep(10)
             # Wait for the products to load (adjust the timeout as needed)
-            WebDriverWait(driver, 10).until(
-                EC.presence_of_all_elements_located((By.TAG_NAME, "div"))
-            )
-            WebDriverWait(driver, 10).until(
-                EC.presence_of_all_elements_located((By.CLASS_NAME, "article-price"))
-            )
-            WebDriverWait(driver, 10).until(
-                EC.presence_of_all_elements_located((By.TAG_NAME, "a"))
-            )
-            WebDriverWait(driver, 20).until(
-                EC.presence_of_all_elements_located((By.CLASS_NAME, "card-content-title"))
-            )
-            WebDriverWait(driver, 10).until(
-                EC.presence_of_all_elements_located((By.CLASS_NAME, "row"))
-            )
+            # WebDriverWait(driver, 10).until(
+            #     EC.presence_of_all_elements_located((By.TAG_NAME, "div"))
+            # )
+            # WebDriverWait(driver, 10).until(
+            #     EC.presence_of_all_elements_located((By.CLASS_NAME, "article-price"))
+            # )
+            # WebDriverWait(driver, 10).until(
+            #     EC.presence_of_all_elements_located((By.TAG_NAME, "a"))
+            # )
+            # WebDriverWait(driver, 20).until(
+            #     EC.presence_of_all_elements_located((By.CLASS_NAME, "card-content-title"))
+            # )
+            # WebDriverWait(driver, 10).until(
+            #     EC.presence_of_all_elements_located((By.CLASS_NAME, "row"))
+            # )
 
             # Find the product divs
             products_div = driver.find_elements(By.CLASS_NAME, "row")
 
             for product in products_div:
                 try:
-
-                    name_title = product.find_element(By.CLASS_NAME, "card-content-title")
+                    print(product.get_attribute('outerHTML'))
+                    name_title = product.find_element(By.CSS_SELECTOR, "a.card-content-title")
                     url = name_title.get_attribute('href')
                     name = name_title.text.strip()
                     print(name)
