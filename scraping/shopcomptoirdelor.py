@@ -167,7 +167,7 @@ def get_price_for(session_prod,session_staging, session_id,buy_price_gold,buy_pr
                     session_prod.add(coin)
                     session_prod.commit()
                     session_prod.expunge(coin)
-                    session_staging.add(coin)
+                    new_coin = session_staging.merge(coin, load=False)
                     session_staging.commit()
 
                 except KeyError as e:

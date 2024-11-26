@@ -131,11 +131,10 @@ def get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_pri
                                 minimum=minimum, timestamp=datetime.now(pytz.timezone('CET')).replace(second=0, microsecond=0)
 )
 
-                    coin_staging = Item(**coin.__dict__)
                     session_prod.add(coin)
                     session_prod.commit()
-                    session_prod.expunge(coin_staging)
-                    session_staging.add(coin)
+                    session_prod.expunge(coin)
+                    new_coin = session_staging.merge(coin, load=False)
                     session_staging.commit()
 
                 except KeyError as e:

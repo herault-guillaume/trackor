@@ -61,9 +61,8 @@ def get(session_prod,session_staging,session_id,driver):
         session_prod.add(gold_price)
         print('i',g_buy_price_eur,g_sell_price_eur,session_id,'or')
         session_prod.commit()
-
-        gold_price = MetalPrice(buy_price=g_buy_price_eur, sell_price=g_sell_price_eur, session_id=session_id, bullion_type='or',timestamp=datetime.now(pytz.timezone('CET')).replace(second=0, microsecond=0))
-        session_staging.add(gold_price)
+        session_prod.expunge(gold_price)
+        new_coin = session_staging.merge(gold_price, load=False)
         session_staging.commit()
         print('i')
         # Extract the price from the span
@@ -88,7 +87,7 @@ def get(session_prod,session_staging,session_id,driver):
         session_prod.add(silver_price)
         session_prod.commit()
         session_prod.expunge(silver_price)
-        session_staging.add(silver_price)
+        new_coin = session_staging.merge(silver_price, load=False)
         session_staging.commit()
         print(g_buy_price_eur,g_sell_price_eur,s_buy_price_eur,s_sell_price_eur)
 
