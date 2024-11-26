@@ -85,7 +85,7 @@ def get_price_for(session_prod,session_staging, session_id,buy_price_gold,buy_pr
     for url in urls:
         try :
             driver.get(url)
-            time.sleep(10)
+            time.sleep(4)
             # Wait for the products to load (adjust the timeout as needed)
             # WebDriverWait(driver, 10).until(
             #     EC.presence_of_all_elements_located((By.TAG_NAME, "div"))
@@ -108,8 +108,10 @@ def get_price_for(session_prod,session_staging, session_id,buy_price_gold,buy_pr
 
             for product in products_div:
                 try:
-                    print(product.get_attribute('outerHTML'))
-                    name_title = product.find_element(By.CSS_SELECTOR, "a.card-content-title")
+                    name_title = product.find_element(By.CSS_SELECTOR, "a.card-content-title[itemprop='name']")
+                except :
+                    continue
+                try :
                     url = name_title.get_attribute('href')
                     name = name_title.text.strip()
                     print(name)
@@ -160,7 +162,7 @@ def get_price_for(session_prod,session_staging, session_id,buy_price_gold,buy_pr
                                 bullion_type=bullion_type,
                                 quantity=quantity,
                                 minimum=minimum, timestamp=datetime.now(pytz.timezone('CET')).replace(second=0, microsecond=0)
-)
+    )
 
                     session_prod.add(coin)
                     session_prod.commit()
