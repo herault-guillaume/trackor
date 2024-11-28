@@ -50,7 +50,7 @@ CMN = {
     'Lunar 1/2 OZ or diverses années' : 'or - 1/2 oz lunar',
     'Lunar 1/10 OZ or diverses années' : 'or - 1/10 oz lunar',
     "Nugget en or 1 once troy années diverses": 'or - 1 oz nugget / kangourou',
-    'Lunar 1/20 OZ en or diverses années' : 'or - 1/10 oz lunar',
+    'Lunar 1/20 OZ en or diverses années' : 'or - 1/20 oz lunar',
     'Kangourou 1 OZ argent diverses années' : 'ar - 1 oz nugget / kangourou',
     'Britannia en argent 1 OZ diverses années' : 'ar - 1 oz britannia',
     'Monsterbox Britannia en argent 1 OZ diverses années' : ('ar - 1 oz nugget / kangourou',250),
@@ -85,7 +85,7 @@ def get_price_for(session_prod,session_staging, session_id,buy_price_gold,buy_pr
     for url in urls:
         try :
             driver.get(url)
-            time.sleep(4)
+            time.sleep(10)
             # Wait for the products to load (adjust the timeout as needed)
             # WebDriverWait(driver, 10).until(
             #     EC.presence_of_all_elements_located((By.TAG_NAME, "div"))

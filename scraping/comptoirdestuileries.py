@@ -113,6 +113,8 @@ def get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_pri
             soup = BeautifulSoup(response.content, 'html.parser')
 
             table = soup.find('table', class_='bord uk-table')
+            if table.find('th', string=lambda text: "courtage" in text):
+                continue
 
             minimum=None
             price_ranges =[]
@@ -178,7 +180,7 @@ def get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_pri
                         bullion_type=bullion_type,
                         quantity=quantity,
                         minimum=minimum, timestamp=datetime.now(pytz.timezone('CET')).replace(second=0, microsecond=0))
-
+            print(name,url,price_ranges)
             session_prod.add(coin)
             session_prod.commit()
             session_prod.expunge(coin)

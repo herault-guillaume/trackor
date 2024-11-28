@@ -112,3 +112,14 @@ class MetalPrice(db.Model):
         )
 
         return query_to_dict(query.all())
+
+class UserChoice(db.Model):
+    __tablename__ = 'user_choices'
+
+    id = db.Column(db.Integer, primary_key=True)
+    timestamp = db.Column(db.DateTime)
+    budget_min = db.Column(db.Float)
+    budget_max = db.Column(db.Float)
+    quantity = db.Column(db.Integer)
+    bullion_type = db.Column(db.String(2))
+    selected_coins = db.Column(db.JSON)  # Store selected coins as JSON

@@ -2,11 +2,13 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from scraping.dashboard.pieces import weights
-from scraping.dashboard.database import db, MetalPrice, Item
+from scraping.dashboard.database import db, MetalPrice, Item, UserChoice
 
 import os
 import pandas as pd
-#import sshtunnel
+import sshtunnel
+import pytz
+import datetime
 
 import dash
 from dash import dcc, html, Input, Output, State, callback_context
@@ -16,35 +18,34 @@ from flask import Flask, request, session
 
 server = Flask(__name__)
 
-# SSH tunnel config
-# server.config['SECRET_KEY'] = os.getenv('FLASK_SECRET_KEY')
-# server.config['SSH_HOST'] = os.getenv('SSH_HOST')
-# server.config['SSH_USERNAME'] = os.getenv('SSH_USERNAME')
-# server.config['SSH_PASSWORD'] = os.getenv('SSH_PASSWORD')
-# server.config['REMOTE_BIND_ADDRESS'] = os.getenv('REMOTE_BIND_ADDRESS')
-# server.config['REMOTE_PORT_ADDRESS'] = int(os.getenv('REMOTE_PORT_ADDRESS', 3306))
-# sshtunnel.SSH_TIMEOUT = float(os.getenv('SSH_TIMEOUT', 3600.0))
-# sshtunnel.TUNNEL_TIMEOUT = float(os.getenv('TUNNEL_TIMEOUT', 3600.0))
-#
-# def create_tunnel():
-#     return sshtunnel.SSHTunnelForwarder(
-#         (os.getenv('SSH_HOST')),
-#         ssh_username=os.getenv('SSH_USERNAME'),
-#         ssh_password=os.getenv('SSH_PASSWORD'),
-#         remote_bind_address=(os.getenv('REMOTE_BIND_ADDRESS'), int(os.getenv('REMOTE_PORT_ADDRESS', 3306)))
-#     )
+server.config['SQLALCHEMY_POOL_PRE_PING'] = True
+server.config['SECRET_KEY'] = os.getenv('FLASK_SECRET_KEY')
+server.config['SSH_HOST'] = os.getenv('SSH_HOST')
+server.config['SSH_USERNAME'] = os.getenv('SSH_USERNAME')
+server.config['SSH_PASSWORD'] = os.getenv('SSH_PASSWORD')
+server.config['REMOTE_BIND_ADDRESS'] = os.getenv('REMOTE_BIND_ADDRESS')
+server.config['REMOTE_PORT_ADDRESS'] = int(os.getenv('REMOTE_PORT_ADDRESS', 3306))
+sshtunnel.SSH_TIMEOUT = float(os.getenv('SSH_TIMEOUT', 3600.0))
+sshtunnel.TUNNEL_TIMEOUT = float(os.getenv('TUNNEL_TIMEOUT', 3600.0))
 
-# def create_and_attach_session_throught_tunnel(db,tunnel):
-#     conn_str = os.getenv('SQLALCHEMY_DATABASE_URI').format(tunnel.local_bind_port)
-#     engine = db.create_engine(conn_str, echo=True)  # echo=False to disable logging SQL queries
-#     Session = db.scoped_session(db.sessionmaker(autocommit=False, autoflush=False, bind=engine))
-#     return Session()  # Set the db.session
+def create_tunnel():
+    return sshtunnel.SSHTunnelForwarder(
+        (os.getenv('SSH_HOST')),
+        ssh_username=os.getenv('SSH_USERNAME'),
+        ssh_password=os.getenv('SSH_PASSWORD'),
+        remote_bind_address=(os.getenv('REMOTE_BIND_ADDRESS'), int(os.getenv('REMOTE_PORT_ADDRESS', 3306)))
+    )
+
+def create_and_attach_session_throught_tunnel(db,tunnel):
+    conn_str = os.getenv('SQLALCHEMY_DATABASE_URI').format(tunnel.local_bind_port)
+    engine = db.create_engine(conn_str, echo=True)  # echo=False to disable logging SQL queries
+    Session = db.scoped_session(db.sessionmaker(autocommit=False, autoflush=False, bind=engine))
+    return Session()  # Set the db.session
 
 tunnel = create_tunnel()
 tunnel.start()
 
 # Configuration using environment variables
-# server.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI').format(tunnel.local_bind_port)
 server.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI').format(tunnel.local_bind_port)
 
 app = dash.Dash(__name__,
@@ -64,7 +65,7 @@ app = dash.Dash(__name__,
                     {"name": "keywords",
                      "content": "pièces d'investissement, or, argent, lingots, achat, vente, bullion, investissement, métaux précieux"},
                 ]
-                )
+            )
 
 # Create the database tables
 
@@ -260,6 +261,7 @@ def serve_layout():
 
     ])
 
+
 @app.callback(
     Output('cheapest-offer-table-body', 'children'),
     Output('last-update-info', 'children'),
@@ -361,6 +363,21 @@ def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_
     else :
 
         bullion_type = 'or' if bullion_type_switch else 'ar'
+        france_timezone = pytz.timezone('Europe/Paris')
+        now_france = datetime.datetime.now(france_timezone)
+        thirty_minutes_ago = now_france - datetime.timedelta(minutes=30)
+
+        user_choice = UserChoice(
+            timestamp=datetime.datetime.now(),
+            budget_min=budget_range[0],
+            budget_max=budget_range[1],
+            quantity=quantity,
+            bullion_type='or' if bullion_type_switch else 'ar',
+            selected_coins=selected_coins if selected_coins else []
+        )
+        db.session.add(user_choice)
+        db.session.commit()
+
 
         results = MetalPrice.get_previous_price(db.session,bullion_type)
         metal_prices_df = pd.DataFrame(results)
