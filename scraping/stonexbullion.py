@@ -124,7 +124,7 @@ def get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_pri
         "20 Drachme Grecque | Or | plusieurs années": "or - 20 drachmes grecques",  # You might need to add this to 'weights'
         "20 Kroner Christian X Danemark | Or | 1913-1917": "or - 20 kroner christian X",  # You might need to add this to 'weights'
         "10 Florins Néerlandais Willem III | Or | 1875-1889": "or - 10 florins willem III",
-        "£2 Souverain (1887) | Or | meilleur prix": "or - 1 souverain",  # Assuming this is a standard sovereign
+        "£2 Souverain (1887) | Or | meilleur prix": "or - 2 souverain",  # Assuming this is a standard sovereign
         "20 Francs Louis XVIII | 2nd Choix | 1814-1824": "or - 20 francs fr louis XVIII buste nu",
         "Souverain Victoria Jeune avec blason | Or | 1871-1887": "or - 1 souverain victoria jeune armoiries",
         "1/4 oz Nugget Kangourou | Or | Plusieurs Années": "or - 1/4 oz nugget / kangourou",
@@ -162,8 +162,8 @@ def get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_pri
         "1/2 oz Philharmonique de Vienne | Or | Diverses Années": "or - 1/2 oz philharmonique",
         "100 Piastres Turques | Or | diverses années": "or - 100 piastres turc",
         "1/10 oz Philharmonique de Vienne | Or | Plusieurs Années" : "or - 1/10 oz philharmonique",
-        "10 Soles Péruviens | Or | années mixtes" : "",  # No matching key in weights
-        "10 Pesos Cubain | Or | 1902-1916" : "", # No matching key in weights
+        "10 Soles Péruviens | Or | années mixtes" : "or - 10 soles péruviens",  # No matching key in weights
+        "10 Pesos Cubain | Or | 1902-1916" : "or - ", # No matching key in weights
         "1 oz Libertad Mexicain pièce d'or (1981)" : "or - 1 oz",
         "1 oz Britannia Or (2ème choix)" : "or - 1 oz britannia",
         "20 Francs Charles III Monaco | Or | 1878 - 1879" : "or - 20 francs fr",
@@ -185,13 +185,13 @@ def get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_pri
         "20 Mark Grand-Duc Ernst Ludwig Hesse-Darmstadt | Or | 1890-1915" : "or - 20 mark", # Assuming this is a generic 20 mark
         "20 Mark Roi Albert I Saxe | Or | 1873-1902" : "or - 20 mark", # Assuming this is a generic 20 mark
         "1 oz American Eagle | Or | Plusieurs Années" : "or - 1 oz american eagle",
-        "4 Forint 10 Francs Hongrie | Or | 1870 - 1892" : "", # No exact match, but could potentially be "or - 4 florins 10 francs 1892 refrappe" if it's a refrappe
-        "10 Mark | Hambourg | 1873-1913" : "or - 20 mark hambourg", # Assuming this is similar to the 20 mark Hamburg
+        "4 Forint 10 Francs Hongrie | Or | 1870 - 1892" : "or - 4 forint 10 Francs hongrie", # No exact match, but could potentially be "or - 4 florins 10 francs 1892 refrappe" if it's a refrappe
+        "10 Mark | Hambourg | 1873-1913" : "or - 10 mark hambourg", # Assuming this is similar to the 20 mark Hamburg
         "10 Mark Empereur Wilhelm II Prusse | Or | 1889-1913" : "or - 10 mark wilhelm II",
         "1/4 oz Krugerrand | Or | plusieurs années" : "or - 1/4 oz krugerrand",
         "1 Dollar Grande Princesse Indienne | Or | 1856-1889" : "or - 1 dollar tête indien", # Assuming "Grande Princesse Indienne" refers to the Indian Head
         "20 Francs Louis XVIII | Or | 1814-1824" : "or - 20 francs fr louis XVIII buste nu", # Assuming "buste nu" based on the year range
-        "20 Markkaa Finlande | Or | 1860-1913" : "", # No matching key in weights
+        "20 Markkaa Finlande | Or | 1860-1913" : "or - 20 markkaa finlande", # No matching key in weights
         "Pièce d'or 10 Francs | Napoleon III tête laurée | Or |1854-1869" : "or - 10 francs fr napoléon III laurée",
         "10 Mark d'or Allemand | Roi Otto | Bavière | 1886-1913" : "or - 10 mark wilhelm I", # Assuming this is similar to wilhelm I
         "10 Mark Roi Albert I Saxe | Or | 1874-1888 et 1891-1902" : "or - 10 mark wilhelm I", # Assuming this is similar to wilhelm I
@@ -206,14 +206,13 @@ def get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_pri
         "Demi Souverain Edouard VII Or | Mix d'années" : "or - 1/2 souverain edouart VII",
         "Demi Souverain Victoria | Or | Mix d'années" : "or - 1/2 souverain victoria",
         "Demi Souverain George V | Or | Mix d'années" : "or - 1/2 souverain georges V",
-        "2 oz Nugget Kangourou | Or | Plusieurs Années" : "", # No matching key in weights (2 oz is not a standard unit in the weights dict)
         "1/4 oz Philharmonique de Vienne | Or | Diverses Années | EUR" : "or - 1/4 oz philharmonique",
         "Pièce d'or 10 Francs | Napoléon III | Or | 1854-1869" : "or - 10 francs fr napoléon III",
         "10 Couronnes Hongrois | Or | 1892-1915" : "or - 10 couronnes hongrie",
         "20 Couronnes Hongrois | Or | 1892-1915" : "or - 20 couronnes hongrie",
         "1/4 oz Philharmonique de Vienne | Or | Diverses Années" : "or - 1/4 oz philharmonique",
         "20 Francs Louis Philippe I | Or | 1830-1848" : "or - 20 francs fr louis philippe laurée", # Assuming "laurée" based on the year range
-        "100 Soles Péruviens | Or | années mixtes" : "", # No matching key in weights
+        "100 Soles Péruviens | Or | années mixtes" : "or - 100 soles péruviens", # No matching key in weights
         "20 Francs Albert I Belgique | Or | 1909-1934" : "or - 20 francs bel albert I",
         '15.04g Eagle "Coronet Head" | Or | 1866-1907' : "or - 10 dollars tête indien", # Assuming this is similar to the 10 dollar Indian Head
         "Demi Souverain Victoria Jubilée Pièce d'or | 1887-1893" : "or - 1/2 souverain victoria jubilee arm.",
@@ -230,7 +229,7 @@ def get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_pri
         "20 Mark Roi Otto Bavière | Or |1886-1916" : "or - 20 mark", # Assuming this is a generic 20 mark
         "1/20 oz Nugget Kangourou | Or | Plusieurs Années" : "or - 1/20 oz nugget / kangourou",
         "5 Pesos Colombia Simon Bolivar Pièce d'Or | 1919-1930" : "", # No matching key in weights
-        "8 Forint 20 Francs Hongrie | Or | 1870 - 1892" : "", # No exact match, but could potentially be "or - 8 florins 20 francs franz joseph I" if it's from that period
+        "8 Forint 20 Francs Hongrie | Or | 1870 - 1892" : "or - 8 forint 20 Francs hongrie", # No exact match, but could potentially be "or - 8 florins 20 francs franz joseph I" if it's from that period
         "1/4 oz Maple Leaf | Or | Plusieurs Années" : "or - 1/4 oz maple leaf"
 
     }
@@ -248,6 +247,8 @@ def get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_pri
 
     for url in urls :
         try:
+            print(url)
+
             response = requests.get(url, headers=headers)
             response.raise_for_status()
 
@@ -256,87 +257,91 @@ def get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_pri
             products = soup.find_all('div',class_='product-item-in')
 
             for p in products:
+                try :
+                    if p.find('small',class_='text-danger',text='Épuisé'):
+                        continue
+                    product_name = p.find('span',class_="product-item-name text-start").text
+                    print(product_name)
+                    source = p.find('a')['href']
+                    # Use a more specific CSS selector to target the price element
+                    price_elements = p.find('div',class_='price')  # Find the <bdi> element within the <span>
+                    solde = price_elements.find('span',class_="text-danger")
+                    if solde:
+                        price = Price.fromstring(solde.text)
+                    else:
+                        price = Price.fromstring(price_elements.text)
 
-                product_name = p.find('span',class_="product-item-name text-start").text
-                source = p.find('a')['href']
-                # Use a more specific CSS selector to target the price element
-                price_elements = p.find('div',class_='price')  # Find the <bdi> element within the <span>
-                solde = price_elements.find('span',class_="text-danger")
-                if solde:
-                    price = Price.fromstring(solde.text)
-                else:
-                    price = Price.fromstring(price_elements.text)
+                    item_data = CMN[product_name]
+                    minimum = 1
+                    quantity = 1
+                    if isinstance(item_data, tuple):
+                        name = item_data[0]
+                        quantity = item_data[1]
+                        bullion_type = item_data[0][:2]
+                    else:
+                        name = item_data
+                        bullion_type = item_data[:2]
 
-                item_data = CMN[product_name]
-                minimum = 1
-                quantity = 1
-                if isinstance(item_data, tuple):
-                    name = item_data[0]
-                    quantity = item_data[1]
-                    bullion_type = item_data[0][:2]
-                else:
-                    name = item_data
-                    bullion_type = item_data[:2]
+                    if bullion_type == 'or':
+                        buy_price = buy_price_gold
+                    else:
+                        buy_price = buy_price_silver
 
-                if bullion_type == 'or':
-                    buy_price = buy_price_gold
-                else:
-                    buy_price = buy_price_silver
+                    print(name,price, "https://stonexbullion.com/fr" + source)
+                    # def has_year(text):
+                    #     pattern = r"\b\d{4}\b"  # Matches a four-digit year
+                    #     match = re.search(pattern, text)
+                    #     if match:
+                    #         # Check if there's another year with an optional hyphen in between
+                    #         year = match.group(0)
+                    #         start_index = match.start()
+                    #         end_index = match.end()
+                    #         rest_of_text = text[start_index:]  # Text after the first year
+                    #         if not re.search(rf"\s*-\s*\d{{4}}", rest_of_text):
+                    #            return True
+                    #     return False
+                    #
+                    # print('"' + product_name + '" : "",' if not has_year(product_name) else 'rejected : ' + product_name)
 
-                # def has_year(text):
-                #     pattern = r"\b\d{4}\b"  # Matches a four-digit year
-                #     match = re.search(pattern, text)
-                #     if match:
-                #         # Check if there's another year with an optional hyphen in between
-                #         year = match.group(0)
-                #         start_index = match.start()
-                #         end_index = match.end()
-                #         rest_of_text = text[start_index:]  # Text after the first year
-                #         if not re.search(rf"\s*-\s*\d{{4}}", rest_of_text):
-                #            return True
-                #     return False
-                #
-                # print('"' + product_name + '" : "",' if not has_year(product_name) else 'rejected : ' + product_name)
+                    price_ranges = [
+                        (1, 1000, price),  # Quantity 1-10, price 10.0 per unit
+                    ]
 
-                # price_ranges = [
-                #     (1, 1000, price),  # Quantity 1-10, price 10.0 per unit
-                # ]
-                #
-                # def price_between(value,ranges):
-                #     """
-                #     Returns the price per unit for a given quantity.
-                #     """
-                #     for min_qty, max_qty, price in ranges:
-                #         if (min_qty <= value <=max_qty):
-                #             if isinstance(price,Price):
-                #                 return price.amount_float
-                #             else:
-                #                 return price
-                #
-                # coin = Item(name=name,
-                #             price_ranges=';'.join(['{min_}-{max_}-{price}'.format(min_=r[0],max_=r[1],price=r[2].amount_float) for r in price_ranges]),
-                #             buy_premiums=';'.join(
-                #                 ['{:.2f}'.format(((price_between(minimum,price_ranges)/quantity + price_between(price_between(minimum,price_ranges)*minimum,delivery_ranges)/(quantity*minimum)) - (buy_price * weights[name])) * 100.0 / (buy_price * weights[name])) for i in range(1, minimum)] +
-                #                 ['{:.2f}'.format(((price_between(i,price_ranges)/quantity + price_between(price_between(i,price_ranges),delivery_ranges)/(quantity*i)) - (buy_price * weights[name])) * 100.0 / (buy_price * weights[name])) for i in range(minimum, 151)]
-                #             ),
-                #             delivery_fees=';'.join(['{min_}-{max_}-{price}'.format(min_=r[0],max_=r[1],price=r[2]) for r in delivery_ranges]),
-                #             source=source,
-                #             session_id=session_id,
-                #             bullion_type=bullion_type,
-                #             quantity=quantity,
-                #             minimum=minimum, timestamp=datetime.now(pytz.timezone('CET')).replace(second=0, microsecond=0)
-                # )
-                # session_prod.add(coin)
-                # session_prod.commit()
-                # session_prod.expunge(coin)
-                # new_coin = session_staging.merge(coin, load=False)
-                # session_staging.commit()
+                    def price_between(value,ranges):
+                        """
+                        Returns the price per unit for a given quantity.
+                        """
+                        for min_qty, max_qty, price in ranges:
+                            if (min_qty <= value <=max_qty):
+                                if isinstance(price,Price):
+                                    return price.amount_float
+                                else:
+                                    return price
 
-        except requests.exceptions.RequestException as e:
-            logger.error(f"Request error: {e}")
+                    coin = Item(name=name,
+                                price_ranges=';'.join(['{min_}-{max_}-{price}'.format(min_=r[0],max_=r[1],price=r[2].amount_float) for r in price_ranges]),
+                                buy_premiums=';'.join(
+                                    ['{:.2f}'.format(((price_between(minimum,price_ranges)/quantity + price_between(price_between(minimum,price_ranges)*minimum,delivery_ranges)/(quantity*minimum)) - (buy_price * weights[name])) * 100.0 / (buy_price * weights[name])) for i in range(1, minimum)] +
+                                    ['{:.2f}'.format(((price_between(i,price_ranges)/quantity + price_between(price_between(i,price_ranges),delivery_ranges)/(quantity*i)) - (buy_price * weights[name])) * 100.0 / (buy_price * weights[name])) for i in range(minimum, 151)]
+                                ),
+                                delivery_fees=';'.join(['{min_}-{max_}-{price}'.format(min_=r[0],max_=r[1],price=r[2]) for r in delivery_ranges]),
+                                source=source,
+                                session_id=session_id,
+                                bullion_type=bullion_type,
+                                quantity=quantity,
+                                minimum=minimum, timestamp=datetime.now(pytz.timezone('CET')).replace(second=0, microsecond=0)
+                    )
+                    session_prod.add(coin)
+                    session_prod.commit()
+                    session_prod.expunge(coin)
+                    new_coin = session_staging.merge(coin, load=False)
+                    session_staging.commit()
 
-        except KeyError as e:
-            logger.error(f"KeyError: {product_name}")
+                except requests.exceptions.RequestException as e:
+                    logger.error(f"Request error: {e}")
+
+                except KeyError as e:
+                    logger.error(f"KeyError: {product_name}")
 
         except Exception as e:
             logger.exception(f"An unexpected error occurred: {e}")  # Log the exception with traceback

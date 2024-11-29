@@ -96,6 +96,7 @@ weights  = {
                         'or - 1/20 oz boeuf 2021 Lunar III': 1.55,
                         'or - 1/4 oz': 7.776,
                         'or - 1/4 oz american eagle': 7.776,
+                        'or - 1/4 oz panda': 7.776,
                         'or - 1/4 oz krugerrand': 7.776,
                         'or - 1/4 oz maple leaf': 7.776,
                         'or - 1/4 oz nugget / kangourou': 7.776,
@@ -135,6 +136,8 @@ weights  = {
                         'or - 10 lire vittorio emanuele II': 2.898,
                         'or - 100 couronnes françois joseph I': 30.483,
                         'or - 100 couronnes hongrie': 30.483,
+                        'or - 25 schilling autriche': 5.29,
+                        'or - 100 schilling autriche': 21.17,
                         'or - 20 couronnes hongrie': 6.093,
                         'or - 10 couronnes hongrie': 3.096,
                         'or - 100 dollars canadien': 15.551,
@@ -152,11 +155,14 @@ weights  = {
                         'or - 50 pesos liberté chili': 8.235,
                         'or - 25 pesetas or alphonse XII': 7.25,
                         'or - 25 pesetas or alphonse XII rouflaq.': 7.25,
-
+                        "or - 20 drachmes grecques" : 5.805,
                         'or - 2.5 pesos mex': 1.872,
                         'or - 2 pesos mex': 1.494,
                         'or - 20 couronnes': 6.093,
                         'or - 20 couronnes françois joseph I': 6.093,
+                        'or - 20 kroner christian X': 8.064,
+                        'or - 20 kroner christian IX': 8.064,
+                        'or - 20 kroner frederik VIII': 8.064,
                         'or - 20 dollars': 30.096, # -> CPor
                         'or - 20 dollars tete indien': 30.096, # -> CPor
                         'or - 20 dollars liberté longacre': 30.096, # -> CPor
@@ -199,6 +205,8 @@ weights  = {
                         'or - 20 mark ludwig II': 7.168, # -> CPor
                         'or - 10 mark wilhelm I': 3.58, # -> CPor
                         'or - 10 mark wilhelm II': 3.58, # -> CPor
+                        'or - 10 mark ludwig II': 3.58, # -> CPor
+                        'or - 10 mark hambourg': 3.58, # -> CPor
                         'or - 20 mark Friedrich I (Baden)': 7.168, # -> CPor
                         'or - 20 mark hambourg': 7.168, # -> CPor
                         'or - 20 mark wilhelm II uniforme': 7.168, # -> CPor
@@ -207,6 +215,8 @@ weights  = {
                         'or - 20 pesos chili': 3.66,
                         'or - 4 ducats': 13.78,
                         'or - 4 florins 10 francs 1892 refrappe': 2.9,
+                        'or - 4 forint 10 Francs hongrie': 2.9033,
+                        'or - 8 forint 20 Francs hongrie': 5.805,
                         'or - 40 francs fr': 11.61,
                         'or - 40 francs fr napoléon empereur laurée': 11.61,
                         'or - 40 francs fr napoléon empereur non laurée': 11.61,
@@ -229,6 +239,7 @@ weights  = {
                         'or - 10 roubles nicolas II': 7.74,
                         'or - 10 roubles chervonetz': 7.74,
                         'or - 5 roubles': 3.87,
+                        'or - 20 markkaa finlande': 5.805,
                         'or - 50 francs fr napoléon III tête nue': 14.51,
                         'or - 50 francs fr napoléon III tête laurée': 14.51,
                         'or - 50 pesos mex': 37.5, # -> CPor
@@ -249,6 +260,7 @@ weights  = {
                         'or - lingot 10 g LBMA': 10.0,
                         'or - lingot 100 g LBMA': 100.0,
                         'or - lingot 20 g LBMA': 20.0,
+                        'or - 25 x 1g maplegram25': 25.0,
                         'or - lingot 250 g LBMA': 250.0,
                         'or - lingot 5 g LBMA': 5.0,
                         'or - lingot 50 g LBMA': 50.0,
@@ -265,6 +277,7 @@ weights  = {
                         'or - 1 souverain 2024 charles III': 7.318, # -> CPor
                         'or - 1 souverain 2023 charles III': 7.318, # -> CPor
                         'or - 1 souverain 2022 charles III': 7.318, # -> CPor
+                        'or - 1 souverain 2022 charles III': 7.318, # -> CPor
                         'or - 1/2 souverain 2024 charles III': 3.6612, # -> CPor
                         'or - 1/2 souverain 2023 charles III': 3.6612, # -> CPor
                         'or - 1/2 souverain 2022 charles III': 3.6612, # -> CPor
@@ -272,6 +285,11 @@ weights  = {
                         'or - 1/4 souverain 2024 charles III': 1.83, # -> CPor
                         'or - 2 souverain 2024 charles III': 14.64, # -> CPor
                         'or - 2 souverain 2022 charles III': 14.64, # -> CPor
+                        'or - 2 souverain': 14.64, # -> CPor
+                        'or - 5 livres souverain': 36.613, # -> CPor
+                        'or - 50 soles péruviens': 21.06, # -> CPor
+                        'or - 10 soles péruviens': 4.14, # -> CPor
+                        'or - 100 soles péruviens': 42.13, # -> CPor
 
                         # Argent
                         'ar - lingot 5 kg' : 5000.0,
