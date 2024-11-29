@@ -44,7 +44,7 @@ class Item(db.Model):
     bullion_type = db.Column(db.String(2), nullable=True, index=False)
 
     @classmethod
-    def get_items_by_bullion_type_and_quantity(cls, session, bullion_type, session_id, quantity):
+    def get_items_by_bullion_type_and_quantity(cls, bullion_type, session_id, quantity):
         """
         Fetches items from the database that match the given bullion type, session_id and quantity.
 
@@ -57,8 +57,9 @@ class Item(db.Model):
         Returns:
             A list of Item objects that match the criteria.
         """
-        return query_to_dict(
-            session.query(cls)
+        db.session = db.session_factory()
+        query_to_dict(
+            db.session.query(cls)
             .filter(
                 cls.bullion_type == bullion_type,
                 cls.session_id == session_id,
@@ -67,6 +68,8 @@ class Item(db.Model):
             )
             .all()
         )
+        db.session.close()
+        return
 
 
 class MetalPrice(db.Model):
@@ -79,7 +82,7 @@ class MetalPrice(db.Model):
     bullion_type = db.Column(db.String(2), nullable=True, index=True)
 
     @classmethod
-    def get_previous_price(cls, session, bullion_type):
+    def get_previous_price(cls, bullion_type):
         """
         Fetches the metal price for the specified bullion type from the previous session.
 
@@ -94,9 +97,9 @@ class MetalPrice(db.Model):
         france_timezone = pytz.timezone('Europe/Paris')
         now_france = datetime.datetime.now(france_timezone)
         thirty_minutes_ago = now_france - datetime.timedelta(minutes=30)
-
+        db.session = db.session_factory()
         subquery = (
-            session.query(cls.session_id)
+            db.session.query(cls.session_id)
             .group_by(cls.session_id)
             .having(db.func.max(cls.timestamp) < thirty_minutes_ago)
             .order_by(db.func.max(cls.timestamp).desc())
@@ -104,13 +107,13 @@ class MetalPrice(db.Model):
         ).subquery()
 
         query = (
-            session.query(cls)
+            db.session.query(cls)
             .filter(
                 cls.bullion_type == bullion_type,
                 cls.session_id == subquery.c.session_id
             )
         )
-
+        db.session.close()
         return query_to_dict(query.all())
 
 class UserChoice(db.Model):

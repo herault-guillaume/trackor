@@ -87,12 +87,12 @@ def serve_layout():
                     dcc.RangeSlider(
                         id='budget-slider',
                         min=0,
-                        max=12500,
+                        max=20000,
                         step=100,
-                        value=[0, 1000],  # Default range
+                        value=[0, 5000],  # Default range
                         marks={
                             0: '0 €',
-                            12500: '12k5 €',
+                            20000: '20k €',
                         },
                         allowCross=False,
                         persistence=True,
@@ -133,7 +133,7 @@ def serve_layout():
 
                         # Add more options as needed
                     ],
-                    value=3,  # Default value
+                    value=7,  # Default value
                     clearable=False,  # Prevent clearing the selection
                     persistence=True,
                     style={'width': '100%','color': 'black','text-align': 'center'}
@@ -282,11 +282,18 @@ def serve_layout():
      Input('quantity-header', 'n_clicks'),
      Input('total_cost-header', 'n_clicks'),
      Input('delivery-header', 'n_clicks')],
-    [State('cheapest-offer-table-body', 'children')]
+    [State('cheapest-offer-table-body', 'children'),
+     State('source-arrow', 'className'),  # Add states for the arrow class names
+     State('name-arrow', 'className'),
+     State('premium-arrow', 'className'),
+     State('quantity-arrow', 'className'),
+     State('total_cost-arrow', 'className'),
+     State('delivery-arrow', 'className')]
 )
+
 def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_coins, n,
-                          source_clicks, name_clicks, premium_clicks, quantity_clicks, total_cost_clicks,delivery_clicks,
-                          current_table):
+                          source_clicks, name_clicks, premium_clicks, quantity_clicks, total_cost_clicks, delivery_clicks,
+                          current_table, source_arrow, name_arrow, premium_arrow, quantity_arrow, total_cost_arrow, delivery_arrow):
     ctx = callback_context
     triggered_id, triggered_prop = ctx.triggered[0]['prop_id'].split('.')
 
@@ -366,6 +373,7 @@ def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_
         france_timezone = pytz.timezone('Europe/Paris')
         now_france = datetime.datetime.now(france_timezone)
         thirty_minutes_ago = now_france - datetime.timedelta(minutes=30)
+        db.session = db.session_factory()
 
         user_choice = UserChoice(
             timestamp=datetime.datetime.now(),
@@ -379,7 +387,7 @@ def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_
         db.session.commit()
 
 
-        results = MetalPrice.get_previous_price(db.session,bullion_type)
+        results = MetalPrice.get_previous_price(bullion_type)
         metal_prices_df = pd.DataFrame(results)
 
         metal_price = metal_prices_df['buy_price'].iloc[0]
@@ -392,7 +400,7 @@ def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_
         table_rows = []
 
         # SQL query to fetch the latest complete session and its data from both tables
-        results = Item.get_items_by_bullion_type_and_quantity(db.session,bullion_type,session_id,quantity)
+        results = Item.get_items_by_bullion_type_and_quantity(bullion_type,session_id,quantity)
         items_df = pd.DataFrame(results).copy()
 
         if selected_coins:
@@ -488,13 +496,14 @@ def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_
 
 @app.callback(
     Output('piece-dropdown', 'options'),
+    Output('piece-dropdown', 'value'),
     [Input('bullion-type-switch', 'value')]
 )
 def update_piece_dropdown(bullion_type_switch):
     if bullion_type_switch :
-        return or_options_quick_filter
+        return or_options_quick_filter, None
     else :
-        return ar_options_quick_filter
+        return ar_options_quick_filter, None
 
 @app.callback(
     Output('quantity-dropdown', 'value'),
@@ -503,9 +512,9 @@ def update_piece_dropdown(bullion_type_switch):
 )
 def update_quantity_dropdown(bullion_type_switch,quantity):
     if bullion_type_switch:
-        return 3
+        return 7
     else:
-        return quantity
+        return 100
 
 @app.callback(
     Output('metal-price-output', 'children'),
@@ -515,10 +524,9 @@ def update_quantity_dropdown(bullion_type_switch,quantity):
 def update_metal_price(bullion_type_switch, n):
     bullion_type = 'or' if bullion_type_switch else 'ar'
 
-    results = MetalPrice.get_previous_price(db.session,bullion_type)
+    results = MetalPrice.get_previous_price(bullion_type)
     metal_prices_df = pd.DataFrame(results)
 
-    print(metal_prices_df)
     # Get buying gold and silver coin values
     metal_price = metal_prices_df['buy_price'].iloc[0]
 
@@ -528,7 +536,6 @@ def update_metal_price(bullion_type_switch, n):
             html.P(f"{metal_price:.3f} €/g ", style={'font-size': '0.8em', 'margin-bottom': '0','text-align':'center'})
         ]
     )
-
     return current_table
 
 app.clientside_callback(
@@ -595,13 +602,13 @@ with app.server.app_context():
     # Simplified layout and callback
     app.layout = serve_layout()
 
-    results = MetalPrice.get_previous_price(db.session, 'or')
+    results = MetalPrice.get_previous_price('or')
     metal_prices_df = pd.DataFrame(results)
 
     metal_price = metal_prices_df['buy_price'].iloc[0]
     session_id = metal_prices_df['session_id'].iloc[0]
     # SQL query to fetch the latest complete session and its data from both tables
-    results = Item.get_items_by_bullion_type_and_quantity(db.session, 'or', session_id, 150)
+    results = Item.get_items_by_bullion_type_and_quantity('or', session_id, 1)
     items_df = pd.DataFrame(results).copy()
     items_df.drop_duplicates(subset=['name'], inplace=True)
     items_df.sort_values(by='name', inplace=True)
@@ -647,7 +654,7 @@ with app.server.app_context():
                               ] + [{'label': html.Span(row['name'][4:].upper()), 'value': row['name']} for _, row in
                                    items_df.iterrows()]
 
-    results = Item.get_items_by_bullion_type_and_quantity(db.session, 'ar', session_id, 150)
+    results = Item.get_items_by_bullion_type_and_quantity('ar', session_id, 1)
     items_df = pd.DataFrame(results).copy()
     items_df.drop_duplicates(subset=['name'], inplace=True)
     items_df.sort_values(by='name', inplace=True)
