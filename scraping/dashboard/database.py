@@ -37,7 +37,7 @@ class Item(db.Model):
     quantity = db.Column(db.Integer, nullable=False)
     minimum = db.Column(db.Integer, nullable=True)
     buy_premiums = db.Column(db.String(2000), nullable=True)
-    delivery_fees = db.Column(db.String(255), nullable=True)
+    delivery_fees = db.Column(db.String(2000), nullable=True)
     source = db.Column(db.String(1024), nullable=False)
     timestamp = db.Column(db.DateTime)
     session_id = db.Column(db.String(36), index=True)

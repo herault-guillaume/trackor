@@ -1,8 +1,9 @@
 from dotenv import load_dotenv
 load_dotenv()
+import cProfile
+import pstats
 
 from scraping.dashboard.pieces import weights
-from scraping.dashboard.database import db, MetalPrice, Item, UserChoice
 
 import os
 import pandas as pd
@@ -14,7 +15,10 @@ import dash
 from dash import dcc, html, Input, Output, State, callback_context
 import dash_bootstrap_components as dbc
 
-from flask import Flask, request, session
+from flask import Flask, request, session, send_from_directory
+from flask_sqlalchemy import SQLAlchemy
+import pytz
+import datetime
 
 server = Flask(__name__)
 
@@ -36,17 +40,135 @@ def create_tunnel():
         remote_bind_address=(os.getenv('REMOTE_BIND_ADDRESS'), int(os.getenv('REMOTE_PORT_ADDRESS', 3306)))
     )
 
-def create_and_attach_session_throught_tunnel(db,tunnel):
-    conn_str = os.getenv('SQLALCHEMY_DATABASE_URI').format(tunnel.local_bind_port)
-    engine = db.create_engine(conn_str, echo=True)  # echo=False to disable logging SQL queries
-    Session = db.scoped_session(db.sessionmaker(autocommit=False, autoflush=False, bind=engine))
-    return Session()  # Set the db.session
-
 tunnel = create_tunnel()
 tunnel.start()
 
 # Configuration using environment variables
 server.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI').format(tunnel.local_bind_port)
+server.config['SQLALCHEMY_ENGINE_OPTIONS'] = {'pool_recycle' : 280}
+db = SQLAlchemy(server)
+
+def query_to_dict(rset):
+    """
+    Converts a SQLAlchemy query result set to a pandas.Dataframe compatible dictionary .
+
+    Args:
+        rset: The result set from a SQLAlchemy query.
+
+    Returns:
+        A dictionary where keys are column names and values are lists of column values.
+    """
+    if not rset:
+        return {}  # Return an empty dictionary if the result set is empty
+
+    # Get column names from the first result object
+    column_names = [column.name for column in rset[0].__table__.columns]
+
+    # Construct the dictionary using list comprehensions
+    return {
+        column_name: [getattr(row, column_name) for row in rset]
+        for column_name in column_names
+    }
+
+class Item(db.Model):
+    __tablename__ = 'item'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255), nullable=True, index=True)
+    price_ranges = db.Column(db.String(255), nullable=True)
+    sell = db.Column(db.Float, nullable=True)
+    quantity = db.Column(db.Integer, nullable=False)
+    minimum = db.Column(db.Integer, nullable=True)
+    buy_premiums = db.Column(db.String(2000), nullable=True)
+    delivery_fees = db.Column(db.String(2000), nullable=True)
+    source = db.Column(db.String(1024), nullable=False)
+    timestamp = db.Column(db.DateTime)
+    session_id = db.Column(db.String(36), index=True)
+    bullion_type = db.Column(db.String(2), nullable=True, index=False)
+
+    @classmethod
+    def get_items_by_bullion_type_and_quantity(cls, bullion_type, session_id, quantity):
+        """
+        Fetches items from the database that match the given bullion type, session_id and quantity.
+
+        Args:
+            session: SQLAlchemy session object.
+            bullion_type: The type of bullion.
+            session_id: The session ID.
+            quantity: The desired quantity.
+
+        Returns:
+            A list of Item objects that match the criteria.
+        """
+        res = query_to_dict(
+            db.session.query(cls)
+            .filter(
+                cls.bullion_type == bullion_type,
+                cls.session_id == session_id,
+                cls.minimum <= quantity,
+                cls.quantity <= quantity,
+            )
+            .all()
+        )
+        db.session.close()
+        return res
+
+
+class MetalPrice(db.Model):
+    __tablename__ = 'metal_price'
+    id = db.Column(db.Integer, primary_key=True)
+    buy_price = db.Column(db.Float, nullable=True)
+    sell_price = db.Column(db.Float, nullable=True)
+    timestamp = db.Column(db.DateTime)
+    session_id = db.Column(db.String(36), index=True)
+    bullion_type = db.Column(db.String(2), nullable=True, index=True)
+
+    @classmethod
+    def get_previous_price(cls, bullion_type):
+        """
+        Fetches the metal price for the specified bullion type from the previous session.
+
+        Args:
+            session: SQLAlchemy session object.
+            bullion_type: The type of bullion.
+
+        Returns:
+            The result of the query.
+        """
+
+        france_timezone = pytz.timezone('Europe/Paris')
+        now_france = datetime.datetime.now(france_timezone)
+        thirty_minutes_ago = now_france - datetime.timedelta(minutes=30)
+
+        subquery = (
+            db.session.query(cls.session_id)
+            .group_by(cls.session_id)
+            .having(db.func.max(cls.timestamp) < thirty_minutes_ago)
+            .order_by(db.func.max(cls.timestamp).desc())
+            .limit(1)
+        ).subquery()
+
+        query = (
+            db.session.query(cls)
+            .filter(
+                cls.bullion_type == bullion_type,
+                cls.session_id == subquery.c.session_id
+            )
+        )
+        db.session.close()
+        return query_to_dict(query.all())
+
+class UserChoice(db.Model):
+    __tablename__ = 'user_choices'
+
+    id = db.Column(db.Integer, primary_key=True)
+    timestamp = db.Column(db.DateTime)
+    budget_min = db.Column(db.Float)
+    budget_max = db.Column(db.Float)
+    quantity = db.Column(db.Integer)
+    bullion_type = db.Column(db.String(2))
+    selected_coins = db.Column(db.JSON)  # Store selected coins as JSON
+
 
 app = dash.Dash(__name__,
                 server=server,
@@ -66,13 +188,16 @@ app = dash.Dash(__name__,
                      "content": "pièces d'investissement, or, argent, lingots, achat, vente, bullion, investissement, métaux précieux"},
                 ]
             )
+    # Rest of your Dash app layout
 
-# Create the database tables
+@server.route('/ads.txt')
+def serve_ads_txt():
+    return send_from_directory(server.root_path, 'assets/ads.txt')
 
 def serve_layout():
     return dbc.Container([
         html.Div([
-
+    dcc.Location(id='url', refresh=True),
     dcc.Loading(id="loading-1",type="default",children=html.Div(id="tawk-to-widget")),
     # Rest of your Dash app layout
     ]),
@@ -185,16 +310,16 @@ def serve_layout():
             xs=12, sm=12, md=8, lg=6, xl=4, xxl=4, className="mb-4"
         ),
     ], className="mb-4 equal-height-cards"),  # Add margin-bottom to the row
-
-    html.Div(id='last-update-info', className="text-center mb-2"),  # Add a div to display the last update info
-
     dbc.Spinner(id="loading-output", children=[
+        html.Div(id='last-update-info', className="text-center mb-2"),  # Add a div to display the last update info
+
+
         dbc.Table([  # Create the table structure in the layout
             html.Thead(
                 html.Tr([
                     html.Th([html.I(className="fa-solid fa-shop", style={'font-size': '16px'}), "  Site marchand",
                              html.Span(id='source-arrow', className="fa fa-sort ms-2")],style={'text-align': 'center'}, id='source-header',n_clicks=0),
-                    html.Th([html.I(className="", style={'font-size': '16px'}),"  Nom",
+                    html.Th([html.I(className="fa-solid fa-hashtag", style={'font-size': '16px'}),"  Nom",
                              html.Span(id='name-arrow', className="fa fa-sort ms-2")], style={'text-align': 'center'}, id='name-header', n_clicks=0),
                     html.Th(
                         [
@@ -207,8 +332,17 @@ def serve_layout():
                         style={'text-align': 'center'},n_clicks=0),
                     html.Th(
                         [
+                            html.I(className="fa-solid fa-circle-info", style={'font-size': '16px'}),
+                            "  Prix U. (€)",
+                            html.Span(id='ppc-arrow', className="fa fa-sort ms-2"),
+                            dbc.Tooltip("Prix unitaire des pièces du lot.", target="ppc-header")
+                        ],
+                        id="ppc-header",
+                        style={'text-align': 'center'}, n_clicks=0),
+                    html.Th(
+                        [
                             html.I(className="fa-solid fa-chart-line", style={'font-size': '16px'}),
-                            "  Quantité min. (U)",
+                            "  Lot x Quantité min. (U)",
                             html.Span(id='quantity-arrow', className="fa fa-sort ms-2"),
                             dbc.Tooltip("Quantité minimum pour obtenir la prime affichée.", target="quantity-header")
                         ],
@@ -225,7 +359,7 @@ def serve_layout():
             , id='table-header'), # Apply spinner only to the tbody
                     html.Tbody(id='cheapest-offer-table-body'),
         ], bordered=True, hover=True, responsive=True, striped=True, dark=True),
-    ],  color="gold", type="border", spinner_style={"position": "absolute", "top": "3em"}),
+
 
     dcc.Interval(
         id='interval-component',
@@ -252,13 +386,14 @@ def serve_layout():
                     )
                 ],
                 width=12)
-        ], className="mb-4 equal-height-cards"),
+        ], className="mb-4 mt-4"),
 
     html.Div([
         "2025 - Bullion-sniper.fr x ",
         html.A("Dash ",href="https://dash.plotly.com/"),
         html.I(className="fa-solid fa-heart fa-beat", style={'font-size': '16px', 'color' : 'red'}),], className="text-center mb-2"),  # Add a div to display the last update info
 
+    ],  color="gold", type="border", spinner_style={"position": "absolute", "top": "3em"}),
     ])
 
 
@@ -279,6 +414,7 @@ def serve_layout():
      Input('source-header', 'n_clicks'),  # Input for each header's n_clicks
      Input('name-header', 'n_clicks'),
      Input('premium-header', 'n_clicks'),
+     Input('ppc-header', 'n_clicks'),
      Input('quantity-header', 'n_clicks'),
      Input('total_cost-header', 'n_clicks'),
      Input('delivery-header', 'n_clicks')],
@@ -286,14 +422,14 @@ def serve_layout():
      State('source-arrow', 'className'),  # Add states for the arrow class names
      State('name-arrow', 'className'),
      State('premium-arrow', 'className'),
+     State('ppc-arrow', 'className'),
      State('quantity-arrow', 'className'),
      State('total_cost-arrow', 'className'),
      State('delivery-arrow', 'className')]
 )
-
 def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_coins, n,
-                          source_clicks, name_clicks, premium_clicks, quantity_clicks, total_cost_clicks, delivery_clicks,
-                          current_table, source_arrow, name_arrow, premium_arrow, quantity_arrow, total_cost_arrow, delivery_arrow):
+                          source_clicks, name_clicks, premium_clicks, ppc_clicks, quantity_clicks, total_cost_clicks, delivery_clicks,
+                          current_table, source_arrow, name_arrow, premium_arrow, ppc_arrow,quantity_arrow, total_cost_arrow, delivery_arrow):
     ctx = callback_context
     triggered_id, triggered_prop = ctx.triggered[0]['prop_id'].split('.')
 
@@ -320,11 +456,14 @@ def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_
         elif triggered_id == 'quantity-header':
             column_index = 3
             sort_key = 'quantity'
-        elif triggered_id == 'total_cost-header':
+        elif triggered_id == 'quantity-header':
             column_index = 4
+            sort_key = 'quantity'
+        elif triggered_id == 'total_cost-header':
+            column_index = 5
             sort_key = 'total_cost'
         elif triggered_id == 'delivery-header':
-            column_index = 5
+            column_index = 6
             sort_key = 'delivery_fees'
 
         if sort_key == 'total_cost':
@@ -373,7 +512,6 @@ def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_
         france_timezone = pytz.timezone('Europe/Paris')
         now_france = datetime.datetime.now(france_timezone)
         thirty_minutes_ago = now_france - datetime.timedelta(minutes=30)
-        db.session = db.session_factory()
 
         user_choice = UserChoice(
             timestamp=datetime.datetime.now(),
@@ -385,7 +523,6 @@ def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_
         )
         db.session.add(user_choice)
         db.session.commit()
-
 
         results = MetalPrice.get_previous_price(bullion_type)
         metal_prices_df = pd.DataFrame(results)
@@ -417,82 +554,93 @@ def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_
         for q_max in reversed(range(1,quantity+1)):
             df_copy = items_df.copy()
 
-            df_copy.loc[:, ['buy_premiums', 'premium_index']] = df_copy['buy_premiums'].apply(
-                lambda x: pd.Series({
-                    'buy_premiums': min(x[:q_max]),
-                    'premium_index': x.index(min(x[:q_max]))
-                })
-            )
+            def calculate_premiums(x, q_max):
+                """
+                Calculates the minimum premium and its index within the first q_max elements of a list.
 
-            df_copy['price'] = df_copy.apply(lambda row: get_price(row['price_ranges'], row['premium_index']+1), axis=1)
+                Args:
+                  x: A list of premiums.
+                  q_max: The maximum number of elements to consider.
+
+                Returns:
+                  A pandas Series with the minimum premium and its index.
+                """
+                min_premium = min(x[:q_max])
+                premium_index = x.index(min_premium)
+                return pd.Series({'buy_premiums': min_premium, 'premium_index': premium_index})
+
+            df_copy[['buy_premiums', 'premium_index']] = df_copy['buy_premiums'].apply(
+                lambda x: calculate_premiums(x, q_max))
 
             # Cheapest offer analysis and recommendations
             results = df_copy.sort_values(by='buy_premiums')
 
             for i, row in results.iterrows():
-                try :
-                    # Calculate total cost (using bullion_type)
-                    spot_cost = weights[row['name']] * metal_price
-                    total_cost = (spot_cost  + (row['buy_premiums']  / 100.0)*spot_cost) * (row['premium_index']+1) * float(row['quantity']) if row['minimum'] == row['quantity'] == 1 else (spot_cost  + (row['buy_premiums']  / 100.0)*spot_cost) * (row['premium_index']+1) * quantity
+                # Calculate total cost (using bullion_type)
+                spot_cost = weights[row['name']] * metal_price
+                total_quantity = row['quantity'] * int(row['premium_index'] + 1) if row['minimum'] == 1 else int(row['premium_index'] + 1) * quantity
+                total_cost = (spot_cost  + (row['buy_premiums']  / 100.0)*spot_cost) * total_quantity
+                # Check if the offer meets the budget
+                if (row['name'], row['source']) not in seen_offers and budget_min <= total_cost <= budget_max and quantity >= row['minimum'] :#and quantity >= total_quantity :
+                    ppc = (spot_cost + (row['buy_premiums'] / 100.0) * spot_cost)
+                    cheapest_offers.append({
+                        'name': row['name'].upper(),
+                        'source': row['source'],
+                        'premium': row['buy_premiums'] ,
+                        'price_per_coin': f"{ppc:.2f} €" ,
+                        'quantity': str(int(row['premium_index'] + 1)) if row['quantity'] == 1 and row['minimum'] == 1 else str(int(row['premium_index'] + 1)) + ' x ' + str(row['quantity']) + ' ({total_quantity})'.format(total_quantity=str(total_quantity)) if row['quantity'] > 1 else quantity ,
+                        'delivery_fees': get_price(row['delivery_fees'],total_cost),
+                        'total_cost': total_cost
+                    })
+                    seen_offers.add((row['name'], row['source']))
 
-                    # Check if the offer meets the budget
-                    if (row['name'], row['source']) not in seen_offers and budget_min <= total_cost <= budget_max and quantity >= row['minimum'] and quantity >= row['quantity'] :
-                        cheapest_offers.append({
-                            'name': row['name'].upper(),
-                            'source': row['source'],
-                            'premium': row['buy_premiums'] ,
-                            'quantity': int(row['premium_index'] + 1) * row['quantity'] if row['minimum'] == row['quantity'] == 1 else quantity,
-                            'delivery_fees': get_price(row['delivery_fees'],quantity),
-                            'total_cost': total_cost
-                        })
-                        seen_offers.add((row['name'], row['source']))
-                except IndexError as e :
-                    print(e)  # Skip if the quantity index is out of range
+            # Sort offers by premium (lowest first)
+            cheapest_offers.sort(key=lambda x: x['premium'])
 
-    # Sort offers by premium (lowest first)
-    cheapest_offers.sort(key=lambda x: x['premium'])
-
-    for offer in cheapest_offers[:30]:
-        table_rows.append(
-            html.Tr([
-                html.Td(
-                    html.A(
-                        html.I(className="fas fa-external-link-alt", style={'color': 'gold'}),  # External link icon
-                        href=offer['source'],  # URL of the source
-                        target="_blank",  # Open link in a new tab
-                        style={'text-decoration': 'none', 'text_align':'center'}  # Remove underline from the link
+        for offer in cheapest_offers[:40]:
+            table_rows.append(
+                html.Tr([
+                    html.Td(
+                        html.A(
+                            html.I(className="fas fa-external-link-alt", style={'color': 'gold'}),  # External link icon
+                            href=offer['source'],  # URL of the source
+                            target="_blank",  # Open link in a new tab
+                            style={'text-decoration': 'none', 'text_align':'center'}  # Remove underline from the link
+                        ),
+                        style={'text-align': 'center'}
                     ),
-                    style={'text-align': 'center'}
-                ),
-                html.Td(offer['name'][4:]),
-                html.Td(offer['premium'],style={'text-align': 'center'}),
-                html.Td(offer['quantity'],style={'text-align': 'center'}),
-                html.Td(f"{offer['total_cost']:.2f} €",style={'text-align': 'center'}),
-                html.Td(f"{offer['delivery_fees']:.2f} €",style={'text-align': 'center'})
-            ])
-        )
-
-    if table_rows == []:
-        DEBUG_icon = html.I(className="fas fa-triangle-exclamation", style={'color': 'orange', 'font-size': '16px'})  # Adjust color and size as needed
-        table_rows.append(
-            html.Tr([
-                html.Td(DEBUG_icon, style={'text-align': 'center'}),
-                html.Td("Veuillez augmenter votre budget pour voir les offres."),
-                html.Td(DEBUG_icon, style={'text-align': 'center'}),
-                html.Td(DEBUG_icon, style={'text-align': 'center'}),
-                html.Td(DEBUG_icon, style={'text-align': 'center'})
-            ])
-        )
-
-    return (table_rows,
-            html.P(f"Dernière mise à jour le {formatted_timestamp}", style={'font-size': '0.8em'}),
-            arrow_classNames['source-arrow'],
-            arrow_classNames['name-arrow'],
-            arrow_classNames['premium-arrow'],
-            arrow_classNames['quantity-arrow'],
-            arrow_classNames['total_cost-arrow'],
-            arrow_classNames['delivery-arrow'],
+                    html.Td(offer['name'][4:]),
+                    html.Td(offer['premium'],style={'text-align': 'center'}),
+                    html.Td(offer['price_per_coin'],style={'text-align': 'center'}),
+                    html.Td(offer['quantity'],style={'text-align': 'center'}),
+                    html.Td(f"{offer['total_cost']:.2f} €",style={'text-align': 'center'}),
+                    html.Td(f"{offer['delivery_fees']:.2f} €",style={'text-align': 'center'})
+                ])
             )
+
+        if table_rows == []:
+            DEBUG_icon = html.I(className="fas fa-triangle-exclamation", style={'color': 'orange', 'font-size': '16px'})  # Adjust color and size as needed
+            table_rows.append(
+                html.Tr([
+                    html.Td(DEBUG_icon, style={'text-align': 'center'}),
+                    html.Td("Veuillez augmenter votre budget pour voir les offres."),
+                    html.Td(DEBUG_icon, style={'text-align': 'center'}),
+                    html.Td(DEBUG_icon, style={'text-align': 'center'}),
+                    html.Td(DEBUG_icon, style={'text-align': 'center'}),
+                    html.Td(DEBUG_icon, style={'text-align': 'center'})
+                ])
+            )
+
+        return (table_rows,
+                html.P(f"Dernière mise à jour le {formatted_timestamp}", style={'font-size': '0.8em'}),
+                arrow_classNames['source-arrow'],
+                arrow_classNames['name-arrow'],
+                arrow_classNames['premium-arrow'],
+                arrow_classNames['quantity-arrow'],
+                arrow_classNames['total_cost-arrow'],
+                arrow_classNames['delivery-arrow'],
+                )
+
 
 @app.callback(
     Output('piece-dropdown', 'options'),
@@ -571,12 +719,16 @@ def get_price(ranges, quantity):
     The price as a float.
     """
     ranges = ranges.split(';')
-
     for r in ranges:
-        lower, upper, price = map(float, r.split('-'))
+        try :
+            lower, upper, price = map(float, r.split('-'))
+        except ValueError as e:
+            print(ranges)
+            print(r,lower, upper, price)
+            raise Exception
         if lower <= quantity < upper:
             return price  # Return the price directly
-        return None  # Or handle the case where quantity is outside all ranges
+    return None  # Or handle the case where quantity is outside all ranges
 
 def get_country_flag_image(country_code):
     """
@@ -592,12 +744,9 @@ def get_country_flag_image(country_code):
     else:
         return ""
 
-
-
-
 with app.server.app_context():
-    db.init_app(server)
-    db.create_all()
+    # db.init_app(server)
+    # db.create_all()
 
     # Simplified layout and callback
     app.layout = serve_layout()
@@ -610,6 +759,7 @@ with app.server.app_context():
     # SQL query to fetch the latest complete session and its data from both tables
     results = Item.get_items_by_bullion_type_and_quantity('or', session_id, 1)
     items_df = pd.DataFrame(results).copy()
+
     items_df.drop_duplicates(subset=['name'], inplace=True)
     items_df.sort_values(by='name', inplace=True)
     or_options_quick_filter = [

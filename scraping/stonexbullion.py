@@ -243,7 +243,7 @@ def get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_pri
         (1,500,2.95),
         (500,1000,3.95),
         (1000,1500,4.95),
-        (1500,2500,5.95)] + [ (2500.0 + (i * 100), 2500.0 + ((i+1) * 500), 5.95 + (1.0 * (i+1))) for i,v in enumerate(range(2500,15000,500))]
+        (1500,2500,5.95)] + [(2500.0 + (i * 500), 2500.0 + ((i+1) * 500), 5.95 + (1.0 * (i+1))) for i,v in enumerate(range(2500,15000,500))]
 
     for url in urls :
         try:
@@ -287,7 +287,7 @@ def get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_pri
                     else:
                         buy_price = buy_price_silver
 
-                    print(name,price, "https://stonexbullion.com/fr" + source)
+                    print(name,price,  + source)
                     # def has_year(text):
                     #     pattern = r"\b\d{4}\b"  # Matches a four-digit year
                     #     match = re.search(pattern, text)
@@ -325,7 +325,7 @@ def get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_pri
                                     ['{:.2f}'.format(((price_between(i,price_ranges)/quantity + price_between(price_between(i,price_ranges),delivery_ranges)/(quantity*i)) - (buy_price * weights[name])) * 100.0 / (buy_price * weights[name])) for i in range(minimum, 151)]
                                 ),
                                 delivery_fees=';'.join(['{min_}-{max_}-{price}'.format(min_=r[0],max_=r[1],price=r[2]) for r in delivery_ranges]),
-                                source=source,
+                                source="https://stonexbullion.com/fr" + source,
                                 session_id=session_id,
                                 bullion_type=bullion_type,
                                 quantity=quantity,
