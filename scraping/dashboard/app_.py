@@ -188,7 +188,95 @@ app = dash.Dash(__name__,
                      "content": "pièces d'investissement, or, argent, lingots, achat, vente, bullion, investissement, métaux précieux"},
                 ]
             )
-    # Rest of your Dash app layout
+# Define the navigation bar
+navbar = dbc.NavbarSimple(
+    children=[
+        dbc.NavItem(dbc.NavLink("Tableau de bord", href="/", id="nav-home")),
+        dbc.NavItem(dbc.NavLink("Guide d'investissement", href="/guide", id="nav-guide")),
+        dbc.NavItem(dbc.NavLink("Analyse Napoléon d'Or", href="/analyses", id="nav-analyse")),
+        dbc.NavItem(dbc.NavLink("FAQ", href="/faq", id="nav-faq")),
+        dbc.NavItem(dbc.NavLink("Qui suis je ?", href="/news", id="nav-whoami")),
+        # Add more navigation items as needed
+    ],
+    brand="",  # Your app's brand name
+    brand_href="/",  # Link for the brand name
+    color="dark",  # Background color
+    dark=True,  # Use dark text color
+    className="mb-4",  # Add margin-bottom for spacing
+    style={"padding-top": "0","padding-bottom": "0"},  # Add margin-bottom for spacing
+)
+
+def get_price(ranges, quantity):
+    """
+    Calculates the price based on the quantity and given ranges.
+
+    Args:
+    ranges: A string of ranges in the format '1-9;10-48;49-98;99-9999999999.9'.
+    quantity: The quantity of the item.
+
+    Returns:
+    The price as a float.
+    """
+    ranges = ranges.split(';')
+    for r in ranges:
+        try :
+            lower, upper, price = map(float, r.split('-'))
+        except ValueError as e:
+            print(ranges)
+            print(r,lower, upper, price)
+            raise Exception
+        if lower <= quantity < upper:
+            return price  # Return the price directly
+    return None  # Or handle the case where quantity is outside all ranges
+
+def get_country_flag_image(country_code):
+    """
+    Generates an HTML img tag for a country flag image from a 2-letter country code.
+    Uses images from the provided URL with the format "https://hatscripts.github.io/circle-flags/flags/{code}.svg".
+    """
+    if len(country_code) == 2:
+        return html.Img(
+            src=f"/assets/{country_code.lower()}.svg",  # Use assets folder
+            alt=country_code,
+            style={'width': '20px', 'margin-right': '5px'}
+        )
+    else:
+        return ""
+
+
+app.layout = html.Div([
+    dcc.Location(id='url', refresh=False),
+    navbar,
+    dbc.Container(id="page-content", fluid=True),
+])
+
+@app.callback(Output("page-content", "children"),
+              [Input("nav-home", "n_clicks"),
+               Input("nav-guide", "n_clicks"),
+               Input("nav-whoami", "n_clicks"),
+               Input("nav-faq", "n_clicks")],
+              [State("url", "pathname")])  # Include the current pathname as state
+
+def render_page_content(n_clicks_home, n_clicks_guide, n_clicks_news, n_clicks_faq, pathname):
+    ctx = callback_context
+    if not ctx.triggered:  # Handle initial load
+        return serve_layout()
+
+    triggered_id, _ = ctx.triggered[0]['prop_id'].split('.')
+
+    if triggered_id == "nav-home":
+        return serve_layout()
+    elif triggered_id == "nav-guide":
+        return 'guide_page_content'
+    elif triggered_id == "nav-whoami":
+        return 'news_page_content'
+    elif triggered_id == "nav-faq":
+        return 'faq_page_content'
+    else:
+        return html.Div([
+            html.H1("404: Page non trouvée"),
+            # ... content for a 404 error page ...
+        ])
 
 @server.route('/ads.txt')
 def serve_ads_txt():
@@ -202,8 +290,14 @@ def serve_layout():
     # Rest of your Dash app layout
     ]),
 
-    dbc.Row([html.Img(src='/assets/logo-bullion-sniper.webp', style={'height': '150px', 'width': 'auto'}),], className="mb-4 mt-4",justify="center"),
-
+    dbc.Row([html.Img(src='/assets/logo-bullion-sniper.webp', style={'height': '150px', 'width': 'auto'}),             html.Div(  # Add the text here
+                 "Votre comparateur de prix  pour l'investissement dans les métaux précieux.",
+                 className='mb-4 mt-4', style={'text-align': 'center', 'font-size': '16px', 'font-weight' : 'bold','color': 'gold'}
+             ),
+             html.Div(  # Add the text here
+                 "100% Indépendant, 0% Affiliation. Plus de 20 plateformes recensées chaque jour.",
+                 className='mb-1 mt-1',style={'text-align': 'center', 'font-size': '16px', 'font-weight' : 'bold','color': 'gold'}
+             ),], className="mb-4 mt-1",justify="center"),
     dbc.Row([
         dbc.Col(
             dbc.Card([
@@ -313,51 +407,55 @@ def serve_layout():
     dbc.Spinner(id="loading-output", children=[
         html.Div(id='last-update-info', className="text-center mb-2"),  # Add a div to display the last update info
 
-
         dbc.Table([  # Create the table structure in the layout
             html.Thead(
                 html.Tr([
                     html.Th([html.I(className="fa-solid fa-shop", style={'font-size': '16px'}), "  Site marchand",
-                             html.Span(id='source-arrow', className="fa fa-sort ms-2")],style={'text-align': 'center'}, id='source-header',n_clicks=0),
-                    html.Th([html.I(className="fa-solid fa-hashtag", style={'font-size': '16px'}),"  Nom",
-                             html.Span(id='name-arrow', className="fa fa-sort ms-2")], style={'text-align': 'center'}, id='name-header', n_clicks=0),
+                             html.Span(id='source-arrow', className="fa fa-sort ms-2")], style={'text-align': 'center'},
+                            id='source-header', n_clicks=0),
+                    html.Th([html.I(className="fa-solid fa-hashtag", style={'font-size': '16px'}), "  Nom",
+                             html.Span(id='name-arrow', className="fa fa-sort ms-2")], style={'text-align': 'center'},
+                            id='name-header', n_clicks=0),
                     html.Th(
                         [
                             html.I(className="fa-solid fa-arrow-trend-down", style={'font-size': '16px'}),
-                            "  Prime (%)",
+                            "  Prime",
                             html.Span(id='premium-arrow', className="fa fa-sort ms-2"),
-                            dbc.Tooltip("La prime inclue les frais de port et le prix dégressif. Valable uniquement à l'horaire affichée ci-dessus.",target="premium-header")  # The tooltip
+                            dbc.Tooltip(
+                                "La prime inclue les frais de port et le prix dégressif. Valable uniquement à l'horaire affichée ci-dessus.",
+                                target="premium-header")  # The tooltip
                         ],
                         id="premium-header",
-                        style={'text-align': 'center'},n_clicks=0),
+                        style={'text-align': 'center'}, n_clicks=0),
                     html.Th(
                         [
                             html.I(className="fa-solid fa-circle-info", style={'font-size': '16px'}),
-                            "  Prix U. (€)",
+                            "  Prix Unitaire FDPI",
                             html.Span(id='ppc-arrow', className="fa fa-sort ms-2"),
-                            dbc.Tooltip("Prix unitaire des pièces du lot.", target="ppc-header")
+                            dbc.Tooltip("Prix unitaire, frais de port inclus, d'une pièce du lot.", target="ppc-header")
                         ],
                         id="ppc-header",
                         style={'text-align': 'center'}, n_clicks=0),
                     html.Th(
                         [
                             html.I(className="fa-solid fa-chart-line", style={'font-size': '16px'}),
-                            "  Lot x Quantité min. (U)",
+                            "  Quantité",
                             html.Span(id='quantity-arrow', className="fa fa-sort ms-2"),
                             dbc.Tooltip("Quantité minimum pour obtenir la prime affichée.", target="quantity-header")
                         ],
                         id="quantity-header",
                         style={'text-align': 'center'}, n_clicks=0),
-                    html.Th([html.I(className="fa-solid fa-tag", style={'font-size': '16px'}),"  Total FDPI",
-                             html.Span(id='total_cost-arrow', className="fa fa-sort ms-2"),], style={'text-align': 'center'}, id='total_cost-header', n_clicks=0),
+                    html.Th([html.I(className="fa-solid fa-tag", style={'font-size': '16px'}), "  Total FDPI",
+                             html.Span(id='total_cost-arrow', className="fa fa-sort ms-2"), ],
+                            style={'text-align': 'center'}, id='total_cost-header', n_clicks=0),
 
                     html.Th([html.I(className="fa-solid fa-truck fa-tag", style={'font-size': '16px'}), "  FDP",
                              html.Span(id='delivery-arrow', className="fa fa-sort ms-2"), ],
                             style={'text-align': 'center'}, id='delivery-header', n_clicks=0),
 
                 ])
-            , id='table-header'), # Apply spinner only to the tbody
-                    html.Tbody(id='cheapest-offer-table-body'),
+                , id='table-header'),  # Apply spinner only to the tbody
+            html.Tbody(id='cheapest-offer-table-body'),
         ], bordered=True, hover=True, responsive=True, striped=True, dark=True),
 
 
@@ -395,7 +493,6 @@ def serve_layout():
 
     ],  color="gold", type="border", spinner_style={"position": "absolute", "top": "3em"}),
     ])
-
 
 @app.callback(
     Output('cheapest-offer-table-body', 'children'),
@@ -438,6 +535,7 @@ def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_
         'source-arrow': "fa fa-sort ms-2",
         'name-arrow': "fa fa-sort ms-2",
         'premium-arrow': "fa fa-sort ms-2",
+        'ppc-arrow': "fa fa-sort ms-2",
         'quantity-arrow': "fa fa-sort ms-2",
         'total_cost-arrow': "fa fa-sort ms-2",
         'delivery-arrow': "fa fa-sort ms-2"
@@ -453,9 +551,9 @@ def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_
         elif triggered_id == 'premium-header':
             column_index = 2
             sort_key = 'premium'
-        elif triggered_id == 'quantity-header':
+        elif triggered_id == 'ppc-header':
             column_index = 3
-            sort_key = 'quantity'
+            sort_key = 'ppc'
         elif triggered_id == 'quantity-header':
             column_index = 4
             sort_key = 'quantity'
@@ -551,7 +649,12 @@ def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_
 
         budget_min, budget_max = budget_range
 
+        total_count = len(items_df)
+        total_processed_count = 0
+
         for q_max in reversed(range(1,quantity+1)):
+            if total_count <= total_processed_count:
+                break
             df_copy = items_df.copy()
 
             def calculate_premiums(x, q_max):
@@ -581,7 +684,7 @@ def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_
                 total_quantity = row['quantity'] * int(row['premium_index'] + 1) if row['minimum'] == 1 else int(row['premium_index'] + 1) * quantity
                 total_cost = (spot_cost  + (row['buy_premiums']  / 100.0)*spot_cost) * total_quantity
                 # Check if the offer meets the budget
-                if (row['name'], row['source']) not in seen_offers and budget_min <= total_cost <= budget_max and quantity >= row['minimum'] :#and quantity >= total_quantity :
+                if row['id'] not in seen_offers and budget_min <= total_cost <= budget_max and quantity >= row['minimum'] :#and quantity >= total_quantity :
                     ppc = (spot_cost + (row['buy_premiums'] / 100.0) * spot_cost)
                     cheapest_offers.append({
                         'name': row['name'].upper(),
@@ -592,7 +695,8 @@ def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_
                         'delivery_fees': get_price(row['delivery_fees'],total_cost),
                         'total_cost': total_cost
                     })
-                    seen_offers.add((row['name'], row['source']))
+                    seen_offers.add(row['id'])
+                    total_count += 1
 
             # Sort offers by premium (lowest first)
             cheapest_offers.sort(key=lambda x: x['premium'])
@@ -624,6 +728,7 @@ def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_
                 html.Tr([
                     html.Td(DEBUG_icon, style={'text-align': 'center'}),
                     html.Td("Veuillez augmenter votre budget pour voir les offres."),
+                    html.Td(DEBUG_icon, style={'text-align': 'center'}),
                     html.Td(DEBUG_icon, style={'text-align': 'center'}),
                     html.Td(DEBUG_icon, style={'text-align': 'center'}),
                     html.Td(DEBUG_icon, style={'text-align': 'center'}),
@@ -707,50 +812,7 @@ app.clientside_callback(
     Input("tawk-to-widget", "n_clicks"),
 )
 
-def get_price(ranges, quantity):
-    """
-    Calculates the price based on the quantity and given ranges.
-
-    Args:
-    ranges: A string of ranges in the format '1-9;10-48;49-98;99-9999999999.9'.
-    quantity: The quantity of the item.
-
-    Returns:
-    The price as a float.
-    """
-    ranges = ranges.split(';')
-    for r in ranges:
-        try :
-            lower, upper, price = map(float, r.split('-'))
-        except ValueError as e:
-            print(ranges)
-            print(r,lower, upper, price)
-            raise Exception
-        if lower <= quantity < upper:
-            return price  # Return the price directly
-    return None  # Or handle the case where quantity is outside all ranges
-
-def get_country_flag_image(country_code):
-    """
-    Generates an HTML img tag for a country flag image from a 2-letter country code.
-    Uses images from the provided URL with the format "https://hatscripts.github.io/circle-flags/flags/{code}.svg".
-    """
-    if len(country_code) == 2:
-        return html.Img(
-            src=f"/assets/{country_code.lower()}.svg",  # Use assets folder
-            alt=country_code,
-            style={'width': '20px', 'margin-right': '5px'}
-        )
-    else:
-        return ""
-
 with app.server.app_context():
-    # db.init_app(server)
-    # db.create_all()
-
-    # Simplified layout and callback
-    app.layout = serve_layout()
-
     results = MetalPrice.get_previous_price('or')
     metal_prices_df = pd.DataFrame(results)
 
@@ -765,7 +827,7 @@ with app.server.app_context():
     or_options_quick_filter = [
                                   {'label': html.Span(
                                       [get_country_flag_image('fr'), "Toutes les 20 francs Napoléon d'Or"]),
-                                   'value': 'or - 20 francs fr *'},
+                                      'value': 'or - 20 francs fr *'},
                                   {'label': html.Span([get_country_flag_image('fr'), "Toutes les 5 francs"]),
                                    'value': 'or - 5 francs fr *'},
                                   {'label': html.Span([get_country_flag_image('fr'), "Toutes les 10 francs"]),
@@ -806,6 +868,7 @@ with app.server.app_context():
 
     results = Item.get_items_by_bullion_type_and_quantity('ar', session_id, 1)
     items_df = pd.DataFrame(results).copy()
+    print(items_df)
     items_df.drop_duplicates(subset=['name'], inplace=True)
     items_df.sort_values(by='name', inplace=True)
     ar_options_quick_filter = [
