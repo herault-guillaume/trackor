@@ -271,7 +271,7 @@ with app.server.app_context():
 #                          dismissable=True,
 #                          fade=True,
 #                          className="mt-4"
-#                          ), serve_layout()  # No alert on successful login
+#                          ), serve_dashboard()  # No alert on successful login
 #     else:
 #         return dbc.Alert("Identifiants invalides.",
 #                          is_open=True,

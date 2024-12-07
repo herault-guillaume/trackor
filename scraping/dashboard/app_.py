@@ -1,24 +1,22 @@
 from dotenv import load_dotenv
 load_dotenv()
-import cProfile
-import pstats
 
 from scraping.dashboard.pieces import weights
 
 import os
 import pandas as pd
+import numpy as np
 import sshtunnel
 import pytz
 import datetime
 
+from sqlalchemy import func
 import dash
 from dash import dcc, html, Input, Output, State, callback_context
 import dash_bootstrap_components as dbc
 
 from flask import Flask, request, session, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
-import pytz
-import datetime
 
 server = Flask(__name__)
 
@@ -42,6 +40,8 @@ def create_tunnel():
 
 tunnel = create_tunnel()
 tunnel.start()
+
+### DATABASE CONNECTION AND MODELS #####################################################################################
 
 # Configuration using environment variables
 server.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI').format(tunnel.local_bind_port)
@@ -169,6 +169,7 @@ class UserChoice(db.Model):
     bullion_type = db.Column(db.String(2))
     selected_coins = db.Column(db.JSON)  # Store selected coins as JSON
 
+#### INSTANCE OF DASH APP ##############################################################################################
 
 app = dash.Dash(__name__,
                 server=server,
@@ -188,24 +189,8 @@ app = dash.Dash(__name__,
                      "content": "pièces d'investissement, or, argent, lingots, achat, vente, bullion, investissement, métaux précieux"},
                 ]
             )
-# Define the navigation bar
-navbar = dbc.NavbarSimple(
-    children=[
-        dbc.NavItem(dbc.NavLink("Tableau de bord", href="/", id="nav-home")),
-        dbc.NavItem(dbc.NavLink("Guide d'investissement", href="/guide", id="nav-guide")),
-        dbc.NavItem(dbc.NavLink("Analyse Napoléon d'Or", href="/analyses", id="nav-analyse")),
-        dbc.NavItem(dbc.NavLink("FAQ", href="/faq", id="nav-faq")),
-        dbc.NavItem(dbc.NavLink("Qui suis je ?", href="/news", id="nav-whoami")),
-        # Add more navigation items as needed
-    ],
-    brand="",  # Your app's brand name
-    brand_href="/",  # Link for the brand name
-    color="dark",  # Background color
-    dark=True,  # Use dark text color
-    className="mb-4",  # Add margin-bottom for spacing
-    style={"padding-top": "0","padding-bottom": "0"},  # Add margin-bottom for spacing
-)
 
+#### UTILS #############################################################################################################
 def get_price(ranges, quantity):
     """
     Calculates the price based on the quantity and given ranges.
@@ -243,31 +228,77 @@ def get_country_flag_image(country_code):
     else:
         return ""
 
+#### NAVIGATION ########################################################################################################
+# Define the navigation bar
+navbar = dbc.NavbarSimple(
+    children=[
+        dbc.NavItem(dbc.NavLink("Tableau de bord", href="/", id="nav-home")),
+        dbc.NavItem(dbc.NavLink("Analyse Prime Napoléon d'Or", href="/analyse-prime-napoleon-d-or", id="nav-analyse")),
+        dbc.NavItem(dbc.NavLink("FAQ", href="/faq", id="nav-faq")),
+        dbc.NavItem(dbc.NavLink("Qui suis je ?", href="/qui-suis-je", id="nav-whoami")),
+        # Add more navigation items as needed
+    ],
+    brand="",  # Your app's brand name
+    brand_href="/",  # Link for the brand name
+    color="dark",  # Background color
+    dark=True,  # Use dark text color
+    className="mb-4",  # Add margin-bottom for spacing
+    style={"padding-top": "0","padding-bottom": "0"},  # Add margin-bottom for spacing
+)
+
+footer = html.Div([
+            dbc.Row(
+                [
+                    dbc.Col(
+                        [
+                            dbc.Card(
+                            [
+                                dbc.CardHeader(
+                                    [
+                                        html.I(className="fa-solid fa-circle-exclamation fa-beat-fade", style={'font-size': '22px'}),
+                                        "  Bullion-sniper.fr ne donne pas de conseils en investissement.",
+
+                                    ],
+                                ),
+                                dbc.CardBody([
+                                "Nous attachons un soin particulier à créer et entretenir le présent site et à veiller à l’exactitude et à l’actualité de son contenu.",html.Br(),html.Br(), "Néanmoins, les éléments présentés dans ce site sont susceptibles de modifications fréquentes sans préavis. Bullion-sniper.fr ne garantit pas l’exactitude et l’actualité du contenu du site. Les éléments présentés Bullion-sniper.fr sont mis à disposition des utilisateurs sans aucune garantie d’aucune sorte et ne peuvent donner lieu à un quelconque droit à dédommagement.",
+                            ])], style={'text-align': 'center'}
+                            )
+                        ],
+                        width=12)
+                ], className="mb-4 mt-4"),
+
+            html.Div([
+                "2025 - Bullion-sniper.fr x ",
+                html.A("Dash ",href="https://dash.plotly.com/"),
+                html.I(className="fa-solid fa-heart fa-beat", style={'font-size': '16px', 'color' : 'red'}),], className="text-center mb-2"),
+        ], id="footer-content")
 
 app.layout = html.Div([
     dcc.Location(id='url', refresh=False),
     navbar,
     dbc.Container(id="page-content", fluid=True),
+    footer,
 ])
 
 @app.callback(Output("page-content", "children"),
               [Input("nav-home", "n_clicks"),
-               Input("nav-guide", "n_clicks"),
+               Input("nav-analyse", "n_clicks"),
                Input("nav-whoami", "n_clicks"),
                Input("nav-faq", "n_clicks")],
               [State("url", "pathname")])  # Include the current pathname as state
 
-def render_page_content(n_clicks_home, n_clicks_guide, n_clicks_news, n_clicks_faq, pathname):
+def render_page_content(n_clicks_home, n_clicks_analyse, n_clicks_whoami, n_clicks_faq, pathname):
     ctx = callback_context
     if not ctx.triggered:  # Handle initial load
-        return serve_layout()
+        return serve_dashboard()
 
     triggered_id, _ = ctx.triggered[0]['prop_id'].split('.')
 
     if triggered_id == "nav-home":
-        return serve_layout()
-    elif triggered_id == "nav-guide":
-        return 'guide_page_content'
+        return serve_dashboard()
+    elif triggered_id == "nav-analyse":
+        return serve_analysis()
     elif triggered_id == "nav-whoami":
         return 'news_page_content'
     elif triggered_id == "nav-faq":
@@ -282,7 +313,8 @@ def render_page_content(n_clicks_home, n_clicks_guide, n_clicks_news, n_clicks_f
 def serve_ads_txt():
     return send_from_directory(server.root_path, 'assets/ads.txt')
 
-def serve_layout():
+#### DASHBOARD #########################################################################################################
+def serve_dashboard():
     return dbc.Container([
         html.Div([
     dcc.Location(id='url', refresh=True),
@@ -465,34 +497,10 @@ def serve_layout():
         n_intervals=0
     ),
 
-    dbc.Row(
-        [
-            dbc.Col(
-                [
-                    dbc.Card(
-                    [
-                        dbc.CardHeader(
-                            [
-                                html.I(className="fa-solid fa-circle-exclamation fa-beat-fade", style={'font-size': '22px'}),
-                                "  Bullion-sniper.fr ne donne pas de conseils en investissement.",
-
-                            ],
-                        ),
-                        dbc.CardBody([
-                        "Nous attachons un soin particulier à créer et entretenir le présent site et à veiller à l’exactitude et à l’actualité de son contenu.",html.Br(),html.Br(), "Néanmoins, les éléments présentés dans ce site sont susceptibles de modifications fréquentes sans préavis. Bullion-sniper.fr ne garantit pas l’exactitude et l’actualité du contenu du site. Les éléments présentés Bullion-sniper.fr sont mis à disposition des utilisateurs sans aucune garantie d’aucune sorte et ne peuvent donner lieu à un quelconque droit à dédommagement.",
-                    ])], style={'text-align': 'center'}
-                    )
-                ],
-                width=12)
-        ], className="mb-4 mt-4"),
-
-    html.Div([
-        "2025 - Bullion-sniper.fr x ",
-        html.A("Dash ",href="https://dash.plotly.com/"),
-        html.I(className="fa-solid fa-heart fa-beat", style={'font-size': '16px', 'color' : 'red'}),], className="text-center mb-2"),  # Add a div to display the last update info
-
     ],  color="gold", type="border", spinner_style={"position": "absolute", "top": "3em"}),
     ])
+
+#### DASHBOARD CALLBACKS ###############################################################################################
 
 @app.callback(
     Output('cheapest-offer-table-body', 'children'),
@@ -746,7 +754,7 @@ def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_
                 arrow_classNames['delivery-arrow'],
                 )
 
-
+########################################################################################################################
 @app.callback(
     Output('piece-dropdown', 'options'),
     Output('piece-dropdown', 'value'),
@@ -791,6 +799,8 @@ def update_metal_price(bullion_type_switch, n):
     )
     return current_table
 
+########################################################################################################################
+
 app.clientside_callback(
         """
         function(n_clicks) {
@@ -811,6 +821,8 @@ app.clientside_callback(
     Output("tawk-to-widget", "children"),
     Input("tawk-to-widget", "n_clicks"),
 )
+
+########################################################################################################################
 
 with app.server.app_context():
     results = MetalPrice.get_previous_price('or')
@@ -891,6 +903,122 @@ with app.server.app_context():
                                   {'label': "Toutes les 1 Oz", 'value': 'ar - 1 oz *'},
                               ] + [{'label': html.Span(row['name'][4:].upper()), 'value': row['name']} for _, row in
                                    items_df.iterrows()]
+
+
+########################################################################################################################
+
+
+
+# ... (your Dash app code)
+def serve_analysis():
+
+    return html.Div([
+        dbc.Row([
+            dbc.Col(
+                dcc.Dropdown(
+                    id='napoleon-type-dropdown',
+                    options=[
+                        {'label': "Tous les 20 Francs Or", 'value': 'all'},
+                        # Add other specific 20 Francs Or types here
+                        {'label': "Marianne Coq", 'value': 'Marianne Coq'},
+                        # ...
+                    ],
+                    value='all',  # Default value
+                    clearable=False,
+                    style={'width': '100%', 'color': 'black', 'text-align': 'center'}
+                ),
+                width=6,  # Adjust width as needed
+            ),
+        ]),
+
+    ])
+
+@app.callback(
+    Output("cross-platform-analysis-graph", "figure"),
+    [Input("url", "pathname"),
+     Input("napoleon-type-dropdown", "value")]
+)
+def update_cross_platform_analysis(pathname, napoleon_type):
+    if pathname == "/analyses":
+
+        # 1. Construct the filter condition based on dropdown selection
+        if napoleon_type == 'all':
+            name_filter = Item.name.like('or - 20 francs fr%')
+        else:
+            name_filter = Item.name.like(f'or - 20 francs fr {napoleon_type}%')
+
+        # 2. Fetch data using SQLAlchemy ORM with the filter
+        results = (
+            db.session.query(
+                func.DATE_FORMAT(Item.timestamp, '%Y-%m').label('month'),
+                Item.source,
+                Item.buy_premiums
+            )
+            .filter(name_filter)
+            .group_by('month', Item.source)
+            .all()
+        )
+
+        df = pd.DataFrame(results, columns=['month', 'source', 'buy_premiums'])
+
+        # 3. Pre-process the 'buy_premiums' column
+        df['buy_premiums'] = df['buy_premiums'].apply(lambda x: [float(i) for i in x.split(';')][:5])
+
+        # 4. Calculate the standard deviation for each stack size (1 to 5) without NumPy
+        def calculate_std_dev_for_stacks(row):
+            premiums_list = row['buy_premiums']
+            std_devs = []
+            for stack_size in range(1, 6):
+                stack_premiums = premiums_list[:stack_size]
+                mean = sum(stack_premiums) / len(stack_premiums)
+                variance = sum([(x - mean) ** 2 for x in stack_premiums]) / len(stack_premiums)
+                std_dev = variance ** 0.5
+                std_devs.append(std_dev)
+            return pd.Series(std_devs)
+
+        df[[f'stack_{i}' for i in range(1, 6)]] = df.apply(calculate_std_dev_for_stacks, axis=1)
+
+        # 5. Melt the DataFrame to long format for Dash
+        df_melted = df.melt(
+            id_vars=['month', 'source'],
+            value_vars=[f'stack_{i}' for i in range(1, 6)],
+            var_name='stack_size',
+            value_name='std_dev'
+        )
+        df_melted['stack_size'] = df_melted['stack_size'].str.replace('stack_', '').astype(int)
+
+        # 6. Create the chart using dash-core-components (dcc.Graph)
+        fig = {
+            'data': [
+                {
+                    'x': df_melted[df_melted['source'] == source]['stack_size'],
+                    'y': df_melted[df_melted['source'] == source]['std_dev'],
+                    'type': 'line',
+                    'name': source,
+                } for source in df_melted['source'].unique()
+            ],
+            'layout': {
+                'title': "Cross-Platform Premium Deviation Analysis for 20 Francs Napoléon (First 5)",
+                'xaxis': {'title': 'Stack Size'},
+                'yaxis': {'title': 'Standard Deviation (%)'},
+            },
+            'frames': [
+                {
+                    'name': month,
+                    'data': [
+                        {
+                            'x': df_melted[(df_melted['source'] == source) & (df_melted['month'] == month)]['stack_size'],
+                            'y': df_melted[(df_melted['source'] == source) & (df_melted['month'] == month)]['std_dev'],
+                        } for source in df_melted['source'].unique()
+                    ]
+                } for month in df_melted['month'].unique()
+            ]
+        }
+
+        return fig
+
+    else:
+        return {}
 
 if __name__ == '__main__':
 
