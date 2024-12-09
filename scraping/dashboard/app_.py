@@ -880,7 +880,7 @@ with app.server.app_context():
 
     results = Item.get_items_by_bullion_type_and_quantity('ar', session_id, 1)
     items_df = pd.DataFrame(results).copy()
-    print(items_df)
+
     items_df.drop_duplicates(subset=['name'], inplace=True)
     items_df.sort_values(by='name', inplace=True)
     ar_options_quick_filter = [
