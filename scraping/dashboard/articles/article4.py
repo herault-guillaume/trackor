@@ -129,17 +129,18 @@ def layout():
                 ),
 
                 html.Ul([
-                    html.Li(
+                    html.Li(className="mt-3", children=[
+                        html.Span("États-Unis : ", className="fw-bold"),
                         "États-Unis: Aborder brièvement les impôts sur les plus-values des métaux précieux, en distinguant les détentions à long terme et à court terme. Mentionner les implications fiscales des comptes d'épargne-retraite en or (Gold IRA)."
-                    ),
-                    html.Li(
+                    ]),
+                    html.Li(className="mt-3", children=[
+                        html.Span("Royaume-Uni : ", className="fw-bold"),
                         "Royaume-Uni: Aborder l'impôt sur les plus-values (Capital Gains Tax) sur les métaux précieux, en mentionnant les exemptions et abattements potentiels. Discuter brièvement de la TVA sur l'argent et l'or.",
-                        className="mt-3"
-                    ),
-                    html.Li(
-                        "Allemagne: Aborder brièvement le traitement fiscal des métaux précieux, y compris la TVA sur les lingots d'argent et les exemptions potentielles pour l'or d'investissement.",
-                        className="mt-3"
-                    ),
+                    ]),
+                    html.Li(className="mt-3", children=[
+                        html.Span("Allemagne : ", className="fw-bold"),
+                        "Aborder brièvement le traitement fiscal des métaux précieux, y compris la TVA sur les lingots d'argent et les exemptions potentielles pour l'or d'investissement.",
+                    ]),
                 ], className="list-unstyled"),
 
                 html.H2("Pièges fiscaux courants à éviter", className="display-6 mt-5 mb-4 fw-bold"),

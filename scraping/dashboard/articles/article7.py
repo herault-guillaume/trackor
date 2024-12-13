@@ -24,10 +24,11 @@ def layout():
                     html.Li(
                         "L'ancrage des prix fait référence à la tendance à se fier trop lourdement à la première information reçue (l'\"ancre\") lors de la prise de décisions, même si cette information n'est pas pertinente ou est obsolète. Dans le contexte des métaux précieux, un investisseur pourrait se fixer sur le prix de l'or lorsqu'il a commencé à envisager d'investir, par exemple, 1500€ l'once. Si le prix monte ensuite à 1900€, il pourrait résister à l'achat, le percevant comme «cher», même si les fondamentaux du marché justifient le prix plus élevé."
                     ),
-                    html.Li(
-                        "Surmonter l'ancrage des prix : Soyez conscient de ce biais et recherchez activement diverses sources d'information et d'analyse. Concentrez-vous sur les facteurs fondamentaux, tels que la dynamique de l'offre et de la demande, les indicateurs économiques et les événements géopolitiques, plutôt que de vous fier uniquement aux prix passés. Menez des recherches approfondies et évaluez de manière critique les tendances du marché pour prendre des décisions objectives.",
-                        className="mt-3"
-                    ),
+                    html.Li(className="mt-3", children=[
+                        html.Span("Surmonter l'ancrage des prix : ", className="fw-bold"),
+                        "Soyez conscient de ce biais et recherchez activement diverses sources d'information et d'analyse. Concentrez-vous sur les facteurs fondamentaux, tels que la dynamique de l'offre et de la demande, les indicateurs économiques et les événements géopolitiques, plutôt que de vous fier uniquement aux prix passés. Menez des recherches approfondies et évaluez de manière critique les tendances du marché pour prendre des décisions objectives.",
+
+                    ]),
                 ], className="list-unstyled"),
 
                 html.H3("Aversion aux pertes", className="display-7 mt-4 mb-3 fw-bold"),
@@ -36,10 +37,10 @@ def layout():
                     html.Li(
                         "L'aversion aux pertes fait référence au principe psychologique selon lequel la douleur d'une perte est ressentie plus fortement que le plaisir d'un gain équivalent. Ce biais peut amener les investisseurs à conserver des positions perdantes trop longtemps, dans l'espoir d'éviter de réaliser une perte, ou à vendre des positions gagnantes trop tôt, par crainte d'une baisse potentielle des prix et du regret associé. Dans le domaine des métaux précieux, un investisseur pourrait conserver une action minière d'argent en baisse, en espérant qu'elle retrouvera son prix précédent, même s'il existe des preuves solides suggérant une nouvelle baisse."
                     ),
-                    html.Li(
-                        "Surmonter l'aversion aux pertes : Établissez des stratégies de sortie claires et des niveaux de tolérance au risque avant de faire tout investissement. Utilisez des ordres stop-loss pour limiter les pertes potentielles et éviter la prise de décision émotionnelle pendant les baisses du marché. Concentrez-vous sur la performance globale du portefeuille et les objectifs à long terme, plutôt que de vous fixer sur les gains ou les pertes individuels.",
-                        className="mt-3"
-                    ),
+                    html.Li(className="mt-3", children=[
+                        html.Span("Surmonter l'aversion aux pertes : ", className="fw-bold"),
+                        "Établissez des stratégies de sortie claires et des niveaux de tolérance au risque avant de faire tout investissement. Utilisez des ordres stop-loss pour limiter les pertes potentielles et éviter la prise de décision émotionnelle pendant les baisses du marché. Concentrez-vous sur la performance globale du portefeuille et les objectifs à long terme, plutôt que de vous fixer sur les gains ou les pertes individuels.",
+                    ]),
                 ], className="list-unstyled"),
 
                 html.H3("Le sophisme des coûts irrécupérables", className="display-7 mt-4 mb-3 fw-bold"),
@@ -48,10 +49,10 @@ def layout():
                     html.Li(
                         "Le sophisme des coûts irrécupérables est la tendance à continuer d'investir dans une entreprise perdante en raison du temps, de l'argent ou des efforts déjà investis, quelles que soient ses perspectives d'avenir. Ce biais peut piéger les investisseurs dans un cycle où ils jettent de l'argent par les fenêtres. Par exemple, un investisseur qui a passé beaucoup de temps à rechercher une société minière d'or particulière pourrait continuer à investir dans ses actions, même si la performance de l'entreprise se détériore et que les perspectives du marché deviennent négatives."
                     ),
-                    html.Li(
-                        "Surmonter le sophisme des coûts irrécupérables : Reconnaissez que les investissements passés sont des coûts irrécupérables et ne doivent pas influencer les décisions futures. Évaluez objectivement la situation actuelle et les perspectives d'avenir de tout investissement, quels que soient les engagements passés. Soyez prêt à réduire vos pertes et à passer à des opportunités plus prometteuses.",
-                        className="mt-3"
-                    ),
+                    html.Li(className="mt-3", children=[
+                        html.Span("Surmonter le sophisme des coûts irrécupérables : ", className="fw-bold"),
+                        "Reconnaissez que les investissements passés sont des coûts irrécupérables et ne doivent pas influencer les décisions futures. Évaluez objectivement la situation actuelle et les perspectives d'avenir de tout investissement, quels que soient les engagements passés. Soyez prêt à réduire vos pertes et à passer à des opportunités plus prometteuses.",
+                    ]),
                 ], className="list-unstyled"),
 
                 html.H2("Comment les biais conduisent à des choix sous-optimaux : Une analyse pratique",
@@ -127,10 +128,10 @@ def layout():
                     html.Li(
                         "La peur de perdre de l'argent est une émotion humaine naturelle, surtout pendant les baisses du marché. Une peur excessive peut conduire à des ventes paniquées, obligeant les investisseurs à enregistrer des pertes et à manquer des gains futurs potentiels."
                     ),
-                    html.Li(
-                        "Gérer la peur : Comprenez votre tolérance au risque et investissez en conséquence. Diversifiez votre portefeuille pour réduire le risque global. Concentrez-vous sur vos objectifs d'investissement à long terme et évitez de prendre des décisions impulsives basées sur les fluctuations à court terme du marché.",
-                        className="mt-3"
-                    ),
+                    html.Li(className="mt-3", children=[
+                        html.Span("Gérer la peur : ", className="fw-bold"),
+                        "Comprenez votre tolérance au risque et investissez en conséquence. Diversifiez votre portefeuille pour réduire le risque global. Concentrez-vous sur vos objectifs d'investissement à long terme et évitez de prendre des décisions impulsives basées sur les fluctuations à court terme du marché.",
+                    ]),
                 ], className="list-unstyled"),
 
                 html.H3("Cupidité", className="display-7 mt-4 mb-3 fw-bold"),
@@ -139,10 +140,10 @@ def layout():
                     html.Li(
                         "La cupidité, ou le désir de gains excessifs, peut conduire à prendre des risques inutiles et à rechercher des investissements spéculatifs. Cela peut être particulièrement tentant sur le marché des métaux précieux, où les histoires d'appréciation rapide des prix peuvent alimenter des attentes irréalistes."
                     ),
-                    html.Li(
-                        "Gérer la cupidité : Fixez-vous des objectifs d'investissement réalistes et évitez la tentation de rechercher des richesses rapides. Concentrez-vous sur la construction d'un portefeuille diversifié qui équilibre le risque et le rendement. N'oubliez pas que la préservation du patrimoine est un marathon, pas un sprint.",
-                        className="mt-3"
-                    ),
+                    html.Li(className="mt-3", children=[
+                        html.Span("Gérer la cupidité : ", className="fw-bold"),
+                        "Fixez-vous des objectifs d'investissement réalistes et évitez la tentation de rechercher des richesses rapides. Concentrez-vous sur la construction d'un portefeuille diversifié qui équilibre le risque et le rendement. N'oubliez pas que la préservation du patrimoine est un marathon, pas un sprint.",
+                    ]),
                 ], className="list-unstyled"),
 
                 html.H3("Regret", className="display-7 mt-4 mb-3 fw-bold"),
@@ -151,10 +152,10 @@ def layout():
                     html.Li(
                         "Le regret est l'émotion négative associée à une mauvaise décision d'investissement. Il peut conduire à l'auto-accusation, à la frustration et à une réticence à prendre des décisions d'investissement futures."
                     ),
-                    html.Li(
-                        "Gérer le regret : Apprenez de vos erreurs et considérez-les comme des expériences d'apprentissage précieuses. Ne vous attardez pas sur les décisions passées. Concentrez-vous sur des choix éclairés pour l'avenir et n'oubliez pas que chaque investisseur commet des erreurs à un moment donné.",
-                        className="mt-3"
-                    ),
+                    html.Li(className="mt-3", children=[
+                        html.Span("Gérer le regret : ", className="fw-bold"),
+                        "Apprenez de vos erreurs et considérez-les comme des expériences d'apprentissage précieuses. Ne vous attardez pas sur les décisions passées. Concentrez-vous sur des choix éclairés pour l'avenir et n'oubliez pas que chaque investisseur commet des erreurs à un moment donné.",
+                    ]),
                 ], className="list-unstyled"),
 
                 html.H2("Discipline et patience : Les clés du succès à long terme",
@@ -165,9 +166,10 @@ def layout():
                 ),
 
                 html.Ul([
-                    html.Li(
-                        "Discipline : Respectez votre plan d'investissement, même pendant les périodes de volatilité du marché. Évitez de prendre des décisions émotionnelles basées sur la peur ou la cupidité. Revoyez et rééquilibrez régulièrement votre portefeuille en fonction de votre plan, mais évitez les transactions impulsives."
-                    ),
+                    html.Li(className="mt-3", children=[
+                        html.Span("Discipline : ", className="fw-bold"),
+                        "Respectez votre plan d'investissement, même pendant les périodes de volatilité du marché. Évitez de prendre des décisions émotionnelles basées sur la peur ou la cupidité. Revoyez et rééquilibrez régulièrement votre portefeuille en fonction de votre plan, mais évitez les transactions impulsives."
+                    ]),
                     html.Li(
                         "Patience : Investir dans les métaux précieux, en particulier l'or ou l'argent physique comme couverture à long terme, exige de la patience. Ne vous attendez pas à devenir riche rapidement. Les prix des métaux précieux peuvent fluctuer considérablement à court terme, mais leur proposition de valeur à long terme réside dans leur capacité à préserver le patrimoine et à fournir une stabilité en période d'incertitude économique. Évitez de vous décourager par les fluctuations de prix à court terme et maintenez une vision à long terme.",
                         className="mt-3"
