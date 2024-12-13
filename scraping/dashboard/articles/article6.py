@@ -1,211 +1,245 @@
-from dash import html
-from dash import dcc
+from dash import html, dcc
+import dash_bootstrap_components as dbc
 
 def layout():
-    return html.Div(children=[
-    html.H1(children="Achat de métaux précieux physique: les notions de bases"),
+    return dbc.Container(fluid=True, children=[
+        dbc.Row(justify="center", children=[
+            dbc.Col(lg=10, children=[
+                html.H1("Sécurité et stockage des métaux précieux : Protéger votre investissement", className="display-4 text-center mb-4 fw-bold"),
 
-    html.P(children="""Le marché des métaux précieux, englobant l'or, l'argent, le platine et le palladium, 
-    offre un paysage d'investissement unique aux investisseurs avertis. Bien que souvent présentés comme une 
-    valeur refuge et une protection contre l'inflation, naviguer sur ce marché exige une compréhension 
-    nuancée de ses complexités."""),
+                html.P(
+                    "L'acquisition de métaux précieux implique un engagement financier important. Par conséquent, il est primordial d'assurer la sécurité et le stockage adéquat de ces actifs. Qu'il s'agisse d'or, d'argent, de platine ou d'autres métaux précieux, les investisseurs doivent examiner attentivement les différentes options de stockage, évaluer les risques potentiels et mettre en œuvre des mesures de sécurité robustes pour protéger leur investissement. Cet article fournit un guide complet sur les solutions de stockage sécurisé, les stratégies d'atténuation des risques et les options d'assurance pour préserver la valeur et l'intégrité des avoirs en métaux précieux.",
+                    className="lead"
+                ),
 
-    html.H2(children="I. S'approvisionner en métaux précieux : Professionnels vs. Particuliers vs. Places de marché en ligne"),
+                html.H2("Options de stockage sécurisé pour les métaux précieux : Un guide complet", className="display-6 mt-5 mb-4 fw-bold"),
 
-    html.P(children="""Une décision fondamentale pour tout investisseur en métaux précieux est de savoir où 
-    acquérir ses actifs. Chaque source - négociants professionnels, particuliers et places de marché en 
-    ligne - présente ses propres avantages et inconvénients, exigeant un examen attentif."""),
+                html.P(
+                    "Il existe plusieurs options de stockage, chacune ayant ses propres avantages et inconvénients en termes de coût, de sécurité, d'accessibilité et de discrétion."
+                ),
 
-    html.H3(children="A. Négociants professionnels :"),
+                html.H3("Stockage à domicile", className="display-7 mt-4 mb-3 fw-bold"),
 
-    html.Ul(children=[
-        html.Li(children="""Authenticité et fiabilité : Les négociants réputés garantissent l'authenticité de 
-        leurs produits, atténuant drastiquement le risque de contrefaçons. Les professionnels sont eux même 
-        exposés à ce risque : cette concurrence déloyale des « faux » est devenue une préoccupation majeure 
-        sur le marché des métaux précieux. Ils fournissent souvent des certificats d'authenticité et des 
-        informations détaillées sur les produits, renforçant la transparence et la confiance. Les négociants 
-        établis ont une réputation à défendre et sont incités à maintenir des normes élevées. Certains 
-        professionnels vont même jusqu’à frapper leur propre pièce afin d’y ajouter une empreinte 
-        difficilement falsifiable et/ou s’appuie sur une technologie de type blockchain afin d’enregistrer 
-        la transaction et limiter le risque de falsification informatique."""),
-        html.Li(children="""Gamme de produits et services : Les négociants professionnels offrent généralement 
-        une sélection diversifiée de produits en lingots et des pièces, avec des stocks plus élevés que chez 
-        les particulier, de différentes tailles et poids. Ils peuvent également fournir des services 
-        supplémentaires tels que le stockage sécurisé, des programmes de rachat et des conseils d'experts."""),
-        html.Li(children="""Recours juridique : Les transactions avec des négociants professionnels sont 
-        généralement documentées avec des factures et des reçus, offrant un recours juridique en cas de 
-        litige ou de divergence. Ceci est crucial pour les déclarations fiscales, les réclamations 
-        d'assurance, la gestion d’un héritage.""")
-    ]),
+                html.Ul([
+                    html.Li(
+                        "Coffres-forts à domicile : Un coffre-fort robuste, correctement installé et fixé à la structure du bâtiment, peut offrir un bon niveau de protection contre le vol. Choisissez un coffre-fort avec un indice de résistance au feu élevé pour le protéger contre les dommages causés par le feu."
+                    ),
+                    html.Li(
+                        "Cachettes : Pour les petites quantités de métaux précieux, des cachettes discrètes dans la maison peuvent fournir une couche de sécurité supplémentaire. Des emplacements créatifs et bien dissimulés peuvent dissuader les voleurs opportunistes.",
+                        className="mt-3"
+                    ),
+                    html.Li(
+                        "Avantages : Contrôle direct sur les actifs, accessibilité facile, absence de frais de stockage récurrents et plus grande confidentialité.",
+                        className="mt-3"
+                    ),
+                    html.Li(
+                        "Inconvénients : Risque de vol plus élevé si le coffre-fort n'est pas correctement sécurisé ou si la cachette est découverte, vulnérabilité au feu ou aux catastrophes naturelles, et risque de perte ou de dommage accidentel. Les coffres-forts bon marché offrent une protection minimale et peuvent être facilement forcés.",
+                        className="mt-3"
+                    ),
+                ], className="list-unstyled"),
 
-    html.Ul(children=[
-        html.Li(children="""Primes un peu plus élevées : Les négociants professionnels facturent souvent des 
-        primes plus élevées que les vendeurs privés ou les places de marché en ligne. Cela est dû à leurs 
-        frais généraux, notamment la sécurité, l'assurance et le personnel."""),
-        html.Li(children="""Négociation limitée : Les prix chez les négociants établis sont généralement 
-        fixes, laissant peu de place à la négociation.""")
-    ]),
+                html.H3("Coffres bancaires", className="display-7 mt-4 mb-3 fw-bold"),
 
-    html.H3(children="B. Particuliers :"),
+                html.Ul([
+                    html.Li(
+                        "Les coffres bancaires dans des banques réputées offrent une solution de stockage hors site sécurisée. Les banques disposent généralement de mesures de sécurité robustes, notamment des coffres-forts, des alarmes et des systèmes de surveillance. Certaines banques offrent une assurance pour le contenu des coffres, mais les limitations de couverture et les conditions spécifiques doivent être examinées attentivement."
+                    ),
+                    html.Li(
+                        "Avantages : Sécurité renforcée par rapport au stockage à domicile, protection contre le feu et les catastrophes naturelles (dans les limites des paramètres de sécurité de la banque) et tranquillité d'esprit en sachant que les actifs sont stockés dans un environnement géré par des professionnels.",
+                        className="mt-3"
+                    ),
+                    html.Li(
+                        "Inconvénients : Frais de location récurrents, accessibilité limitée aux heures d'ouverture des banques, restrictions potentielles d'accès pendant les crises financières ou les jours fériés, et moins de confidentialité par rapport au stockage à domicile. De plus, le contenu des coffres bancaires n'est généralement pas couvert par l'assurance-dépôts (ou un système d'assurance-dépôts équivalent).",
+                        className="mt-3"
+                    ),
+                ], className="list-unstyled"),
 
-    html.Ul(children=[
-        html.Li(children="""Potentiel de prix plus bas : Acheter auprès de particuliers, souvent par le biais 
-        de réseaux locaux ou de petites annonces, peut permettre d'obtenir des prix et des primes plus bas 
-        que chez les négociants professionnels. Les vendeurs peuvent être motivés à liquider rapidement 
-        leurs actifs ou ne pas être pleinement conscients de la valeur marchande actuelle. Les annonces ne 
-        sont pas actualisées en effet aussi régulièrement que chez un professionnel."""),
-        html.Li(children="""Possibilités de négociation : Les transactions privées offrent une plus grande 
-        flexibilité pour la négociation, permettant aux investisseurs avisés de conclure de meilleures 
-        affaires."""),
-        html.Li(children="""Discrétion (avec réserves) : Les ventes privées peuvent offrir un certain degré 
-        d'anonymat, bien que de plus en plus, les gouvernements surveillent les sites de petites annonces en 
-        ligne et encouragent les transactions traçables pour lutter contre le blanchiment d'argent.""")
-    ]),
+                html.H3("Coffres-forts privés et installations de stockage", className="display-7 mt-4 mb-3 fw-bold"),
 
-    html.Ul(children=[
-        html.Li(children="""Risque accru de contrefaçons : Le risque d'acquérir des produits contrefaits est 
-        considérablement plus élevé lorsqu'on traite avec des particuliers. L'authentification devient la 
-        seule responsabilité de l'acheteur."""),
-        html.Li(children="""Préoccupations en matière de sécurité : Rencontrer des étrangers pour effectuer 
-        des transactions peut présenter des risques pour la sécurité. Il est essentiel de privilégier la 
-        sécurité personnelle et de choisir des lieux publics et bien éclairés pour les rencontres."""),
-        html.Li(children="""Recours limité : Les transactions privées manquent souvent de documentation 
-        formelle, ce qui rend difficile l'engagement de poursuites judiciaires en cas de fraude ou de 
-        litige.""")
-    ]),
+                html.Ul([
+                    html.Li(
+                        "Les coffres-forts privés spécialisés ou les installations de stockage sécurisé offrent le plus haut niveau de protection pour les avoirs importants en métaux précieux. Ces installations disposent de systèmes de sécurité avancés, notamment plusieurs couches de contrôle d'accès physique et électronique, des environnements à température contrôlée et des options d'assurance complètes."
+                    ),
+                    html.Li(
+                        "Avantages : Sécurité maximale, protection contre le vol, le feu et les catastrophes naturelles, protocoles de manutention et de stockage spécialisés pour les métaux précieux et possibilité de stockage séparé (vos actifs sont physiquement séparés des autres).",
+                        className="mt-3"
+                    ),
+                    html.Li(
+                        "Inconvénients : Frais de stockage les plus élevés, accès potentiellement moins pratique que le stockage à domicile ou en banque, et nécessite une diligence raisonnable approfondie pour s'assurer de la réputation et de la stabilité financière de l'installation.",
+                        className="mt-3"
+                    ),
+                ], className="list-unstyled"),
 
-    html.H3(children="C. Places de marché en ligne (eBay, Leboncoin) :"),
+                html.H2("Risques de sécurité et stratégies d'atténuation : Une discussion approfondie",
+                        className="display-6 mt-5 mb-4 fw-bold"),
 
-    html.Ul(children=[
-        html.Li(children="""Large sélection et comparaison des prix : Les places de marché en ligne donnent 
-        accès à un vaste inventaire de métaux précieux provenant de vendeurs du monde entier, permettant une 
-        comparaison complète des prix et l'identification d'articles potentiellement sous-évalués."""),
-        html.Li(children="""Commodité : Les plateformes en ligne offrent la commodité de naviguer et d'acheter 
-        de n'importe où avec une connexion Internet, éliminant le besoin de se déplacer ou de rencontrer des 
-        personnes en personne."""),
-        html.Li(children="""Potentiel d'aubaines : Les enchères en ligne ou les petites annonces peuvent 
-        générer des aubaines, en particulier pour les pièces moins courantes ou en circulation.""")
-    ]),
+                html.P(
+                    "La protection des investissements en métaux précieux nécessite une approche proactive de l'atténuation des risques."
+                ),
 
-    html.Ul(children=[
-        html.Li(children="""Risque élevé de contrefaçon : Les places de marché en ligne regorgent de 
-        produits contrefaits, nécessitant une extrême prudence et une authentification diligente. Les 
-        politiques de protection des acheteurs varient d'une plateforme à l'autre et peuvent ne pas toujours 
-        offrir un recours adéquat."""),
-        html.Li(children="""Expédition et logistique : Les frais d'expédition, l'assurance et les éventuels 
-        droits de douane peuvent ajouter considérablement au coût total, en particulier pour les achats 
-        internationaux. Les retards de livraison et les colis perdus sont des risques supplémentaires à 
-        prendre en compte."""),
-        html.Li(children="""Fiabilité du vendeur : Évaluer la fiabilité et la réputation des vendeurs en 
-        ligne peut être difficile. Il est crucial d'examiner attentivement les commentaires, les évaluations 
-        et les politiques de retour des vendeurs avant d'effectuer un achat.""")
-    ]),
-        html.H2(children="II. La prime : le B.A.-BA"),
-        html.P(children="""Les primes, la différence entre le prix au comptant et le prix d'achat réel d'un produit en métal précieux, 
-            sont un facteur critique dans l'investissement dans les métaux précieux. Comprendre les variations de primes et utiliser 
-            des stratégies avancées pour calculer et comparer les primes peut avoir un impact significatif sur le rendement des 
-            investissements."""),
-        html.H3(children="A. Calcul des primes :"),
-        html.Ul(children=[
-            html.Li(
-                children="Formule de base : Prime = (Prix d'achat - Valeur du métal fondu) / Valeur du métal fondu * 100"),
-            html.Li(children="""Facteurs affectant les primes : La rareté, l'état, la demande, les coûts de production, la marge du 
-                négociant, la tension du marché et même la taille et le type de produit (pièce vs. lingot) peuvent influencer les primes."""),
-            html.Li(children="""Considérations avancées : Le prix au comptant fluctuant, les primes variables d'un négociant à l'autre 
-                et la distinction entre les pièces de qualité investissement et les pièces de collection ajoutent de la complexité aux 
-                calculs de prime. Par exemple, une pièce rare peut avoir une prime élevée mais aussi avoir une valeur numismatique 
-                significative, qui doit être considérée séparément.""")
-        ]),
-        html.H3(children="B. Comparaison des primes :"),
-        html.Ul(children=[
-            html.Li(children="""Entre les produits : La comparaison des primes entre différents produits (par exemple, pièce d'or de 
-                1/10 oz vs. lingot d'or de 1 oz) nécessite la conversion des primes en une unité commune, telle que la prime par once de 
-                métal pur."""),
-            html.Li(children="""Entre les négociants : Une comparaison minutieuse entre plusieurs négociants, en ligne et hors ligne, 
-                est essentielle pour identifier les primes les plus compétitives."""),
-            html.Li(children="""Au fil du temps : Le suivi des tendances des primes pour le même produit au fil du temps peut fournir des 
-                informations sur la dynamique du marché et les opportunités potentielles d'achat ou de vente. Des primes en hausse 
-                pourraient suggérer une augmentation de la demande ou de la rareté, tandis que des primes en baisse pourraient indiquer un 
-                refroidissement du marché ou une offre excédentaire.""")
-        ]),
-        html.H3(children="C. Stratégies avancées :"),
-        html.Ul(children=[
-            html.Li(children="""Se concentrer sur les faibles primes (avec réserves) : En général, les investisseurs qui cherchent à 
-                maximiser leurs rendements devraient privilégier les produits avec les primes les plus basses, en particulier pour les 
-                investissements plus importants. Cependant, des primes excessivement basses pourraient soulever des inquiétudes quant à 
-                l'authenticité, en particulier sur les places de marché en ligne ou les transactions privées."""),
-            html.Li(children="""Tenir compte de la valeur numismatique : Pour les pièces de collection, la prime reflète non seulement 
-                les coûts de production mais aussi la valeur numismatique, qui peut fluctuer indépendamment du prix au comptant du métal. 
-                Les collectionneurs avertis tiennent compte de la rareté, de l'importance historique et de la demande du marché lorsqu'ils 
-                évaluent les primes numismatiques."""),
-            html.Li(children="""Tenir compte de la TVA : Dans certaines juridictions, la TVA est appliquée à certains produits en métaux 
-                précieux, ce qui a un impact significatif sur le coût total. Les investisseurs doivent tenir compte de la TVA lorsqu'ils 
-                comparent les prix et les primes, en particulier pour les lingots d'argent, qui sont souvent soumises à la TVA tandis que 
-                certaines pièces en sont exemptées.""")
-        ]),
+                html.H3("Vol", className="display-7 mt-4 mb-3 fw-bold"),
 
-        dcc.Tabs(id="articles-tabs", value='tab-1', children=[
-            dcc.Tab(label='Le Platine', value='tab-1', children=[
-                html.H2(children="III. Le platine : Une analyse détaillée pour les investisseurs avertis"),
-                html.P(children="""Le platine, souvent éclipsé par l'or et l'argent, offre une proposition d'investissement unique avec son 
-                propre ensemble de risques et de récompenses. Les investisseurs avertis doivent analyser attentivement ses utilisations 
-                industrielles, la volatilité de son prix et ses perspectives à long terme."""),
-                html.H3(children="A. Propriétés et rareté :"),
-                html.Ul(children=[
-                    html.Li(children="""Le platine est plus rare que l'or et possède des propriétés physiques et chimiques uniques, ce qui le rend 
-                    très apprécié dans diverses applications industrielles. Sa densité et son point de fusion élevés rendent la contrefaçon 
-                    extrêmement difficile.""")
-                ]),
-                html.H3(children="B. Demande industrielle et volatilité des prix :"),
-                html.Ul(children=[
-                    html.Li(children="""La majorité de la production de platine est consommée par des applications industrielles, en particulier 
-                    les convertisseurs catalytiques des automobiles. Cela rend le prix du platine fortement dépendant de la demande industrielle et 
-                    des cycles économiques. L'essor des véhicules électriques, qui ne nécessitent pas de convertisseurs catalytiques 
-                    traditionnels, pose un défi important à la demande industrielle future de platine. Cette dépendance à un seul secteur 
-                    contribue à la volatilité du prix du platine.""")
-                ]),
-                html.H3(children="C. Considérations d'investissement :"),
-                html.Ul(children=[
-                    html.Li(children="""Bien que le marché limité du platine et sa liquidité plus faible par rapport à l'or et à l'argent puissent 
-                    rendre sa revente plus difficile, il peut constituer un outil de diversification. Ses propriétés uniques et ses applications 
-                    futures potentielles dans les piles à combustible à hydrogène et d'autres technologies émergentes pourraient faire grimper 
-                    son prix à long terme.""")
-                ]),
-                html.H3(children="D. Comparaison avec l'or et l'argent :"),
-                html.Ul(children=[
-                    html.Li(children="""L'or est principalement considéré comme une valeur refuge et une protection contre l'inflation, tandis que 
-                    l'argent a des utilisations à la fois d'investissement et industrielles, ce qui le rend plus volatile que l'or. Le platine 
-                    partage certaines similitudes avec les deux métaux, offrant une certaine protection contre l'incertitude économique tout en 
-                    présentant des fluctuations de prix importantes en raison de sa demande industrielle. Le prix actuel du platine, plus bas que 
-                    celui de l'or, pourrait présenter une opportunité d'achat pour les investisseurs ayant une tolérance au risque plus élevée et un 
-                    horizon d'investissement à long terme.""")
-                ])
-            ]),
-            dcc.Tab(label='Due Diligence', value='tab-2', children=[
-                html.H2(children="IV. Due diligence"),
-                html.P(children="""Une due diligence approfondie est essentielle pour atténuer les risques sur le marché des métaux précieux. 
-                Voici quelques stratégies clés :"""),
-                html.Ul(children=[
-                    html.Li(children="""Vérifier la réputation du négociant : Avant d'acheter auprès de n'importe quel négociant, en 
-                    particulier en ligne ou auprès de vendeurs privés, recherchez minutieusement sa réputation et sa légitimité. Consultez les 
-                    avis en ligne, les forums et les associations professionnelles pour obtenir des commentaires et des plaintes."""),
-                    html.Li(children="""Authentifier les produits : Utilisez plusieurs méthodes d'authentification lors de l'acquisition de 
-                    métaux précieux, en particulier lorsque vous traitez avec des vendeurs non professionnels. L'inspection visuelle, la 
-                    vérification du poids, les tests sonores, les tests magnétiques et les tests à l'acide (avec prudence) doivent être 
-                    combinés pour obtenir des résultats fiables. Pour les achats de plus grande valeur, des services d'authentification 
-                    professionnels peuvent être nécessaires."""),
-                    html.Li(children="""Comprendre les spécifications du produit : Soyez pleinement conscient de la teneur en métal, de la 
-                    pureté, du poids et de toute caractéristique distinctive du produit. Comparez ces spécifications avec des sources réputées 
-                    comme Numista ou les sites web officiels des hôtels des monnaies."""),
-                    html.Li(children="""Documents sécurisés : Conservez tous les documents relatifs à vos achats, y compris les factures, les 
-                    certificats d'authenticité et les reçus d'expédition. Ceci est crucial pour les réclamations d'assurance, les déclarations 
-                    fiscales et la preuve de propriété."""),
-                    html.Li(children="""Rester informé : Surveillez continuellement les tendances du marché, les indicateurs économiques et 
-                    les nouvelles relatives au marché des métaux précieux. Abonnez-vous à des publications sectorielles réputées et suivez les 
-                    analyses d'experts pour anticiper les risques et opportunités potentiels.""")
-                ])
-            ]),
-    ]),
+                html.Ul([
+                    html.Li(
+                        "Stockage à domicile : Investissez dans un coffre-fort de haute qualité, installé par des professionnels et boulonné à la structure du bâtiment. Évitez de divulguer vos avoirs en métaux précieux. Envisagez un coffre-fort leurre ou une cachette pour détourner l'attention du véritable emplacement de stockage. Installez un système d'alarme avec des capteurs sur les portes et les fenêtres, et envisagez des détecteurs de mouvement ou des caméras de sécurité."
+                    ),
+                    html.Li(
+                        "Coffres bancaires : Choisissez une banque réputée avec des mesures de sécurité robustes. Soyez discret lorsque vous accédez à votre coffre-fort.",
+                        className="mt-3"
+                    ),
+                    html.Li(
+                        "Coffres-forts privés : Examinez attentivement les protocoles de sécurité de l'installation, y compris les contrôles d'accès, la vérification des antécédents du personnel et la couverture d'assurance.",
+                        className="mt-3"
+                    ),
+                ], className="list-unstyled"),
 
-    html.Div(id='tabs-content')
-])
+                html.H3("Incendie", className="display-7 mt-4 mb-3 fw-bold"),
+
+                html.Ul([
+                    html.Li(
+                        "Stockage à domicile : Stockez les métaux dans un coffre-fort ignifuge avec une certification. Mettez en œuvre des mesures générales de sécurité incendie dans votre maison, y compris des détecteurs de fumée, des extincteurs et un plan d'évacuation."
+                    ),
+                    html.Li(
+                        "Coffres bancaires et coffres-forts privés : Ces installations sont généralement équipées de systèmes d'extinction d'incendie et sont conçues pour résister aux dommages causés par le feu, offrant une meilleure protection que le stockage à domicile.",
+                        className="mt-3"
+                    ),
+                ], className="list-unstyled"),
+
+                html.H3("Risque de contrepartie", className="display-7 mt-4 mb-3 fw-bold"),
+
+                html.Ul([
+                    html.Li(
+                        "Le risque de contrepartie survient lorsque l'on confie des actifs à un tiers, tel qu'une banque ou une installation de stockage. Le risque est que l'institution devienne insolvable, restreigne l'accès aux actifs ou se livre à des activités frauduleuses."
+                    ),
+                    html.Li(
+                        "Atténuation du risque de contrepartie : Détenir du métal physique à domicile élimine ce risque, mais augmente les risques de vol et de perte. Lorsque vous utilisez une banque ou une installation privée, effectuez une diligence raisonnable approfondie pour évaluer leur stabilité financière, leur réputation et leur conformité légale. Diversifiez les emplacements de stockage et envisagez des options de stockage séparé.",
+                        className="mt-3"
+                    ),
+                ], className="list-unstyled"),
+
+                html.H3("Catastrophes naturelles", className="display-7 mt-4 mb-3 fw-bold"),
+
+                html.Ul([
+                    html.Li(
+                        "Les catastrophes naturelles, comme les inondations, les tremblements de terre ou les ouragans, peuvent constituer une menace importante pour les avoirs en métaux précieux."
+                    ),
+                    html.Li(
+                        "Atténuation : Choisissez des emplacements de stockage géographiquement moins sujets à des catastrophes naturelles spécifiques. Les coffres bancaires et les coffres-forts privés, souvent situés dans des bâtiments renforcés, offrent généralement une meilleure protection que le stockage à domicile. Assurez-vous que les polices d'assurance couvrent les risques spécifiques de catastrophes naturelles.",
+                        className="mt-3"
+                    ),
+                ], className="list-unstyled"),
+
+                html.H3("Escroqueries et contrefaçons", className="display-7 mt-4 mb-3 fw-bold"),
+
+                html.Ul([
+                    html.Li(
+                        "Le marché des métaux précieux, en particulier les marchés en ligne et les transactions privées, est sensible aux escroqueries et aux produits contrefaits."
+                    ),
+                    html.Li(
+                        "Atténuation : N'achetez qu'auprès de revendeurs réputés ou de vendeurs privés ayant des antécédents vérifiables. Authentifiez tous les achats en utilisant plusieurs méthodes de test. Méfiez-vous des offres qui semblent trop belles pour être vraies.",
+                        className="mt-3"
+                    ),
+                ], className="list-unstyled"),
+
+                html.H3("Perte ou oubli", className="display-7 mt-4 mb-3 fw-bold"),
+
+                html.Ul([
+                    html.Li(
+                        "Égarer ou oublier l'emplacement des métaux précieux cachés est un événement étonnamment courant."
+                    ),
+                    html.Li(
+                        "Atténuation : Tenez des registres détaillés de vos avoirs et de leurs emplacements de stockage. Si vous utilisez une cachette, créez une carte ou des instructions écrites et conservez-les en lieu sûr dans un endroit séparé. Informez un membre de votre famille ou un conseiller juridique de confiance de vos avoirs et de vos modalités de stockage.",
+                        className="mt-3"
+                    ),
+                ], className="list-unstyled"),
+
+                html.H2("Analyse des méthodes de stockage: avantages, inconvénients et considérations",
+                        className="display-6 mt-5 mb-4 fw-bold"),
+
+                html.P(
+                    "(Développez cette section en ajoutant plus de détails sur chaque méthode, en comparant les coûts (achat d'un coffre-fort vs frais de location), les options d'assurance et l'accessibilité):"
+                ),
+
+                html.H3("Stockage à domicile", className="display-7 mt-4 mb-3 fw-bold"),
+
+                html.P(
+                    "Discuter des différents types de coffres-forts à domicile (ignifuges, résistants au cambriolage, à combinaison, biométriques), des compartiments cachés et des coffres-forts leurres. Analyser les coûts d’achat et d’installation d’un coffre-fort par rapport aux frais de location récurrents pour d’autres options de stockage."
+                ),
+
+                html.H3("Coffres bancaires", className="display-7 mt-4 mb-3 fw-bold"),
+
+                html.P(
+                    "Comparer les frais de location entre différentes banques. Examiner les options d’assurance offertes par les banques et leurs limitations de couverture. Discuter des restrictions d’accessibilité et des difficultés potentielles pendant les jours fériés ou les crises financières."
+                ),
+
+                html.H3("Coffres privés", className="display-7 mt-4 mb-3 fw-bold"),
+
+                html.P(
+                    "Rechercher des sociétés de coffres privés réputées et comparer leurs services, leurs frais, leurs mesures de sécurité et leurs options d’assurance. Discuter des avantages du stockage séparé, du stockage alloué et d’autres services spécialisés."
+                ),
+
+                html.H2("Tactiques de diversion et mesures de sécurité supplémentaires",
+                        className="display-6 mt-5 mb-4 fw-bold"),
+
+                html.P(
+                    "L'amélioration de la sécurité nécessite une approche multicouche. Combinez la sécurité physique avec des tactiques de diversion et d'autres mesures proactives."
+                ),
+
+                html.Ul([
+                    html.Li(
+                        "Coffres-forts leurres : Un coffre-fort moins sécurisé et facilement accessible contenant une petite quantité d'objets de valeur peut détourner l'attention du véritable emplacement de stockage."
+                    ),
+                    html.Li(
+                        "Fausses caméras de sécurité : Des caméras de sécurité visibles mais non fonctionnelles peuvent dissuader les voleurs opportunistes.",
+                        className="mt-3"
+                    ),
+                    html.Li(
+                        "Sécurité domiciliaire renforcée : Des portes et fenêtres renforcées, un film de sécurité sur les fenêtres, un éclairage activé par le mouvement et une signalisation du système d'alarme peuvent améliorer la sécurité générale de la maison.",
+                        className="mt-3"
+                    ),
+                    html.Li(
+                        "Discrétion : Évitez de divulguer vos avoirs en métaux précieux. Soyez discret lorsque vous transportez ou accédez à vos métaux.",
+                        className="mt-3"
+                    ),
+                ], className="list-unstyled"),
+                html.H2("Options d'assurance et documentation", className="display-6 mt-5 mb-4 fw-bold"),
+
+                html.P(
+                    "L'assurance est essentielle pour protéger les investissements en métaux précieux contre les événements imprévus."
+                ),
+
+                html.H3("Assurance habitation ou locataire", className="display-7 mt-4 mb-3 fw-bold"),
+
+                html.Ul([
+                    html.Li(
+                        "Vérifiez votre police actuelle pour connaître la couverture des métaux précieux. La plupart des polices ont des limitations de couverture pour les objets de valeur, et des «avenants» supplémentaires peuvent être nécessaires pour assurer adéquatement les avoirs en métaux précieux. Fournissez à votre compagnie d'assurance une documentation détaillée de vos métaux, y compris les reçus d'achat, les photos et les évaluations."
+                    ),
+                ], className="list-unstyled"),
+
+                html.H3("Assurance spécialisée pour les métaux précieux", className="display-7 mt-4 mb-3 fw-bold"),
+
+                html.Ul([
+                    html.Li(
+                        "Certains assureurs proposent des polices spécifiquement conçues pour les métaux précieux, offrant une couverture plus large et des limites plus élevées que l'assurance habitation ou locataire standard."
+                    ),
+                ], className="list-unstyled"),
+
+                html.H3("Assurance pour coffre bancaire", className="display-7 mt-4 mb-3 fw-bold"),
+
+                html.Ul([
+                    html.Li(
+                        "Certaines banques offrent une assurance pour le contenu des coffres bancaires. Examinez attentivement les détails de la couverture, les exclusions et le processus de réclamation."
+                    ),
+                ], className="list-unstyled"),
+
+                html.H3("Assurance pour coffre-fort privé", className="display-7 mt-4 mb-3 fw-bold"),
+
+                html.Ul([
+                    html.Li(
+                        "Les installations de coffres-forts privés réputées incluent une assurance complète dans leur forfait de services. Examinez les détails de la police et assurez-vous que les limites de couverture sont adéquates."
+                    ),
+                ], className="list-unstyled"),
+
+            ]),  # Close the dbc.Col
+        ]),  # Close the dbc.Row
+    ])  # Close the dbc.Container

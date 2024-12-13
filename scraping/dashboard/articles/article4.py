@@ -1,7 +1,6 @@
 from dash import html,dcc
 import dash_bootstrap_components as dbc
 
-
 def layout():
     return dbc.Container(fluid=True, children=[
         dbc.Row(justify="center", children=[
@@ -35,10 +34,10 @@ def layout():
                     html.Li(
                         "Alternativement à la taxe de 11,5 %, les investisseurs peuvent opter pour le régime de l'impôt sur les plus-values. Ce régime applique un impôt d'environ 36,2 % sur la plus-value réalisée, plutôt que sur le montant total de la vente. Cela peut être avantageux pour les investisseurs qui détiennent leurs métaux précieux depuis une période prolongée et ont accumulé des gains importants."
                     ),
-                    html.Li(
-                        "Avantage clé : Le régime de l'impôt sur les plus-values comprend un abattement annuel de 5 % après la deuxième année de détention. Cet abattement réduit efficacement la plus-value imposable, diminuant ainsi la charge fiscale globale.",
-                        className="mt-3"
-                    ),
+                    html.Li(className="mt-3", children=[
+                        html.Span("Avantage clé : ", className="fw-bold"),
+                        "Le régime de l'impôt sur les plus-values comprend un abattement annuel de 5 % après la deuxième année de détention. Cet abattement réduit efficacement la plus-value imposable, diminuant ainsi la charge fiscale globale.",
+                    ]),
                 ], className="list-unstyled"),
 
                 html.H3("Taxe sur la valeur ajoutée (TVA)", className="display-7 mt-4 mb-3 fw-bold"),
@@ -47,10 +46,10 @@ def layout():
                     html.Li(
                         "Les lingots d'argent, considérés comme des matières premières industrielles en France, sont soumis à une TVA de 20 %. Cela augmente considérablement le coût d'investissement initial et impacte les rendements potentiels. C'est un facteur crucial à prendre en compte lors de la comparaison des lingots d'argent avec d'autres options d'investissement."
                     ),
-                    html.Li(
-                        "Exemption clé : Les pièces d'argent ayant cours légal sont exemptées de TVA en France. Cette exemption les rend plus attrayantes pour les investisseurs par rapport aux lingots d'argent, permettant une acquisition d'argent physique plus rentable. L'or d'investissement est généralement également exempté de TVA.",
-                        className="mt-3"
-                    ),
+                    html.Li(className="mt-3", children=[
+                        html.Span("Exemption clé : ", className="fw-bold"),
+                        "Les pièces d'argent ayant cours légal sont exemptées de TVA en France. Cette exemption les rend plus attrayantes pour les investisseurs par rapport aux lingots d'argent, permettant une acquisition d'argent physique plus rentable. L'or d'investissement est généralement également exempté de TVA.",
+                    ]),
                 ], className="list-unstyled"),
 
                 html.H2("Cours légal et fiscalité : Pièces démonétisées, pièces ayant cours légal et jetons",
@@ -76,7 +75,7 @@ def layout():
 
                 html.Ul([
                     html.Li(
-                        "Les pièces ayant actuellement cours légal, telles que la pièce d'or Philharmonique de Vienne ou le Souverain britannique, sont considérées comme des biens meubles en droit français. La revente de ces pièces est exonérée d'impôt jusqu'à une limite de 5 000 € par transaction. Cette exemption peut être très avantageuse pour les investisseurs, notamment pour gérer les liquidités ou effectuer des transactions plus petites et régulières."
+                        "Les pièces ayant actuellement cours légal, telles que la pièce d'or Philharmonique de Vienne ou le Souverain britannique, sont considérées comme des biens meubles en droit français. La revente de ces pièces est exonérée d'impôt jusqu'à une limite de 5000 € par transaction. Cette exemption peut être très avantageuse pour les investisseurs, notamment pour gérer les liquidités ou effectuer des transactions plus petites et régulières."
                     ),
                 ], className="list-unstyled"),
 
@@ -85,7 +84,7 @@ def layout():
 
                 html.Ul([
                     html.Li(
-                        "Les jetons, tels que les refrappes de la pièce d'or suisse de 20 francs, ressemblent à des pièces mais n'ont jamais eu de cours légal officiel. Cependant, en vertu du droit fiscal français, ils entrent dans la même catégorie que les bijoux et sont exonérés d'impôt jusqu'à une limite de 5 000 € par transaction. Cela rend certains jetons spécifiques fiscalement avantageux pour les investisseurs, en particulier ceux qui cherchent à diversifier leurs avoirs en or."
+                        "Les jetons, tels que les refrappes de la pièce d'or suisse de 20 francs, ressemblent à des pièces mais n'ont jamais eu de cours légal officiel. Cependant, en vertu du droit fiscal français, ils entrent dans la même catégorie que les bijoux et sont exonérés d'impôt jusqu'à une limite de 5000 € par transaction. Cela rend certains jetons spécifiques fiscalement avantageux pour les investisseurs, en particulier ceux qui cherchent à diversifier leurs avoirs en or."
                     ),
                 ], className="list-unstyled"),
 
@@ -131,15 +130,61 @@ def layout():
 
                 html.Ul([
                     html.Li(
-                        "États-Unis : Aborder brièvement les impôts sur les plus-values des métaux précieux, en distinguant les détentions à long terme et à court terme. Mentionner les implications fiscales des comptes d'épargne-retraite en or (Gold IRA)."
+                        "États-Unis: Aborder brièvement les impôts sur les plus-values des métaux précieux, en distinguant les détentions à long terme et à court terme. Mentionner les implications fiscales des comptes d'épargne-retraite en or (Gold IRA)."
                     ),
                     html.Li(
-                        "Royaume-Uni : Aborder l'impôt sur les plus-values (Capital Gains Tax) sur les métaux précieux, en mentionnant les exemptions et abattements potentiels. Discuter brièvement de la TVA sur l'argent et l'or.",
+                        "Royaume-Uni: Aborder l'impôt sur les plus-values (Capital Gains Tax) sur les métaux précieux, en mentionnant les exemptions et abattements potentiels. Discuter brièvement de la TVA sur l'argent et l'or.",
                         className="mt-3"
                     ),
                     html.Li(
-                        "Allemagne : Aborder brièvement le traitement fiscal des métaux précieux, y compris la TVA sur les lingots d'argent et les exemptions potentielles pour l'or d'investissement.",
+                        "Allemagne: Aborder brièvement le traitement fiscal des métaux précieux, y compris la TVA sur les lingots d'argent et les exemptions potentielles pour l'or d'investissement.",
                         className="mt-3"
+                    ),
+                ], className="list-unstyled"),
+
+                html.H2("Pièges fiscaux courants à éviter", className="display-6 mt-5 mb-4 fw-bold"),
+
+                html.P(
+                    "Être conscient des pièges potentiels peut éviter aux investisseurs des coûts et des soucis importants."
+                ),
+
+                html.H3("Le «Piège Napoléon»", className="display-7 mt-4 mb-3 fw-bold"),
+
+                html.Ul([
+                    html.Li(
+                        "Comme mentionné précédemment, éviter l'idée fausse que les pièces Napoléon sont exonérées d'impôt en France. Elles sont soumises à la taxe de 11,5% sur les métaux précieux."
+                    ),
+                ], className="list-unstyled"),
+
+                html.H3("Mauvaise identification des jetons", className="display-7 mt-4 mb-3 fw-bold"),
+
+                html.Ul([
+                    html.Li(
+                        "S'assurer d'identifier correctement les jetons et de les différencier des pièces démonétisées. Ceci est crucial pour appliquer le traitement fiscal correct et éviter d'éventuels litiges avec l'administration fiscale. Effectuer des recherches et consulter des experts en cas d'incertitude."
+                    ),
+                ], className="list-unstyled"),
+
+                html.H3("Documentation inadéquate", className="display-7 mt-4 mb-3 fw-bold"),
+
+                html.Ul([
+                    html.Li(
+                        "Conserver méticuleusement tous les justificatifs d'achat, y compris les factures, les certificats et les confirmations de paiement. Cette documentation est essentielle pour les déclarations fiscales et la minimisation des obligations fiscales potentielles."
+                    ),
+                ], className="list-unstyled"),
+
+                html.H3("Ignorer l'évolution des réglementations", className="display-7 mt-4 mb-3 fw-bold"),
+
+                html.Ul([
+                    html.Li(
+                        "Les lois et réglementations fiscales sont sujettes à modification. Se tenir informé des règles en vigueur et consulter régulièrement un conseiller fiscal pour adapter sa stratégie d'investissement en conséquence."
+                    ),
+                ], className="list-unstyled"),
+
+                html.H3("Négliger les implications internationales", className="display-7 mt-4 mb-3 fw-bold"),
+
+                html.Ul([
+                    html.Li(
+                        "Pour les investisseurs détenant des actifs ou réalisant des transactions dans plusieurs pays, les considérations fiscales internationales peuvent être complexes. Demander conseil à un spécialiste fiscal international qualifié pour comprendre les implications transfrontalières, les conventions fiscales et les obligations déclaratives."
                     ),
                 ], className="list-unstyled"),
 
