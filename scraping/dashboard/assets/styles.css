@@ -84,7 +84,7 @@ body {
 }
 
 /* Target the slider's active track */
-.rc-slider-track-1 {
+.rc-slider-track {
   background-color: gold !important; /* Change to your desired color */
 }
 
