@@ -240,8 +240,8 @@ navbar = dbc.NavbarSimple(
             children=[
                 dbc.DropdownMenuItem("1. Fondamentaux", href="/articles/1-fondamentaux",id="nav-article1"),
                 dbc.DropdownMenuItem("2. Compléments", href="/articles/2-complements",id="nav-article2"),
-                dbc.DropdownMenuItem("Article 3", href="/articles/article3",id="nav-article3"),
-                dbc.DropdownMenuItem("Article 4", href="/articles/article4",id="nav-article4"),
+                dbc.DropdownMenuItem("3. Argent", href="/articles/3-argent",id="nav-article3"),
+                dbc.DropdownMenuItem("4. Fiscalité", href="/articles/4-fiscalite",id="nav-article4"),
                 dbc.DropdownMenuItem("Article 5", href="/articles/article5",id="nav-article5"),
                 dbc.DropdownMenuItem("Article 6", href="/articles/article6",id="nav-article6"),
                 dbc.DropdownMenuItem("Article 7", href="/articles/article7",id="nav-article7"),
@@ -934,21 +934,21 @@ with app.server.app_context():
     items_df.sort_values(by='name', inplace=True)
     ar_options_quick_filter = [
                                   {'label': html.Span([get_country_flag_image('fr'), "Toutes les 50 Cts francs"]),
-                                   'value': 'ar - 50 centimes francs fr *'},
+                                   'value': 'ar - 50 centimes francs *'},
                                   {'label': html.Span([get_country_flag_image('fr'), "Toutes les 1 franc"]),
-                                   'value': 'ar - 1 franc fr *'},
+                                   'value': 'ar - 1 franc *'},
                                   {'label': html.Span([get_country_flag_image('fr'), "Toutes les 2 francs"]),
-                                   'value': 'ar - 2 francs fr *'},
+                                   'value': 'ar - 2 francs *'},
                                   {'label': html.Span([get_country_flag_image('fr'), "Toutes les 5 francs"]),
-                                   'value': 'ar - 5 francs fr *'},
+                                   'value': 'ar - 5 francs *'},
                                   {'label': html.Span([get_country_flag_image('fr'), "Toutes les 10 francs"]),
-                                   'value': 'ar - 10 francs fr *'},
+                                   'value': 'ar - 10 francs *'},
                                   {'label': html.Span([get_country_flag_image('fr'), "Toutes les 20 francs"]),
-                                   'value': 'ar - 20 francs fr *'},
+                                   'value': 'ar - 20 francs *'},
                                   {'label': html.Span([get_country_flag_image('fr'), "Toutes les 50 francs Hercule"]),
-                                   'value': 'ar - 50 francs fr *'},
+                                   'value': 'ar - 50 francs *'},
                                   {'label': html.Span([get_country_flag_image('fr'), "Toutes les 100 francs Hercule"]),
-                                   'value': 'ar - 100 francs fr *'},
+                                   'value': 'ar - 100 francs *'},
                                   {'label': "Toutes les 1 Oz", 'value': 'ar - 1 oz *'},
                               ] + [{'label': html.Span(row['name'][4:].upper()), 'value': row['name']} for _, row in
                                    items_df.iterrows()]
@@ -956,9 +956,6 @@ with app.server.app_context():
 
 ########################################################################################################################
 
-
-
-# ... (your Dash app code)
 def serve_analysis():
 
     return html.Div([
@@ -1068,6 +1065,53 @@ def update_cross_platform_analysis(pathname, napoleon_type):
 
     else:
         return {}
+
+@app.callback(
+        Output("tax-comparison-graph", "figure"),
+        [Input("total-amount", "value"),
+         Input("annual-yield", "value")]
+    )
+def update_graph(total_amount, annual_yield):
+    years = list(range(0, 23))  # Years 0 to 23
+    initial_amount = total_amount
+    amount_after_tax_11_5 = []
+    amount_after_tax_36_2 = []
+
+    for year in years:
+        # Calculate amount after yield
+        amount_with_yield = initial_amount * (1 + annual_yield / 100) ** year
+
+        # Calculate amount after tax for 11.5% (remains the same)
+        amount_after_tax_11_5.append(amount_with_yield * (1 - 0.115))
+
+        # Calculate amount after tax for 36.2% with reduction and condition
+        if amount_with_yield > initial_amount:  # Only apply tax if there's a profit
+            if year <= 2:
+                tax_36_2 = (amount_with_yield - initial_amount) * 0.362  # Tax on the profit only
+            else:
+                reduction = 0.05 * (year - 2)
+                effective_tax_rate = 0.362 * (1 - reduction)
+                tax_36_2 = (amount_with_yield - initial_amount) * effective_tax_rate
+            amount_after_tax_36_2.append(amount_with_yield - tax_36_2)
+        else:
+            amount_after_tax_36_2.append(amount_with_yield)  # No tax if no profit
+
+    fig = {
+        'data': [
+            {'x': str(years) + 'ans', 'y': amount_after_tax_36_2, 'type': 'line', 'name': "TPV 36.2%", 'hoverinfo': 'y'},
+            {'x': str(years) + 'ans', 'y': amount_after_tax_11_5, 'type': 'line', 'name': "TMP 11.5%",'hoverinfo': 'y'},
+        ],
+        'layout': {
+            'title': "Montant récupéré après impôt selon la période de détention",
+            'xaxis': {'title': "Année de possession", 'dtick': 1,
+                     'tickvals': years,  # Set tickvals to the years list
+                     'ticktext': [f'{year} ans' if year > 1 else f'{year} an' for year in years ]},
+            'yaxis': {'title': "Montant après impôts (€)", 'tickformat': '.2f','ticksuffix': ' €'},
+            'hovermode': 'x unified'
+        }
+    }
+
+    return fig
 
 if __name__ == '__main__':
 

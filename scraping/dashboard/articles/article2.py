@@ -4,18 +4,18 @@ import dash_bootstrap_components as dbc
 def layout():
     return dbc.Container(fluid=True, children=[
         dbc.Row(justify="center", children=[
-            dbc.Col(lg=10, children=[
-                html.H1("Stratégies d'investissement dans l'or : Compléments", className="display-4 text-center mb-4"),
+            dbc.Col(lg=8, children=[
+                html.H1("Stratégies d'investissement dans l'or : Compléments", className="display-4 text-center mb-4 fw-bold"),
 
                 html.P(
-                    "L'or captive les investisseurs depuis des millénaires, servant de réserve de valeur, de moyen d'échange et de symbole de richesse et de pouvoir. Dans le paysage de l'investissement moderne, l'or continue d'occuper une position unique, souvent considéré comme une valeur refuge et une protection contre l'inflation et l'incertitude économique. Cet article explore les stratégies avancées d'investissement dans l'or, fournissant aux investisseurs expérimentés les connaissances et les outils nécessaires pour naviguer dans les complexités du marché de l'or et optimiser leurs portefeuilles.",
+                    "L'or captive les investisseurs depuis des millénaires, servant de réserve de valeur, de moyen d'échange et de symbole de richesse et de pouvoir. Dans le paysage de l'investissement moderne, l'or continue d'occuper une position unique, souvent considéré comme une valeur refuge et une protection contre l'inflation et l'incertitude économique. Cet article explore les stratégies d'investissement dans l'or, fournissant aux investisseurs les connaissances et les outils nécessaires pour naviguer dans les complexités du marché de l'or et optimiser leurs portefeuilles.",
                     className="lead"
                 ),
 
-                html.H2("L'or comme investissement : Une perspective avancée", className="display-6 mt-5 mb-4 "),
+                html.H2("I. L'or comme investissement", className="display-6 mt-5 mb-4 "),
 
                 html.P(
-                    "L'attrait de l'or en tant qu'investissement découle de sa résilience historique, de sa rareté et de sa valeur intrinsèque perçue. Bien qu'il ne génère pas de revenus comme les actions ou les obligations, il peut servir de puissant facteur de diversification et de protecteur de patrimoine en période de turbulences économiques.",
+                    "L'attrait de l'or en tant qu'investissement découle de sa résilience historique, de sa rareté et de sa valeur intrinsèque perçue. Bien qu'il ne génère pas de revenus comme les actions ou les obligations, il peut servir de facteur de diversification et de protecteur de patrimoine en période de turbulences économiques.",
                        className="lead"
                 ),
 
@@ -51,12 +51,12 @@ def layout():
                         "L'inclusion de l'or dans un portefeuille diversifié peut contribuer à réduire le risque global du portefeuille. Les fluctuations du prix de l'or ont souvent une corrélation faible ou négative avec d'autres classes d'actifs, ce qui a un effet stabilisateur. Cela peut améliorer les rendements corrigés du risque à long terme.",
                     ),
                     html.Li(
-                        "L'allocation optimale de l'or dans un portefeuille dépend de la tolérance au risque individuelle, des objectifs d'investissement et des perspectives du marché. Une recommandation courante est d'allouer 5 à 20 % d'un portefeuille à l'or, mais cela peut varier en fonction des circonstances spécifiques.",
+                        "L'allocation optimale de l'or dans un portefeuille dépend de la tolérance au risque individuelle, des objectifs d'investissement et des perspectives du marché. Une recommandation courante est d'allouer 5 à 20 % d'un portefeuille à l'or, mais cela peut varier en fonction des circonstances spécifiques ou qui vous sont propres.",
                         className="mt-3"
                     ),
                 ], className="list-unstyled"),
 
-                html.H2("Produits aurifères : Une analyse complète", className="display-6 mt-5 mb-4 "),
+                html.H2("II. Les produits aurifères", className="display-6 mt-5 mb-4"),
 
                 html.P(
                     "Les investissements dans l'or se présentent sous diverses formes, chacune ayant ses propres caractéristiques, avantages et inconvénients.",
@@ -67,24 +67,24 @@ def layout():
 
                 html.Ul([
                     html.Li(className="mt-3", children=[
-                        html.Span("Avantages : ", className="fw-bold"),
+                        html.Span("- Avantages -", className="fw-bold "),
                         "Grande liquidité, facilité d'authentification, attrait esthétique et valeur numismatique potentielle. Certaines pièces d'or ayant cours légal peuvent offrir des avantages fiscaux selon la juridiction. Les pièces d'or fractionnaires (par exemple, 1/10 oz) permettent des investissements plus petits et réguliers.",
                     ]),
                     html.Li(className="mt-3", children=[
-                        html.Span("Inconvénients : ", className="fw-bold"),
+                        html.Span("- Inconvénients -", className="fw-bold "),
                         "Primes plus élevées par rapport aux lingots d'or, potentiel de contrefaçon et sensibilité aux rayures ou à l'usure, en particulier pour les pièces en or pur comme la Britannia.",
                     ]),
                 ], className="list-unstyled"),
 
-                html.H3("Lingots d'or", className="display-7 mt-4 mb-3 "),
+                html.H3("Lingots d'or", className="display-7 mt-4 mb-3  "),
 
                 html.Ul([
                     html.Li(className="mt-3", children=[
-                        html.Span("Avantages : ", className="fw-bold"),
+                        html.Span("- Avantages -", className="fw-bold "),
                         "Primes plus faibles par rapport aux pièces, efficaces pour stocker de grandes quantités d'or, et disponibilité dans une large gamme de tailles et de poids.",
                     ]),
                     html.Li(className="mt-3", children=[
-                        html.Span("Inconvénients : ", className="fw-bold"),
+                        html.Span("- Inconvénients -", className="fw-bold "),
                         "Moins liquides que les pièces, plus difficiles à authentifier, surtout lorsqu'ils ne sont pas scellés et manquent de provenance claire, et coûts de stockage potentiellement plus élevés pour les lingots plus gros.",
                     ]),
                 ], className="list-unstyled"),
@@ -93,11 +93,11 @@ def layout():
 
                 html.Ul([
                     html.Li(className="mt-3", children=[
-                        html.Span("Avantages : ", className="fw-bold"),
+                        html.Span("- Avantages -", className="fw-bold "),
                         "Attrait esthétique, peuvent être portés et appréciés, et potentiel d'appréciation de la valeur pour les pièces anciennes ou de créateurs.",
                     ]),
                     html.Li(className="mt-3", children=[
-                        html.Span("Inconvénients : ", className="fw-bold"),
+                        html.Span("- Inconvénients -", className="fw-bold "),
                         "Soumis à la TVA dans de nombreuses juridictions, marges plus élevées par rapport aux produits en lingots, potentiel de valeur de revente plus faible en raison du design ou de l'usure, et nécessite une expertise pour évaluer la valeur de l'or ancien ou de la ferraille.",
                     ]),
                 ], className="list-unstyled"),
@@ -106,16 +106,16 @@ def layout():
 
                 html.Ul([
                     html.Li(className="mt-3", children=[
-                        html.Span("Avantages : ", className="fw-bold"),
+                        html.Span("- Avantages -", className="fw-bold "),
                         "Facilité d'achat et de vente par l'intermédiaire de comptes de courtage, élimine le besoin de stockage physique et offre une plus grande liquidité par rapport à l'or physique.",
                     ]),
                     html.Li(className="mt-3", children=[
-                        html.Span("Inconvénients : ", className="fw-bold"),
+                        html.Span("- Inconvénients -", className="fw-bold "),
                         "Les investisseurs ne possèdent pas l'or physique, risque de contrepartie associé au fournisseur du FNB, potentiel d'écarts par rapport au prix de l'or en raison de la structure et des frais de gestion du FNB, et préoccupations quant à la capacité de convertir les actions en or physique pendant une crise. De plus, certains soutiennent que les FNB sont complices de la manipulation du marché, en particulier sur le marché de l'argent.",
                     ]),
                 ], className="list-unstyled"),
 
-                html.H2("Stratégies avancées de calcul des primes", className="display-6 mt-5 mb-4 "),
+                html.H2("III. Calcul des primes", className="display-6 mt-5 mb-4 "),
 
                 html.P(
                     "Le calcul et la comparaison précis des primes sur l'or exigent d'aller au-delà de la formule de base et de tenir compte de divers facteurs du marché.",
@@ -144,7 +144,7 @@ def layout():
                     ]),
                 ], className="list-unstyled"),
 
-                html.H2("Démystifier les mythes de la confiscation de l'or", className="display-6 mt-5 mb-4 "),
+                html.H2("IV. L'or confisqué ?", className="display-6 mt-5 mb-4 "),
 
                 html.P(
                     "La crainte de la confiscation de l'or est un thème récurrent chez les investisseurs en métaux précieux. Comprendre les précédents historiques et les réglementations actuelles peut aider à dissiper ces mythes et à prendre des décisions éclairées.",
