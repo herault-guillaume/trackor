@@ -171,7 +171,7 @@ def get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_pri
         "1/10 oz Maple Leaf | Or | plusieurs années" : "or - 1/10 oz maple leaf",
         "1/10 oz Krugerrand | Or | plusieurs années" : "or - 1/10 oz krugerrand",
         "10 Couronnes Franz-Joseph I Autriche | Or | 1892-1916" : "or - 10 couronnes françois joseph I",
-        "100 Francs Tunisiens | Or | 1930-1956" : "or - 100 francs fr",
+        "100 Francs Tunisiens | Or | 1930-1956" : "or - 100 francs tunisie",
         "10 Mark Roi Karl Wurttemberg | Or | 1864-1891" : "or - 10 mark wilhelm I", # Assuming this is similar to wilhelm I
         "25 Schilling autrichien | Or | 1926-1938" : "", # No matching key in weights
         "10 Francs Tunisiens | Or | plusieurs années" : "or - 10 francs tunisie",
@@ -258,7 +258,10 @@ def get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_pri
 
             for p in products:
                 try :
+
                     if p.find('small',class_='text-danger',text='Épuisé'):
+                        continue
+                    if p.find('div',class_='product_thumb_out_stock'):
                         continue
                     product_name = p.find('span',class_="product-item-name text-start").text
                     print(product_name)
@@ -287,7 +290,6 @@ def get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_pri
                     else:
                         buy_price = buy_price_silver
 
-                    print(name,price,  + source)
                     # def has_year(text):
                     #     pattern = r"\b\d{4}\b"  # Matches a four-digit year
                     #     match = re.search(pattern, text)

@@ -4,7 +4,7 @@ import dash_bootstrap_components as dbc
 def layout():
     return dbc.Container(fluid=True, children=[
         dbc.Row(justify="center", children=[
-            dbc.Col(lg=8, children=[
+            dbc.Col(lg=9, children=[
                 html.H1("Stratégies d'investissement dans l'or : Compléments", className="display-4 text-center mb-4 fw-bold"),
 
                 html.P(

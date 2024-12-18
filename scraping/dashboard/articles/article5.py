@@ -4,19 +4,15 @@ import dash_bootstrap_components as dbc
 def layout():
     return dbc.Container(fluid=True, children=[
         dbc.Row(justify="center", children=[
-            dbc.Col(lg=10, children=[
-                html.H1("Métaux précieux et diversification de portefeuille : Stratégies avancées pour la préservation du patrimoine", className="display-4 text-center mb-4 fw-bold"),
+            dbc.Col(lg=9, children=[
+                html.H1("Métaux précieux et diversification de portefeuille", className="display-4 text-center mb-4 fw-bold"),
 
                 html.P(
-                    "La diversification de portefeuille, pierre angulaire d'une gestion saine des investissements, consiste à allouer stratégiquement des capitaux entre différentes classes d'actifs afin de réduire le risque global et d'accroître le potentiel de rendement à long terme. Les métaux précieux, en particulier l'or et l'argent, ont historiquement joué un rôle unique dans les portefeuilles diversifiés, offrant une protection contre l'inflation, l'incertitude économique et les risques géopolitiques. Cet article explore des stratégies avancées pour intégrer les métaux précieux dans un portefeuille bien structuré, en examinant leurs avantages, leurs limites et les aspects psychologiques à prendre en compte pour une préservation optimale du patrimoine.",
+                    "La diversification de portefeuille, pierre angulaire d'une gestion saine des investissements, consiste à allouer stratégiquement des capitaux entre différentes classes d'actifs afin de réduire le risque global et d'accroître le potentiel de rendement à long terme. Les métaux précieux, en particulier l'or et l'argent, ont historiquement joué un rôle unique dans les portefeuilles diversifiés, offrant une protection contre l'inflation, l'incertitude économique et les risques géopolitiques. Cet article explore des stratégies pour intégrer les métaux précieux dans un portefeuille bien structuré, en examinant leurs avantages, leurs limites et les aspects psychologiques à prendre en compte pour une préservation optimale du patrimoine.",
                     className="lead"
                 ),
 
-                html.H2("Les métaux précieux dans un portefeuille diversifié : Une analyse approfondie", className="display-6 mt-5 mb-4 fw-bold"),
-
-                html.P(
-                    "Les métaux précieux présentent des caractéristiques distinctes qui peuvent compléter d'autres classes d'actifs dans un portefeuille diversifié."
-                ),
+                html.H2("II. Rôles", className="display-6 mt-5 mb-4 fw-bold"),
 
                 html.H3("Couverture contre l'inflation", className="display-7 mt-4 mb-3 fw-bold"),
 
@@ -49,12 +45,12 @@ def layout():
                         "Les métaux précieux peuvent également servir de couverture contre les risques géopolitiques, tels que la guerre, l'instabilité politique ou les sanctions. Ces événements peuvent créer de l'incertitude sur les marchés financiers traditionnels, conduisant les investisseurs à rechercher la stabilité relative des métaux précieux. Le rôle historique de l'or en tant que réserve de valeur mondialement reconnue le rend particulièrement attrayant en période de tensions internationales."
                     ),
                     html.Li(className="mt-3", children=[
-                        html.Span("Mais ...", className="fw-bold"),
+                        html.Span("Mais ... ", className="fw-bold"),
                         "L'impact des événements géopolitiques sur les prix des métaux précieux peut être de courte durée. Si une hausse initiale des prix peut se produire, les prix se stabilisent ou même baissent souvent une fois la situation résolue ou que le marché s'est adapté. Une perspective à long terme est essentielle lorsque l'on considère les métaux précieux comme une couverture contre les risques géopolitiques.",
                     ]),
                 ], className="list-unstyled"),
 
-                html.H2("Stratégies avancées d'allocation de portefeuille", className="display-6 mt-5 mb-4 fw-bold"),
+                html.H2("II. Allocation dans un portefeuille", className="display-6 mt-5 mb-4 fw-bold"),
 
                 html.P(
                     "Déterminer l'allocation optimale des métaux précieux au sein d'un portefeuille nécessite une approche nuancée, en tenant compte de divers facteurs."
@@ -67,7 +63,7 @@ def layout():
                         "Une stratégie courante consiste à allouer un pourcentage spécifique du portefeuille global aux métaux précieux, généralement entre 5% et 20%. Ce pourcentage dépend de la tolérance au risque individuelle, des objectifs d'investissement et des perspectives de l'économie et du système financier. Un investisseur plus prudent, préoccupé par la stabilité économique, pourrait allouer un pourcentage plus élevé aux métaux précieux, tandis qu'un investisseur plus agressif, axé sur la croissance, pourrait allouer un pourcentage plus faible."
                     ),
                     html.Li(className="mt-3", children=[
-                        html.Span("Mais ...", className="fw-bold"),
+                        html.Span("Mais ... ", className="fw-bold"),
                         "Maintenir une allocation précise en pourcentage peut être difficile en raison des fluctuations du marché. Le rééquilibrage constant du portefeuille pour maintenir l'allocation cible peut entraîner des coûts de transaction et potentiellement des implications fiscales. Il est essentiel de laisser une certaine flexibilité et d'éviter les transactions excessives.",
                     ]),
                 ], className="list-unstyled"),
@@ -96,72 +92,7 @@ def layout():
                     ]),
                 ], className="list-unstyled"),
 
-                html.H2("Métaux précieux vs autres classes d'actifs : Une analyse comparative",
-                        className="display-6 mt-5 mb-4 fw-bold"),
-
-                html.P(
-                    "Comprendre comment les métaux précieux se comparent à d'autres options d'investissement est crucial pour une allocation stratégique des actifs."
-                ),
-
-                html.P(
-                    "(Développez cette section avec des comparaisons plus approfondies, y compris des données historiques sur les performances, des graphiques et des profils risque/rendement) :"
-                ),
-
-                html.Ul([
-                    html.Li(className="mt-3", children=[
-                        html.Span("Immobilier : ", className="fw-bold"),
-                        "Si l'immobilier et les métaux précieux sont tous deux des actifs tangibles, l'immobilier offre des revenus locatifs potentiels et un plus grand contrôle sur l'investissement. Cependant, il est moins liquide, nécessite des dépenses en capital importantes et implique des coûts de gestion et d'entretien continus. Les métaux précieux, quant à eux, sont plus liquides, nécessitent moins de gestion et offrent un point d'entrée plus accessible."
-                    ]),
-                    html.Li(className="mt-3", children=[
-                        html.Span("Actions : ", className="fw-bold"),
-                        "Les actions offrent un potentiel de rendement plus élevé grâce aux dividendes et à la plus-value, mais comportent également un risque plus élevé en raison de la volatilité du marché et de facteurs spécifiques aux entreprises. Les métaux précieux, en particulier l'or, sont généralement considérés comme moins risqués et peuvent agir comme un stabilisateur lors des baisses du marché boursier.",
-
-                    ]),
-                    html.Li(className="mt-3", children=[
-                        html.Span("Obligations : ", className="fw-bold"),
-                        "Les obligations procurent un revenu fixe et sont généralement considérées comme moins risquées que les actions, mais leurs rendements peuvent être inférieurs. L'inflation peut éroder la valeur réelle des rendements obligataires. Les métaux précieux peuvent offrir une protection contre l'inflation que les obligations n'offrent pas.",
-
-                    ]),
-                ], className="list-unstyled"),
-
-                html.H2("Biais psychologiques dans l'investissement : Le sophisme des coûts irrécupérables et autres",
-                        className="display-6 mt-5 mb-4 fw-bold"),
-
-                html.P(
-                    "Les biais psychologiques peuvent avoir un impact significatif sur les décisions d'investissement, conduisant à des choix irrationnels et à des résultats sous-optimaux."
-                ),
-
-                html.H3("Le sophisme des coûts irrécupérables", className="display-7 mt-4 mb-3 fw-bold"),
-
-                html.Ul([
-                    html.Li(
-                        "Le sophisme des coûts irrécupérables fait référence à la tendance à continuer d'investir dans un actif ou une stratégie perdante en raison du temps, de l'argent ou des efforts déjà investis. Ce biais peut empêcher les investisseurs de réduire leurs pertes et de réallouer des capitaux à des opportunités plus prometteuses. Dans le contexte des métaux précieux, un investisseur pourrait conserver des actions minières peu performantes simplement parce qu'il a déjà investi une somme importante, même si les fondamentaux de l'entreprise se sont détériorés."
-                    ),
-                    html.Li(className="mt-3", children=[
-                        html.Span("Surmonter le biais : ", className="fw-bold"),
-                        "Reconnaître que les coûts irrécupérables ne sont pas pertinents pour les décisions futures. Fonder les choix d'investissement sur les conditions actuelles du marché, les perspectives d'avenir et la stratégie globale du portefeuille, et non sur les dépenses passées.",
-                    ]),
-                ], className="list-unstyled"),
-
-                html.H3("Autres biais psychologiques", className="display-7 mt-4 mb-3 fw-bold"),
-
-                html.Ul([
-                    html.Li(className="mt-3", children=[
-                        html.Span("Biais de confirmation : ", className="fw-bold"),
-                        "Tendance à rechercher des informations qui confirment les croyances existantes et à ignorer celles qui les contredisent. Les investisseurs pourraient interpréter les nouvelles ou les analyses de manière sélective pour étayer leur vision haussière ou baissière des métaux précieux, ignorant les preuves contradictoires."
-                    ]),
-                    html.Li(className="mt-3", children=[
-                        html.Span("Aversion aux pertes : ", className="fw-bold"),
-                        "La douleur psychologique d'une perte est supérieure au plaisir d'un gain équivalent. Cela peut conduire les investisseurs à conserver des positions perdantes trop longtemps, dans l'espoir d'éviter de réaliser une perte, ou à vendre des positions gagnantes trop tôt, par crainte d'une baisse potentielle.",
-                    ]),
-                    html.Li(className="mt-3", children=[
-                        html.Span("Mentalité de troupeau : ", className="fw-bold"),
-                        "Tendance à suivre la foule, même si cela va à l'encontre de sa propre analyse. En période de battage médiatique ou de crainte, les investisseurs peuvent suivre aveuglément les tendances du marché, ce qui les conduit à acheter à des prix élevés et à vendre à bas prix.",
-
-                    ]),
-                ], className="list-unstyled"),
-
-                html.H2("Limites d'investissement optimales : Équilibre entre risque et rendement",
+                html.H2("III. Limites : Équilibre entre risque et rendement",
                         className="display-6 mt-5 mb-4 fw-bold"),
 
                 html.P(

@@ -98,7 +98,7 @@ data = [
 def layout():
     return dbc.Container(fluid=True, children=[
         dbc.Row(justify="center", children=[
-            dbc.Col(lg=8, children=[
+            dbc.Col(lg=9, children=[
                 html.H1("Fiscalité et réglementations en métaux précieux", className="display-4 text-center mb-4 fw-bold"),
 
                 html.P(
@@ -107,7 +107,7 @@ def layout():
                 ),
 
                 dbc.Card(
-                    dbc.CardBody(
+                    dbc.CardHeader(
                         html.P(
                             "Avertissement : Cet article est fourni à titre informatif seulement et ne constitue pas un conseil financier ou fiscal. Consultez un professionnel qualifié pour obtenir des conseils personnalisés.")
                     ),
@@ -191,7 +191,15 @@ def layout():
                     ]),
                 ], className="list-unstyled"),
 
-
+                html.Ul([
+                    html.Li(
+                        "Les lingots d'argent, considérés comme des matières premières industrielles en France, sont soumis à une TVA de 20 %. Cela augmente considérablement le coût d'investissement initial et impacte les rendements potentiels. C'est un facteur crucial à prendre en compte lors de la comparaison des lingots d'argent avec d'autres options d'investissement."
+                    ),
+                    html.Li(className="mt-3", children=[
+                        html.Span("Exemption clé : ", className="fw-bold"),
+                        "Les pièces d'argent ayant cours légal sont exemptées de TVA en France. Cette exemption les rend plus attrayantes pour les investisseurs par rapport aux lingots d'argent, permettant une acquisition d'argent physique plus rentable. L'or d'investissement est généralement également exempté de TVA et les objets en or destinés à la fonte sont totalement exonérés de taxe en France.",
+                    ]),
+                ], className="list-unstyled"),
 
                 html.H2("II. Cours légal et fiscalité : Pièces démonétisées, pièces ayant cours légal et jetons",
                         className="display-6 mt-5 mb-4 fw-bold"),
@@ -206,26 +214,23 @@ def layout():
                     html.Li(
                         "Les pièces démonétisées, telles que la pièce d'or Napoléon française ou la pièce d'argent Hercule de 50 francs, n'ont plus cours légal et sont considérées comme des objets en métaux précieux. À ce titre, elles sont soumises à la TMP ou TPV lors de leur revente, même si elles ont déjà circulé comme monnaie."
                     ),
-                    html.Li(
-                        "Circule une idée colportée concernant les pièces Napoléon et qui dirait que, en raison de leur importance historique et de leur large reconnaissance, elles seraient exemptées de cette taxe. C'est faux, elles sont soumises à la TMP ou TPV lors de leur revente.",
-                        className="mt-3"
-                    ),
                 ], className="list-unstyled"),
 
                 html.H3("Pièces ayant cours légal", className="display-7 mt-4 mb-3 fw-bold"),
 
                 html.Ul([
                     html.Li(
-                        "Les pièces ayant actuellement cours légal, telles que la pièce d'or Philharmonique de Vienne ou les monnaies en € frappées par la Monnaie de Paris, sont considérées comme des biens meubles en droit français. La revente de ces pièces est exonérée d'impôt jusqu'à une limite de 5000 € par transaction. Cette exemption peut être très avantageuse pour les investisseurs, notamment pour gérer les liquidités ou effectuer des transactions plus petites et régulières."
+                        "Les pièces ayant actuellement cours légal, telles que la pièce d'or Philharmonique de Vienne ou les monnaies en € de diverses formes frappées par la Monnaie de Paris, sont considérées comme des biens meubles en droit français. La revente de ces pièces est exonérée d'impôt jusqu'à une limite de 5000 € par transaction. Cette exemption peut être très avantageuse pour les investisseurs, notamment pour gérer les liquidités ou effectuer des transactions plus petites et régulières."
                     ),
                 ], className="list-unstyled"),
 
-                html.H3("Jetons (par exemple, refrappes de 20 francs suisses Vreneli)",
+                html.H3("Jetons",
                         className="display-7 mt-4 mb-3 fw-bold"),
 
                 html.Ul([
                     html.Li(
-                        "Les jetons tels que les refrappes 20 francs suisse Vreneli ou refrappes 20 francs Marianne Coq dites 'Pinnay' ne sont pas exonérées d'impôt en France. Elles sont bien considérées comme 'pièces' même si elles approchent la définition du 'jeton'. Elles sont soumises à la TMP ou TPV lors de la revente. Les autres jetons ne ressemblant pas à des pièces ayant eu cours légal sont exemptés de taxe jusqu'à 5000€. Au delà, c'est la TMP ou TPV qui s'applique."
+                        "Les jetons tels que les refrappes 20 francs suisse Vreneli ou refrappes 20 francs Marianne Coq dites 'Pinnay' sont rarement exonérées d'impôt en France. Il existe plusieurs interprétations quant à leur fiscalité. Elles peuvent être considérées comme 'pièces d'investissement' par un inspecteur des impôts même si elles n'ont jamais eu un cours légal et n'ont donc pas pu être démonétisées. La majorité des professionels appliquent la TMP ou la TVP. Vous pouvez demander à votre centre des impôts comment sont considérées spécifiquement vos jetons (par rescrit fiscal) mais il existe bien une pluralité de réponses."
+                        "Les autres jetons ne ressemblant pas à des pièces ayant eu cours légal sont exemptés de taxe jusqu'à 5000€. Au delà, c'est la TMP ou TPV qui s'applique."
 
                     ),
                 ], className="list-unstyled"),
@@ -255,35 +260,7 @@ def layout():
                 html.H2("IV. Considérations fiscales internationales", className="display-6 mt-5 mb-4 fw-bold"),
 
                 html.P(
-                    "Les lois fiscales varient considérablement d'une juridiction à l'autre, ce qui a une incidence sur la façon dont les bénéfices des cessions de métaux précieux sont traités."
-                ),
-
-                dbc.Table(
-                    [
-                        html.Thead(
-                            html.Tr([
-                                html.Th("Pays"),
-                                html.Th("Métal"),
-                                html.Th("Achat"),
-                                html.Th("Vente"),
-                                html.Th("Source")
-                            ])
-                        ),
-                        html.Tbody([
-                            html.Tr([
-                                html.Td(row["Pays"]),
-                                html.Td(row["Métal"]),
-                                html.Td(row["Achat"]),
-                                html.Td(row["Vente"]),
-                                html.Td(row["Source"])
-                            ]) for row in data
-                        ])
-                    ],
-                    bordered=True,
-                    hover=True,
-                    responsive=True,
-                    striped=True,
-                    dark=True
+                    "Les lois fiscales varient considérablement d'une juridiction à l'autre, cependant vous devez toujours régler la taxe française TMP ou TPV si vous êtes résidant fiscal français."
                 ),
 
                 html.H2("V. Pièges fiscaux courants à éviter", className="display-6 mt-5 mb-4 fw-bold"),

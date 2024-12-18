@@ -4,10 +4,10 @@ import dash_bootstrap_components as dbc
 def layout():
     return dbc.Container(fluid=True, children=[
         dbc.Row(justify="center", children=[
-            dbc.Col(lg=8, children=[
+            dbc.Col(lg=9, children=[
                 html.H1(children="Achat de métaux précieux physique: les fondamentaux", className="display-4 text-center mb-4 fw-bold"),
                 html.P(children="""Le marché des métaux précieux, englobant l'or, l'argent, le platine et le
-                palladium, offre un paysage d'investissement unique aux investisseurs avertis. Bien que
+                palladium, offre un paysage d'investissement unique aux investisseurs . Bien que
                 souvent présentés comme une valeur refuge et une protection contre l'inflation, naviguer sur
                 ce marché exige une compréhension nuancée de ses complexités.""", className="lead text-center"),
 
@@ -216,7 +216,7 @@ def layout():
                     ]),
                 ]),
 
-                html.H3(children="Stratégies avancées", className="display-7 mt-4 mb-3"),
+                html.H3(children="Stratégies ", className="display-7 mt-4 mb-3"),
                 html.Ul(className="list-unstyled", children=[
                     html.Li(children=[
                         html.Span("Se concentrer sur les faibles primes (avec réserves) : ", className="fw-bold"),
@@ -243,7 +243,7 @@ def layout():
                 ]),
 
                 html.H2(children="III. Due diligence", className="display-6 mt-5 mb-4"),
-                html.P(children="""Une analyse approfondie de chaque offre est essentielle pour atténuer les risques sur lors de l'achat de métaux précieux.
+                html.P(children="""Une analyse de chaque offre est essentielle pour atténuer les risques sur lors de l'achat de métaux précieux.
                 Voici quelques points clés :""", className="lead"),
 
                 html.Ul(className="list-unstyled", children=[

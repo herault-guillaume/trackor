@@ -5,260 +5,176 @@ def layout():
     return dbc.Container(fluid=True, children=[
         dbc.Row(justify="center", children=[
             dbc.Col(lg=10, children=[
-                html.H1("Sécurité et stockage des métaux précieux : Protéger votre investissement", className="display-4 text-center mb-4 fw-bold"),
+                html.H1("Comprendre les biais comportementaux", className="display-4 text-center mb-4 fw-bold"),
 
                 html.P(
-                    "L'acquisition de métaux précieux implique un engagement financier important. Par conséquent, il est primordial d'assurer la sécurité et le stockage adéquat de ces actifs. Qu'il s'agisse d'or, d'argent, de platine ou d'autres métaux précieux, les investisseurs doivent examiner attentivement les différentes options de stockage, évaluer les risques potentiels et mettre en œuvre des mesures de sécurité robustes pour protéger leur investissement. Cet article fournit un guide complet sur les solutions de stockage sécurisé, les stratégies d'atténuation des risques et les options d'assurance pour préserver la valeur et l'intégrité des avoirs en métaux précieux.",
+                    "Investir, en particulier sur des marchés volatils comme celui des métaux précieux, n'est pas uniquement une activité rationnelle. La psychologie humaine joue un rôle important dans l'élaboration des décisions d'investissement, conduisant souvent à des biais qui peuvent compromettre même les stratégies les plus soigneusement élaborées. Comprendre ces facteurs psychologiques, reconnaître les biais courants et développer des stratégies pour atténuer leur influence est crucial pour faire des choix d'investissement judicieux et réussir à long terme. Cet article explore la psychologie de l'investissement dans les métaux précieux, en examinant comment les émotions et les biais cognitifs peuvent influencer les décisions et en fournissant aux investisseurs  des outils et des techniques pour favoriser une approche plus rationnelle et disciplinée.",
                     className="lead"
                 ),
 
-                html.H2("Options de stockage sécurisé pour les métaux précieux : Un guide complet", className="display-6 mt-5 mb-4 fw-bold"),
+                html.H2("Facteurs psychologiques influençant les décisions d'investissement", className="display-6 mt-5 mb-4 fw-bold"),
 
                 html.P(
-                    "Il existe plusieurs options de stockage, chacune ayant ses propres avantages et inconvénients en termes de coût, de sécurité, d'accessibilité et de discrétion."
+                    "Divers facteurs psychologiques peuvent obscurcir le jugement et conduire à un comportement d'investissement irrationnel."
                 ),
 
-                html.H3("Stockage à domicile", className="display-7 mt-4 mb-3 fw-bold"),
-
-                html.Ul([
-                    html.Li(className="mt-3", children=[
-                        html.Span("Coffres-forts à domicile : ", className="fw-bold"),
-                        "Un coffre-fort robuste, correctement installé et fixé à la structure du bâtiment, peut offrir un bon niveau de protection contre le vol. Choisissez un coffre-fort avec un indice de résistance au feu élevé pour le protéger contre les dommages causés par le feu."
-                    ]),
-                    html.Li(className="mt-3", children=[
-                        html.Span("Cachettes : ", className="fw-bold"),
-                        "Pour les petites quantités de métaux précieux, des cachettes discrètes dans la maison peuvent fournir une couche de sécurité supplémentaire. Des emplacements créatifs et bien dissimulés peuvent dissuader les voleurs opportunistes.",
-                    ]),
-                    html.Li(className="mt-3", children=[
-                        html.Span("Avantages : ", className="fw-bold"),
-                        "Contrôle direct sur les actifs, accessibilité facile, absence de frais de stockage récurrents et plus grande confidentialité.",
-
-                    ]),
-                    html.Li(className="mt-3", children=[
-                        html.Span("Inconvénients : ", className="fw-bold"),
-                        "Risque de vol plus élevé si le coffre-fort n'est pas correctement sécurisé ou si la cachette est découverte, vulnérabilité au feu ou aux catastrophes naturelles, et risque de perte ou de dommage accidentel. Les coffres-forts bon marché offrent une protection minimale et peuvent être facilement forcés.",
-
-                    ]),
-                ], className="list-unstyled"),
-
-                html.H3("Coffres bancaires", className="display-7 mt-4 mb-3 fw-bold"),
+                html.H3("Ancrage des prix", className="display-7 mt-4 mb-3 fw-bold"),
 
                 html.Ul([
                     html.Li(
-                        "Les coffres bancaires dans des banques réputées offrent une solution de stockage hors site sécurisée. Les banques disposent généralement de mesures de sécurité robustes, notamment des coffres-forts, des alarmes et des systèmes de surveillance. Certaines banques offrent une assurance pour le contenu des coffres, mais les limitations de couverture et les conditions spécifiques doivent être examinées attentivement."
+                        "L'ancrage des prix fait référence à la tendance à se fier trop lourdement à la première information reçue (l'\"ancre\") lors de la prise de décisions, même si cette information n'est pas pertinente ou est obsolète. Dans le contexte des métaux précieux, un investisseur pourrait se fixer sur le prix de l'or lorsqu'il a commencé à envisager d'investir, par exemple, 1500€ l'once. Si le prix monte ensuite à 1900€, il pourrait résister à l'achat, le percevant comme «cher», même si les fondamentaux du marché justifient le prix plus élevé."
                     ),
                     html.Li(className="mt-3", children=[
-                        html.Span("Avantages : ", className="fw-bold"),
-                        "Sécurité renforcée par rapport au stockage à domicile, protection contre le feu et les catastrophes naturelles (dans les limites des paramètres de sécurité de la banque) et tranquillité d'esprit en sachant que les actifs sont stockés dans un environnement géré par des professionnels.",
-
-                    ]),
-                    html.Li(className="mt-3", children=[
-                        html.Span("Inconvénients : ", className="fw-bold"),
-                        "Frais de location récurrents, accessibilité limitée aux heures d'ouverture des banques, restrictions potentielles d'accès pendant les crises financières ou les jours fériés, et moins de confidentialité par rapport au stockage à domicile. De plus, le contenu des coffres bancaires n'est généralement pas couvert par l'assurance-dépôts (ou un système d'assurance-dépôts équivalent).",
+                        html.Span("Surmonter l'ancrage des prix : ", className="fw-bold"),
+                        "Soyez conscient de ce biais et recherchez activement diverses sources d'information et d'analyse. Concentrez-vous sur les facteurs fondamentaux, tels que la dynamique de l'offre et de la demande, les indicateurs économiques et les événements géopolitiques, plutôt que de vous fier uniquement aux prix passés. Menez des recherches approfondies et évaluez de manière critique les tendances du marché pour prendre des décisions objectives.",
 
                     ]),
                 ], className="list-unstyled"),
 
-                html.H3("Coffres-forts privés et installations de stockage", className="display-7 mt-4 mb-3 fw-bold"),
+                html.H3("Aversion aux pertes", className="display-7 mt-4 mb-3 fw-bold"),
 
                 html.Ul([
                     html.Li(
-                        "Les coffres-forts privés spécialisés ou les installations de stockage sécurisé offrent le plus haut niveau de protection pour les avoirs importants en métaux précieux. Ces installations disposent de systèmes de sécurité avancés, notamment plusieurs couches de contrôle d'accès physique et électronique, des environnements à température contrôlée et des options d'assurance complètes."
+                        "L'aversion aux pertes fait référence au principe psychologique selon lequel la douleur d'une perte est ressentie plus fortement que le plaisir d'un gain équivalent. Ce biais peut amener les investisseurs à conserver des positions perdantes trop longtemps, dans l'espoir d'éviter de réaliser une perte, ou à vendre des positions gagnantes trop tôt, par crainte d'une baisse potentielle des prix et du regret associé. Dans le domaine des métaux précieux, un investisseur pourrait conserver une action minière d'argent en baisse, en espérant qu'elle retrouvera son prix précédent, même s'il existe des preuves solides suggérant une nouvelle baisse."
                     ),
                     html.Li(className="mt-3", children=[
-                        html.Span("Avantages : ", className="fw-bold"),
-                        "Sécurité maximale, protection contre le vol, le feu et les catastrophes naturelles, protocoles de manutention et de stockage spécialisés pour les métaux précieux et possibilité de stockage séparé (vos actifs sont physiquement séparés des autres).",
-
-                    ]),
-                    html.Li(className="mt-3", children=[
-                        html.Span("Inconvénients : ", className="fw-bold"),
-                        "Frais de stockage les plus élevés, accès potentiellement moins pratique que le stockage à domicile ou en banque, et nécessite une diligence raisonnable approfondie pour s'assurer de la réputation et de la stabilité financière de l'installation.",
-
+                        html.Span("Surmonter l'aversion aux pertes : ", className="fw-bold"),
+                        "Établissez des stratégies de sortie claires et des niveaux de tolérance au risque avant de faire tout investissement. Utilisez des ordres stop-loss pour limiter les pertes potentielles et éviter la prise de décision émotionnelle pendant les baisses du marché. Concentrez-vous sur la performance globale du portefeuille et les objectifs à long terme, plutôt que de vous fixer sur les gains ou les pertes individuels.",
                     ]),
                 ], className="list-unstyled"),
 
-                html.H2("Risques de sécurité et stratégies d'atténuation : Une discussion approfondie",
+                html.H3("Le sophisme des coûts irrécupérables", className="display-7 mt-4 mb-3 fw-bold"),
+
+                html.Ul([
+                    html.Li(
+                        "Le sophisme des coûts irrécupérables est la tendance à continuer d'investir dans une entreprise perdante en raison du temps, de l'argent ou des efforts déjà investis, quelles que soient ses perspectives d'avenir. Ce biais peut piéger les investisseurs dans un cycle où ils jettent de l'argent par les fenêtres. Par exemple, un investisseur qui a passé beaucoup de temps à rechercher une société minière d'or particulière pourrait continuer à investir dans ses actions, même si la performance de l'entreprise se détériore et que les perspectives du marché deviennent négatives."
+                    ),
+                    html.Li(className="mt-3", children=[
+                        html.Span("Surmonter le sophisme des coûts irrécupérables : ", className="fw-bold"),
+                        "Reconnaissez que les investissements passés sont des coûts irrécupérables et ne doivent pas influencer les décisions futures. Évaluez objectivement la situation actuelle et les perspectives d'avenir de tout investissement, quels que soient les engagements passés. Soyez prêt à réduire vos pertes et à passer à des opportunités plus prometteuses.",
+                    ]),
+                ], className="list-unstyled"),
+
+                html.H2("Comment les biais conduisent à des choix sous-optimaux : Une analyse pratique",
                         className="display-6 mt-5 mb-4 fw-bold"),
 
                 html.P(
-                    "La protection des investissements en métaux précieux nécessite une approche proactive de l'atténuation des risques."
+                    "Les biais psychologiques peuvent se manifester de diverses manières, conduisant à de mauvais choix d'investissement."
                 ),
 
-                html.H3("Vol", className="display-7 mt-4 mb-3 fw-bold"),
-
-                html.Ul([
-                    html.Li(className="mt-3", children=[
-                        html.Span("Stockage à domicile : ", className="fw-bold"),
-                        "Investissez dans un coffre-fort de haute qualité, installé par des professionnels et boulonné à la structure du bâtiment. Évitez de divulguer vos avoirs en métaux précieux. Envisagez un coffre-fort leurre ou une cachette pour détourner l'attention du véritable emplacement de stockage. Installez un système d'alarme avec des capteurs sur les portes et les fenêtres, et envisagez des détecteurs de mouvement ou des caméras de sécurité."
-                    ]),
-                    html.Li(className="mt-3", children=[
-                        html.Span("Coffres bancaires : ", className="fw-bold"),
-                        "Choisissez une banque réputée avec des mesures de sécurité robustes. Soyez discret lorsque vous accédez à votre coffre-fort.",
-
-                    ]),
-                    html.Li(className="mt-3", children=[
-                        html.Span("Coffres-forts privés : ", className="fw-bold"),
-                        "Examinez attentivement les protocoles de sécurité de l'installation, y compris les contrôles d'accès, la vérification des antécédents du personnel et la couverture d'assurance.",
-
-                    ]),
-                ], className="list-unstyled"),
-
-                html.H3("Incendie", className="display-7 mt-4 mb-3 fw-bold"),
-
-                html.Ul([
-                    html.Li(className="mt-3", children=[
-                        html.Span("Stockage à domicile : ", className="fw-bold"),
-                        "Stockez les métaux dans un coffre-fort ignifuge avec une certification. Mettez en œuvre des mesures générales de sécurité incendie dans votre maison, y compris des détecteurs de fumée, des extincteurs et un plan d'évacuation."
-                    ]),
-                    html.Li(className="mt-3", children=[
-                        html.Span("Coffres bancaires et coffres-forts privés : ", className="fw-bold"),
-                        "Ces installations sont généralement équipées de systèmes d'extinction d'incendie et sont conçues pour résister aux dommages causés par le feu, offrant une meilleure protection que le stockage à domicile.",
-
-                    ]),
-                ], className="list-unstyled"),
-
-                html.H3("Risque de contrepartie", className="display-7 mt-4 mb-3 fw-bold"),
+                html.H3("Dépenses excessives", className="display-7 mt-4 mb-3 fw-bold"),
 
                 html.Ul([
                     html.Li(
-                        "Le risque de contrepartie survient lorsque l'on confie des actifs à un tiers, tel qu'une banque ou une installation de stockage. Le risque est que l'institution devienne insolvable, restreigne l'accès aux actifs ou se livre à des activités frauduleuses."
+                        "L'excitation et l'attrait de posséder des métaux précieux, en particulier de l'or ou de l'argent physique, peuvent déclencher des prises de décision émotionnelles et entraîner des dépenses excessives. Les investisseurs pourraient être tentés d'acheter plus de métal que leur budget ne le permet, négligeant d'autres objectifs financiers essentiels ou s'endettant inutilement. Cela est particulièrement vrai pendant les périodes de battage médiatique ou de pénurie perçue sur le marché."
                     ),
-                    html.Li(className="mt-3", children=[
-                        html.Span("Atténuation du risque de contrepartie : ", className="fw-bold"),
-                        "Détenir du métal physique à domicile élimine ce risque, mais augmente les risques de vol et de perte. Lorsque vous utilisez une banque ou une installation privée, effectuez une diligence raisonnable approfondie pour évaluer leur stabilité financière, leur réputation et leur conformité légale. Diversifiez les emplacements de stockage et envisagez des options de stockage séparé.",
-                    ]),
                 ], className="list-unstyled"),
 
-                html.H3("Catastrophes naturelles", className="display-7 mt-4 mb-3 fw-bold"),
+                html.H3("Course aux pertes", className="display-7 mt-4 mb-3 fw-bold"),
 
                 html.Ul([
                     html.Li(
-                        "Les catastrophes naturelles, comme les inondations, les tremblements de terre ou les ouragans, peuvent constituer une menace importante pour les avoirs en métaux précieux."
+                        "L'aversion aux pertes peut conduire à la course aux pertes, où les investisseurs essaient de récupérer les pertes précédentes en prenant des risques encore plus grands. Cela peut créer un cycle dangereux de pertes croissantes. Par exemple, un investisseur qui a perdu de l'argent sur un investissement spéculatif dans l'argent pourrait doubler la mise sur une autre action argentifère à haut risque, dans l'espoir de récupérer rapidement ses pertes."
                     ),
-                    html.Li(className="mt-3", children=[
-                        html.Span("Atténuation : ", className="fw-bold"),
-                        "Choisissez des emplacements de stockage géographiquement moins sujets à des catastrophes naturelles spécifiques. Les coffres bancaires et les coffres-forts privés, souvent situés dans des bâtiments renforcés, offrent généralement une meilleure protection que le stockage à domicile. Assurez-vous que les polices d'assurance couvrent les risques spécifiques de catastrophes naturelles.",
-
-                    ]),
                 ], className="list-unstyled"),
 
-                html.H3("Escroqueries et contrefaçons", className="display-7 mt-4 mb-3 fw-bold"),
+                html.H3("Conserver des investissements perdants", className="display-7 mt-4 mb-3 fw-bold"),
 
                 html.Ul([
                     html.Li(
-                        "Le marché des métaux précieux, en particulier les marchés en ligne et les transactions privées, est sensible aux escroqueries et aux produits contrefaits."
+                        "Le sophisme des coûts irrécupérables, combiné à l'aversion aux pertes, peut amener les investisseurs à conserver des investissements perdants pendant beaucoup trop longtemps, dans l'espoir d'un retournement de situation qui pourrait ne jamais se produire. Cela les empêche de réaliser des pertes, qui peuvent être utilisées pour compenser les gains dans d'autres investissements et réduire les obligations fiscales. De plus, conserver un investissement perdant immobilise des capitaux qui pourraient être déployés dans des opportunités plus rentables."
                     ),
-                    html.Li(className="mt-3", children=[
-                        html.Span("Atténuation : ", className="fw-bold"),
-                        "N'achetez qu'auprès de revendeurs réputés ou de vendeurs privés ayant des antécédents vérifiables. Authentifiez tous les achats en utilisant plusieurs méthodes de test. Méfiez-vous des offres qui semblent trop belles pour être vraies.",
-
-                    ]),
                 ], className="list-unstyled"),
 
-                html.H3("Perte ou oubli", className="display-7 mt-4 mb-3 fw-bold"),
+                html.H2("Stratégies pour une prise de décision rationnelle", className="display-6 mt-5 mb-4 fw-bold"),
+
+                html.P(
+                    "Cultiver la prise de décision rationnelle exige un effort conscient et des pratiques disciplinées."
+                ),
+
+                html.H3("Analyse objective", className="display-7 mt-4 mb-3 fw-bold"),
 
                 html.Ul([
                     html.Li(
-                        "Égarer ou oublier l'emplacement des métaux précieux cachés est un événement étonnamment courant."
+                        "Basez les décisions d'investissement sur des recherches approfondies, une analyse fondamentale et des données objectives, plutôt que sur des émotions ou des intuitions. Évaluez les tendances du marché, les indicateurs économiques et les événements géopolitiques qui peuvent influencer les prix des métaux précieux. Diversifiez les sources d'information et évaluez de manière critique les différentes perspectives."
+                    ),
+                ], className="list-unstyled"),
+
+                html.H3("Élaborer un plan d'investissement clair", className="display-7 mt-4 mb-3 fw-bold"),
+
+                html.Ul([
+                    html.Li(
+                        "Définissez vos objectifs d'investissement, votre tolérance au risque et votre horizon temporel. Élaborez un plan d'investissement écrit qui décrit votre stratégie de répartition du capital entre différentes classes d'actifs, y compris les métaux précieux. Établissez des points d'entrée et de sortie clairs pour chaque investissement. Ce plan servira de feuille de route pendant les fluctuations du marché et aidera à prévenir les prises de décision émotionnelles."
+                    ),
+                ], className="list-unstyled"),
+
+                html.H3("Demander conseil à un professionnel", className="display-7 mt-4 mb-3 fw-bold"),
+
+                html.Ul([
+                    html.Li(
+                        "Consultez un conseiller financier qualifié qui peut vous fournir des conseils objectifs et vous aider à élaborer une stratégie d'investissement personnalisée. Un conseiller financier peut également servir de caisse de résonance, remettant en question vos hypothèses et vous aidant à éviter les décisions émotionnelles."
+                    ),
+                ], className="list-unstyled"),
+
+                html.H2("Gérer les défis émotionnels de l'investissement", className="display-6 mt-5 mb-4 fw-bold"),
+
+                html.P(
+                    "Investir implique de naviguer dans un éventail complexe d'émotions, notamment la peur, la cupidité et le regret. Gérer efficacement ces émotions est essentiel pour réussir à long terme."
+                ),
+
+                html.H3("Peur", className="display-7 mt-4 mb-3 fw-bold"),
+
+                html.Ul([
+                    html.Li(
+                        "La peur de perdre de l'argent est une émotion humaine naturelle, surtout pendant les baisses du marché. Une peur excessive peut conduire à des ventes paniquées, obligeant les investisseurs à enregistrer des pertes et à manquer des gains futurs potentiels."
                     ),
                     html.Li(className="mt-3", children=[
-                        html.Span("Atténuation : ", className="fw-bold"),
-                        "Tenez des registres détaillés de vos avoirs et de leurs emplacements de stockage. Si vous utilisez une cachette, créez une carte ou des instructions écrites et conservez-les en lieu sûr dans un endroit séparé. Informez un membre de votre famille ou un conseiller juridique de confiance de vos avoirs et de vos modalités de stockage.",
-
+                        html.Span("Gérer la peur : ", className="fw-bold"),
+                        "Comprenez votre tolérance au risque et investissez en conséquence. Diversifiez votre portefeuille pour réduire le risque global. Concentrez-vous sur vos objectifs d'investissement à long terme et évitez de prendre des décisions impulsives basées sur les fluctuations à court terme du marché.",
                     ]),
                 ], className="list-unstyled"),
 
-                html.H2("Analyse des méthodes de stockage: avantages, inconvénients et considérations",
+                html.H3("Cupidité", className="display-7 mt-4 mb-3 fw-bold"),
+
+                html.Ul([
+                    html.Li(
+                        "La cupidité, ou le désir de gains excessifs, peut conduire à prendre des risques inutiles et à rechercher des investissements spéculatifs. Cela peut être particulièrement tentant sur le marché des métaux précieux, où les histoires d'appréciation rapide des prix peuvent alimenter des attentes irréalistes."
+                    ),
+                    html.Li(className="mt-3", children=[
+                        html.Span("Gérer la cupidité : ", className="fw-bold"),
+                        "Fixez-vous des objectifs d'investissement réalistes et évitez la tentation de rechercher des richesses rapides. Concentrez-vous sur la construction d'un portefeuille diversifié qui équilibre le risque et le rendement. N'oubliez pas que la préservation du patrimoine est un marathon, pas un sprint.",
+                    ]),
+                ], className="list-unstyled"),
+
+                html.H3("Regret", className="display-7 mt-4 mb-3 fw-bold"),
+
+                html.Ul([
+                    html.Li(
+                        "Le regret est l'émotion négative associée à une mauvaise décision d'investissement. Il peut conduire à l'auto-accusation, à la frustration et à une réticence à prendre des décisions d'investissement futures."
+                    ),
+                    html.Li(className="mt-3", children=[
+                        html.Span("Gérer le regret : ", className="fw-bold"),
+                        "Apprenez de vos erreurs et considérez-les comme des expériences d'apprentissage précieuses. Ne vous attardez pas sur les décisions passées. Concentrez-vous sur des choix éclairés pour l'avenir et n'oubliez pas que chaque investisseur commet des erreurs à un moment donné.",
+                    ]),
+                ], className="list-unstyled"),
+
+                html.H2("Discipline et patience : Les clés du succès à long terme",
                         className="display-6 mt-5 mb-4 fw-bold"),
 
                 html.P(
-                    "(Développez cette section en ajoutant plus de détails sur chaque méthode, en comparant les coûts (achat d'un coffre-fort vs frais de location), les options d'assurance et l'accessibilité):"
-                ),
-
-                html.H3("Stockage à domicile", className="display-7 mt-4 mb-3 fw-bold"),
-
-                html.P(
-                    "Discuter des différents types de coffres-forts à domicile (ignifuges, résistants au cambriolage, à combinaison, biométriques), des compartiments cachés et des coffres-forts leurres. Analyser les coûts d’achat et d’installation d’un coffre-fort par rapport aux frais de location récurrents pour d’autres options de stockage."
-                ),
-
-                html.H3("Coffres bancaires", className="display-7 mt-4 mb-3 fw-bold"),
-
-                html.P(
-                    "Comparer les frais de location entre différentes banques. Examiner les options d’assurance offertes par les banques et leurs limitations de couverture. Discuter des restrictions d’accessibilité et des difficultés potentielles pendant les jours fériés ou les crises financières."
-                ),
-
-                html.H3("Coffres privés", className="display-7 mt-4 mb-3 fw-bold"),
-
-                html.P(
-                    "Rechercher des sociétés de coffres privés réputées et comparer leurs services, leurs frais, leurs mesures de sécurité et leurs options d’assurance. Discuter des avantages du stockage séparé, du stockage alloué et d’autres services spécialisés."
-                ),
-
-                html.H2("Tactiques de diversion et mesures de sécurité supplémentaires",
-                        className="display-6 mt-5 mb-4 fw-bold"),
-
-                html.P(
-                    "L'amélioration de la sécurité nécessite une approche multicouche. Combinez la sécurité physique avec des tactiques de diversion et d'autres mesures proactives."
+                    "La discipline et la patience sont des qualités essentielles pour réussir à long terme en matière d'investissement."
                 ),
 
                 html.Ul([
                     html.Li(className="mt-3", children=[
-                        html.Span("Coffres-forts leurres : ", className="fw-bold"),
-                        "Un coffre-fort moins sécurisé et facilement accessible contenant une petite quantité d'objets de valeur peut détourner l'attention du véritable emplacement de stockage."
+                        html.Span("Discipline : ", className="fw-bold"),
+                        "Respectez votre plan d'investissement, même pendant les périodes de volatilité du marché. Évitez de prendre des décisions émotionnelles basées sur la peur ou la cupidité. Revoyez et rééquilibrez régulièrement votre portefeuille en fonction de votre plan, mais évitez les transactions impulsives."
                     ]),
-                    html.Li(className="mt-3", children=[
-                        html.Span("Fausses caméras de sécurité : ", className="fw-bold"),
-                        " : Des caméras de sécurité visibles mais non fonctionnelles peuvent dissuader les voleurs opportunistes.",
-
-                    ]),
-                    html.Li(className="mt-3", children=[
-                        html.Span("Sécurité domiciliaire renforcée : ", className="fw-bold"),
-                        "Des portes et fenêtres renforcées, un film de sécurité sur les fenêtres, un éclairage activé par le mouvement et une signalisation du système d'alarme peuvent améliorer la sécurité générale de la maison.",
-
-                    ]),
-                    html.Li(className="mt-3", children=[
-                        html.Span("Discrétion : ", className="fw-bold"),
-                        "Évitez de divulguer vos avoirs en métaux précieux. Soyez discret lorsque vous transportez ou accédez à vos métaux.",
-
-                    ]),
-                ], className="list-unstyled"),
-                html.H2("Options d'assurance et documentation", className="display-6 mt-5 mb-4 fw-bold"),
-
-                html.P(
-                    "L'assurance est essentielle pour protéger les investissements en métaux précieux contre les événements imprévus."
-                ),
-
-                html.H3("Assurance habitation ou locataire", className="display-7 mt-4 mb-3 fw-bold"),
-
-                html.Ul([
                     html.Li(
-                        "Vérifiez votre police actuelle pour connaître la couverture des métaux précieux. La plupart des polices ont des limitations de couverture pour les objets de valeur, et des «avenants» supplémentaires peuvent être nécessaires pour assurer adéquatement les avoirs en métaux précieux. Fournissez à votre compagnie d'assurance une documentation détaillée de vos métaux, y compris les reçus d'achat, les photos et les évaluations."
+                        "Patience : Investir dans les métaux précieux, en particulier l'or ou l'argent physique comme couverture à long terme, exige de la patience. Ne vous attendez pas à devenir riche rapidement. Les prix des métaux précieux peuvent fluctuer considérablement à court terme, mais leur proposition de valeur à long terme réside dans leur capacité à préserver le patrimoine et à fournir une stabilité en période d'incertitude économique. Évitez de vous décourager par les fluctuations de prix à court terme et maintenez une vision à long terme.",
+                        className="mt-3"
                     ),
                 ], className="list-unstyled"),
-
-                html.H3("Assurance spécialisée pour les métaux précieux", className="display-7 mt-4 mb-3 fw-bold"),
-
-                html.Ul([
-                    html.Li(
-                        "Certains assureurs proposent des polices spécifiquement conçues pour les métaux précieux, offrant une couverture plus large et des limites plus élevées que l'assurance habitation ou locataire standard."
-                    ),
-                ], className="list-unstyled"),
-
-                html.H3("Assurance pour coffre bancaire", className="display-7 mt-4 mb-3 fw-bold"),
-
-                html.Ul([
-                    html.Li(
-                        "Certaines banques offrent une assurance pour le contenu des coffres bancaires. Examinez attentivement les détails de la couverture, les exclusions et le processus de réclamation."
-                    ),
-                ], className="list-unstyled"),
-
-                html.H3("Assurance pour coffre-fort privé", className="display-7 mt-4 mb-3 fw-bold"),
-
-                html.Ul([
-                    html.Li(
-                        "Les installations de coffres-forts privés réputées incluent une assurance complète dans leur forfait de services. Examinez les détails de la police et assurez-vous que les limites de couverture sont adéquates."
-                    ),
-                ], className="list-unstyled"),
-
             ]),  # Close the dbc.Col
         ]),  # Close the dbc.Row
     ])  # Close the dbc.Container

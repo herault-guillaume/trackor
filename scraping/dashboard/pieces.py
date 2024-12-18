@@ -142,6 +142,7 @@ weights  = {
                         'or - 10 couronnes hongrie': 3.096,
                         'or - 100 dollars canadien': 15.551,
                         'or - 100 francs fr': 29.02,
+                        'or - 100 francs tunisie': 5.89,
                         'or - 100 francs fr napoléon III tête nue': 29.02,
                         'or - 100 francs fr napoléon III tête laurée': 29.02,
                         'or - 100 francs fr génie DPF': 29.02,

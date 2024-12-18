@@ -4,11 +4,11 @@ import dash_bootstrap_components as dbc
 def layout():
     return dbc.Container(fluid=True, children=[
         dbc.Row(justify="center", children=[
-            dbc.Col(lg=8, children=[
+            dbc.Col(lg=9, children=[
                 html.H1("Stratégies d'investissement dans l'argent", className="display-4 text-center mb-4 fw-bold text-center"),
 
                 html.P(
-                    "L'argent, souvent appelé « l'or du pauvre » à tord, offre une opportunité d'investissement intéressante grâce à son double rôle de métal précieux et de matière première industrielle. Bien qu'il partage certaines similitudes avec l'or, l'argent présente une dynamique de marché distincte, notamment une plus grande volatilité des prix, une composante importante de la demande industrielle et une sensibilité à la manipulation du marché. Cet article propose une analyse approfondie des stratégies d'investissement dans l'argent, fournissant aux investisseurs expérimentés les connaissances et les outils nécessaires pour naviguer sur ce marché complexe et potentiellement capitaliser sur ses caractéristiques uniques.",
+                    "L'argent, souvent appelé « l'or du pauvre » à tord, offre une opportunité d'investissement intéressante grâce à son double rôle de métal précieux et de matière première industrielle. Bien qu'il partage certaines similitudes avec l'or, l'argent présente une dynamique de marché distincte, notamment une plus grande volatilité des prix, une composante importante de la demande industrielle et une sensibilité à la manipulation du marché. Cet article propose une analyse des stratégies d'investissement dans l'argent, fournissant aux investisseurs expérimentés les connaissances et les outils nécessaires pour naviguer sur ce marché complexe et potentiellement capitaliser sur ses caractéristiques uniques.",
                     className="lead"
                 ),
 
