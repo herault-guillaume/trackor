@@ -206,10 +206,18 @@ def pre_calculate_and_store_offers():
     standard_bullion_type = 'or'
     standard_selected_coins = None
 
+    france_timezone = pytz.timezone('Europe/Paris')
+    now_france = datetime.datetime.now(france_timezone)
+    thirty_minutes_ago = now_france - datetime.timedelta(minutes=30)
+
     # 2. Fetch the latest metal price
-    results = session.query(MetalPrice).order_by(MetalPrice.timestamp.desc()).first()
-    metal_price = results.buy_price
-    session_id = results.session_id
+    results = MetalPrice.get_previous_price(standard_bullion_type)
+    metal_prices_df = pd.DataFrame(results)
+
+    metal_price = metal_prices_df['buy_price'].iloc[0]
+    session_id = metal_prices_df['session_id'].iloc[0]
+    latest_timestamp = metal_prices_df['timestamp'].iloc[0]
+    formatted_timestamp = latest_timestamp.strftime('%d/%m/%Y à %Hh%M.')
 
     # 3. Fetch items from the database
     results = Item.get_items_by_bullion_type_and_quantity(standard_bullion_type, session_id, standard_quantity)
@@ -267,7 +275,7 @@ def pre_calculate_and_store_offers():
                         row['quantity']) + ' ({total_quantity})'.format(
                         total_quantity=str(total_quantity)) if row['quantity'] > 1 else standard_quantity,
                     'delivery_fees': get_price(row['delivery_fees'], total_cost),
-                    'total_cost': total_cost
+                    'total_cost': float(total_cost)
                 })
                 seen_offers.add(row['id'])
                 total_count += 1
@@ -299,5 +307,5 @@ def pre_calculate_and_store_offers():
 if __name__ == "__main__":
     pre_calculate_and_store_offers()
     scheduler = BackgroundScheduler()
-    scheduler.add_job(pre_calculate_and_store_offers, 'interval', minutes=10)
+    scheduler.add_job(pre_calculate_and_store_offers, 'interval', minutes=5)
     scheduler.start()

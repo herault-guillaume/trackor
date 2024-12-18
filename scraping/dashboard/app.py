@@ -281,7 +281,7 @@ navbar = dbc.NavbarSimple(
     style={"paddingTop": "0","paddingBottom": "0"},  # Add margin-bottom for spacing
 )
 
-header = dbc.Row([html.Img(src='/assets/logo-bullion-sniper.webp', style={'height': '100px', 'width': '300px'}),
+header = dbc.Row([html.Img(src='/assets/logo-bullion-sniper.webp', style={'height': '150px', 'width': '450px'}),
              html.Div(  # Add the text here
                  "Votre comparateur de prix  pour l'investissement dans les métaux précieux.",
                  className='mb-4 mt-4', style={'textAlign': 'center', 'fontSize': '16px', 'font-weight' : 'bold','color': 'gold'}
