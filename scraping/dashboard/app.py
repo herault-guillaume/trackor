@@ -309,7 +309,7 @@ footer = html.Div([
                             ])], style={'textAlign': 'center'}
                             )
                         ],
-                        width=8)
+                        width=12)
                 ], className="mb-4 mt-4",justify="center"),
 
             html.Div([
@@ -324,6 +324,40 @@ app.layout = html.Div([
     header,
     dbc.Container(id="page-content", fluid=False),
     dcc.Store(id='initial-load', data=True),
+    html.Div(id='google-analytics-container'),
+    dcc.Store(id='cookie-consent', storage_type='local'),  # Changed to local storage
+    html.Div(
+        id='cookie-banner',
+        children=[
+            html.Div(className="cookie-consent", children=[
+                html.Div([
+                    html.P("Salut les investisseurs ! 👋"),
+                    html.P(
+                        "Bullion-Sniper est un site 100% gratuit et sans pub, conçu par un passionné pour vous aider à trouver les meilleures offres. Pour que je puisse continuer à améliorer le site et vous offrir la meilleure expérience possible, j'ai besoin de collecter quelques données anonymes grâce aux cookies."),
+                    html.P(
+                        "C'est un petit coup de pouce de votre part qui m'aide énormément ! 😊 Acceptez-vous les cookies analytiques pour m'aider à faire grandir Bullion-Sniper ?")
+                ],
+                    className="cookie-message mb-3 text-center text-white",
+                    style={"max-width": "400px", "margin": "0 auto"}
+                ),
+                dcc.Checklist(
+                    id='cookie-checklist',
+                    options=[
+                        {'label': 'Cookies essentiels', 'value': 'essential'},
+                        {'label': 'Cookies analytiques', 'value': 'analytics'}
+                    ],
+                    value=['essential', 'analytics'],
+                    inline=False,
+                    inputClassName="form-check-input",
+                    labelClassName="form-check-label",
+                    className="mb-3"
+                ),
+                html.Button("Enregistrer mes préférences", id='save-cookie-preferences', n_clicks=0,
+                            className="btn btn-warning mt-3")
+            ]),
+        ],
+        style={'display': 'none'}
+    )
 ])
 
 @app.callback(Output("page-content", "children"),
@@ -760,7 +794,8 @@ def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_
         if selected_coins:
             filtered_df = pd.DataFrame()  # Create an empty DataFrame to store filtered rows
             for coin in selected_coins:
-                filtered_df = pd.concat([filtered_df, items_df[items_df['name'].str.contains(coin, regex=True)]])
+                pattern = coin.replace('(', r'\(').replace(')', r'\)')
+                filtered_df = pd.concat([filtered_df, items_df[items_df['name'].str.contains(pattern, regex=True)]])
             items_df = filtered_df  # Update items_df with the filtered DataFrame
 
         # Pre-process the 'buy_premiums' column before the loops
@@ -934,6 +969,52 @@ app.clientside_callback(
     Input("tawk-to-widget", "n_clicks"),
 )
 
+# Clientside callback to manage cookie consent, banner visibility, and Google Analytics
+app.clientside_callback(
+    """
+    function(href, saveClicks, checklistValues) {
+        let essentialConsent = localStorage.getItem('essential-cookies');
+        let analyticsConsent = localStorage.getItem('analytics-cookies');
+
+        if (saveClicks > 0) {
+            localStorage.setItem('essential-cookies', checklistValues.includes('essential'));
+            localStorage.setItem('analytics-cookies', checklistValues.includes('analytics'));
+            essentialConsent = checklistValues.includes('essential') ? 'true' : 'false';
+            analyticsConsent = checklistValues.includes('analytics') ? 'true' : 'false';
+
+            // Inject Google Analytics if consent is given
+            if (analyticsConsent === 'true') {
+                const scriptId = 'gtag-script';
+                if (!document.getElementById(scriptId)) {
+                    const script = document.createElement('script');
+                    script.id = scriptId;
+                    script.src = 'https://www.googletagmanager.com/gtag/js?id=G-DBDM228K9G';
+                    document.head.appendChild(script);
+
+                    window.dataLayer = window.dataLayer || [];
+                    function gtag(){dataLayer.push(arguments);}
+                    gtag('js', new Date());
+                    gtag('config', 'G-DBDM228K9G');
+                }
+            }
+        }
+
+        if (essentialConsent === null || analyticsConsent === null) {
+            document.getElementById('cookie-banner').style.display = 'block';
+        } else {
+            document.getElementById('cookie-banner').style.display = 'none';
+        }
+        return [
+            essentialConsent === 'true', 
+            analyticsConsent === 'true'
+        ];
+    }
+    """,
+    Output('cookie-consent', 'data'),
+    Input('url', 'href'),
+    Input('save-cookie-preferences', 'n_clicks'),
+    Input('cookie-checklist', 'value')
+)
 ########################################################################################################################
 
 with app.server.app_context():

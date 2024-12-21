@@ -49,17 +49,17 @@ def fetch_and_update_data():
         with sshtunnel.SSHTunnelForwarder(
                 ('ssh.pythonanywhere.com'),
                 ssh_username='Pentagruel',
-                ssh_password='(US)ue%1',
+                ssh_password='M1nceMaManette',
                 remote_bind_address=('pentagruel.mysql.pythonanywhere-services.com', 3306),
                 local_bind_address=('127.0.0.1', 3306)
                 # Your database hostname
         ) as tunnel:
 
             engine_prod = create_engine(
-                f"mysql+mysqlconnector://Pentagruel:(US)ue%1@127.0.0.1:{tunnel.local_bind_port}/Pentagruel$bullionsniper"
+                f"mysql+mysqlconnector://Pentagruel:(US)ue%1(US)ue%1@127.0.0.1:{tunnel.local_bind_port}/Pentagruel$bullionsniper"
             )
             engine_staging = create_engine(
-                f"mysql+mysqlconnector://Pentagruel:(US)ue%1@127.0.0.1:{tunnel.local_bind_port}/Pentagruel$staging-bullionsniper"
+                f"mysql+mysqlconnector://Pentagruel:(US)ue%1(US)ue%1@127.0.0.1:{tunnel.local_bind_port}/Pentagruel$staging-bullionsniper"
             )
 
             driver = Driver(uc=True, headless=True)

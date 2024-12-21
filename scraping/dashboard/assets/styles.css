@@ -91,3 +91,40 @@ body {
 .rc-slider-handle:active {
   box-shadow: 0 0 0 5px rgba(0, 0, 0, 0.4) !important;
 }
+
+.cookie-consent {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: #1A1A1A; /* Dark background color */
+  color: #ffc107;            /* Gold text color */
+  padding: 20px;
+  text-align: center;
+  z-index: 100;            /* Ensure it's on top */
+  border-top: 1px solid #ffc107; /* Gold top border */
+}
+
+.cookie-consent-accept {
+  margin: 0 10px;
+  padding: 8px 16px;
+  background-color: #ffc107; /* Gold button color */
+  color: #212529;           /* Dark text color */
+  border: none;
+  cursor: pointer;
+}
+
+.cookie-consent-decline {
+  margin: 0 10px;
+  padding: 8px 16px;
+  background-color: #1A1A1A; /* Dark button color */
+  color: #ffc107;           /* Gold text color */
+  border: 1px solid #ffc107; /* Gold border */
+  cursor: pointer;
+}
+
+.form-check-input {
+  width: 20px; /* Adjust size */
+  height: 20px; /* Adjust size */
+  margin-right: 10px; /* Adjust spacing */
+}
