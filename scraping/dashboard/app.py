@@ -10,8 +10,6 @@ import pytz
 import datetime
 
 from scipy.optimize import minimize
-from math import floor
-
 
 from sqlalchemy import func
 import dash
@@ -238,6 +236,7 @@ def objective_function(x):
     return -x[0]  # Access the first element of the array x
 
 def constraint(x, budget, price_ranges, delivery_fee_ranges):
+
     price_per_coin_ = lambda x: get_price(price_ranges, x)
     delivery_fees_ = lambda x: get_price(delivery_fee_ranges, x * price_per_coin_(x))
 
@@ -251,24 +250,23 @@ def constraint(x, budget, price_ranges, delivery_fee_ranges):
     return budget - (x[0] * price + delivery_fee)
 
 # Function to find the maximum coins
-def find_max_coins(budget, price_ranges, delivery_fee_ranges,minimum):
+def find_max_coins(max_quantity, max_budget, price_ranges, delivery_fee_ranges,minimum):
     # Initial guess for x (can be improved)
-    x0 = pd.Series([max(1, minimum)])
+    x0 = pd.Series(max([1,minimum]))
 
     constraint_dict = [
-        {'type': 'ineq', 'fun': lambda x: constraint(x, budget, price_ranges, delivery_fee_ranges)},
-        {'type': 'ineq', 'fun': lambda x: x[0] - minimum}  # Minimum quantity constraint
+        {'type': 'ineq', 'fun': lambda x: constraint(x, max_budget, price_ranges, delivery_fee_ranges)},
     ]
     # Perform numerical optimization using minimize
     result = minimize(
         objective_function,
         x0,
-        bounds=[(minimum, budget)],  # Set the lower bound to the minimum
+        bounds=[(minimum, max_quantity)],  # Set the lower bound to the minimum
         constraints=constraint_dict,
         method='SLSQP'
     )
 
-    max_coins = floor(result.x[0])  # Access the solution from result.x[0]
+    max_coins = int(round(result.x[0]))  # Access the solution from result.x[0]
     return max_coins
 
 def get_country_flag_image(country_code):
@@ -515,13 +513,12 @@ def serve_dashboard():
                 dcc.Slider(
                     id='quantity-slider',
                     min=1,
-                    max=750,
+                    max=2000,
                     step=1,
-                    value=3,  # Default value
+                    value=2000,  # Default value
                     marks={
                         1: '1',
-                        375: '375',
-                        750: '750',
+                        2000: '2000',
                         # Add more marks if needed
                     },
                     tooltip={"placement": "bottom", "always_visible": True,"style": {"color": "gold", "fontSize": "14px"}},
@@ -842,24 +839,33 @@ def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_
         # Pre-process the 'buy_premiums' column before the loops
 
         budget_min, budget_max = budget_range
-        print('go')
+
         for i, row in items_df.iterrows():
 
-            total_quantity = find_max_coins(budget_max, row['price_ranges'], row['delivery_fees'],row['minimum'])
-            premium = float(row['buy_premiums'].split(';')[total_quantity-1])
+            total_quantity = find_max_coins(quantity,budget_max, row['price_ranges'], row['delivery_fees'],row['minimum'])
+
+            #obligé de retirer les offres inferieur a la quantité, le solveur doit pouvoir descendre en dessous du minimum de pièce pour calculer.
+            if total_quantity < row['minimum']:
+                continue
+
+            price_per_coin = get_price(row['price_ranges'],total_quantity) / row['quantity']
+            delivery_cost = get_price(row['delivery_fees'],total_quantity)
+            ppc_ipc = price_per_coin + (delivery_cost/total_quantity)
             spot_cost = weights[row['name']] * metal_price
-            ppc = (spot_cost + (premium / 100.0) * spot_cost)
-            total_cost = ppc * total_quantity
-            # Check if the offer meets the budget
-            #if row['id'] not in seen_offers and budget_min <= total_cost <= budget_max and quantity >= total_quantity:#and quantity >= total_quantity :
-            print(total_quantity,row['quantity'],row['minimum'] == 1)
+            premium = ppc_ipc - spot_cost
+            premium_percentage = (premium / spot_cost) * 100
+            total_cost = ppc_ipc * total_quantity * row['quantity']
+
+            if total_cost > budget_max or total_quantity > quantity:
+                continue
+
             cheapest_offers.append({
                 'name': row['name'].upper(),
                 'source': row['source'],
-                'premium': premium ,
-                'price_per_coin': f"{ppc:.2f} €" ,
-                'quantity': total_quantity if row['quantity'] == 1 and row['minimum'] == 1 else str(total_quantity) + ' x ' + str(row['quantity']) + ' ({total_quantity})'.format(total_quantity=str(total_quantity)) if row['quantity'] > 1 else quantity ,
-                'delivery_fees': 0.00 if get_price(row['delivery_fees'],total_cost) == 0.01 else get_price(row['delivery_fees'],total_cost),
+                'premium':premium_percentage,
+                'price_per_coin': ppc_ipc,
+                'quantity': total_quantity if row['quantity'] == 1 else str(total_quantity) + ' x ' + str(row['quantity']) + ' ({total_quantity})'.format(total_quantity=str(total_quantity * row['quantity'])) ,
+                'delivery_fees': 0 if get_price(row['delivery_fees'],total_cost) == 0.01 else get_price(row['delivery_fees'],total_cost),
                 'total_cost': total_cost
             })
 
@@ -879,8 +885,8 @@ def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_
                         style={'textAlign': 'center'}
                     ),
                     html.Td(offer['name'][4:]),
-                    html.Td(offer['premium'],style={'textAlign': 'center'}),
-                    html.Td(offer['price_per_coin'],style={'textAlign': 'center'}),
+                    html.Td(f"{offer['premium']:.2f}",style={'textAlign': 'center'}),
+                    html.Td(f"{offer['price_per_coin']:.2f} €",style={'textAlign': 'center'}),
                     html.Td(offer['quantity'],style={'textAlign': 'center'}),
                     html.Td(f"{offer['total_cost']:.2f} €",style={'textAlign': 'center'}),
                     html.Td(f"{offer['delivery_fees']:.2f} €",style={'textAlign': 'center'})
@@ -923,17 +929,6 @@ def update_piece_dropdown(bullion_type_switch):
         return or_options_quick_filter, None
     else :
         return ar_options_quick_filter, None
-
-@app.callback(
-    Output('quantity-slider', 'value'),
-    [Input('bullion-type-switch', 'value'),
-     State('quantity-slider', 'value')]
-)
-def update_quantity_dropdown(bullion_type_switch,quantity):
-    if bullion_type_switch:
-        return 3
-    else:
-        return 100
 
 @app.callback(
     Output('metal-price-output', 'children'),
