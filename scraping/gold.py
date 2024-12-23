@@ -74,7 +74,7 @@ def get_price_for(session_prod,session_staging, session_id,buy_price_gold,buy_pr
                     else:
                         buy_price = buy_price_silver
 
-                    price_ranges = [(minimum,999999999,price)]
+                    price_ranges = [(minimum,9999999999,price)]
 
                     def price_between(value, ranges):
                         """
@@ -92,7 +92,7 @@ def get_price_for(session_prod,session_staging, session_id,buy_price_gold,buy_pr
                                 price_ranges=';'.join(['{min_}-{max_}-{price}'.format(min_=r[0],max_=r[1],price=r[2].amount_float) for r in price_ranges]),
                                 buy_premiums=';'.join(
                                     ['{:.2f}'.format(((price_between(minimum,price_ranges)/quantity + price_between(price_between(minimum,price_ranges)*minimum,delivery_ranges)/(quantity*minimum)) - (buy_price * weights[name])) * 100.0 / (buy_price * weights[name])) for i in range(1, minimum)] +
-                                    ['{:.2f}'.format(((price_between(i,price_ranges)/quantity + price_between(price_between(i,price_ranges),delivery_ranges)/(quantity*i)) - (buy_price * weights[name])) * 100.0 / (buy_price * weights[name])) for i in range(minimum, 151)]
+                                    ['{:.2f}'.format(((price_between(i,price_ranges)/quantity + price_between(price_between(i,price_ranges),delivery_ranges)/(quantity*i)) - (buy_price * weights[name])) * 100.0 / (buy_price * weights[name])) for i in range(minimum, 751)]
                                 ),
                                 delivery_fees=';'.join(['{min_}-{max_}-{price}'.format(min_=r[0],max_=r[1],price=r[2]) for r in delivery_ranges]),
                                 source=source,

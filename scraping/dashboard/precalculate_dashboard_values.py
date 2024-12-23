@@ -241,30 +241,32 @@ def pre_calculate_and_store_offers():
     total_count = len(items_df)
     total_processed_count = 0
 
+    def calculate_premiums(x, q_max):
+        premium_index = min(range(len(x[:q_max])), key=lambda i: x[:q_max][i] - i)
+        return pd.Series({'buy_premiums': x[premium_index], 'premium_index': premium_index})
+
     for q_max in reversed(range(1, standard_quantity + 1)):
         if total_count <= total_processed_count:
             break
         df_copy = items_df.copy()
 
-        def calculate_premiums(x, q_max):
-            min_premium = min(x[:q_max])
-            premium_index = x.index(min_premium)
-            return pd.Series({'buy_premiums': min_premium, 'premium_index': premium_index})
-
         df_copy[['buy_premiums', 'premium_index']] = df_copy['buy_premiums'].apply(
             lambda x: calculate_premiums(x, q_max))
 
         results = df_copy.sort_values(by='buy_premiums')
-        print('i')
+
         for i, row in results.iterrows():
+            if not standard_quantity >= row['minimum']:
+                continue
+            # Calculate total cost (using bullion_type)
+
+            total_quantity = row['quantity'] * int(row['premium_index'] + 1) if row['minimum'] == 1 else int(row['premium_index'] + 1) * standard_quantity
             spot_cost = weights[row['name']] * metal_price
-            total_quantity = row['quantity'] * int(row['premium_index'] + 1) if row['minimum'] == 1 else int(
-                row['premium_index'] + 1) * standard_quantity
             total_cost = (spot_cost + (row['buy_premiums'] / 100.0) * spot_cost) * total_quantity
-            if row['id'] not in seen_offers and budget_min <= total_cost <= budget_max and standard_quantity >= \
-                    row['minimum']:
+            # Check if the offer meets the budget
+            if row['id'] not in seen_offers and budget_min <= total_cost <= budget_max and standard_quantity >= total_quantity:  # and quantity >= total_quantity :
                 ppc = (spot_cost + (row['buy_premiums'] / 100.0) * spot_cost)
-                print(ppc,row['name'])
+
                 cheapest_offers.append({
                     'name': row['name'].upper(),
                     'source': row['source'],

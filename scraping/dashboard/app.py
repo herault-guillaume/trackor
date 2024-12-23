@@ -8,6 +8,7 @@ import pandas as pd
 import sshtunnel
 import pytz
 import datetime
+from scipy.optimize import minimize
 
 from sqlalchemy import func
 import dash
@@ -208,12 +209,13 @@ app = dash.Dash(__name__,
             )
 
 #### UTILS #############################################################################################################
+# Your get_price function
 def get_price(ranges, quantity):
     """
     Calculates the price based on the quantity and given ranges.
 
     Args:
-    ranges: A string of ranges in the format '1-9;10-48;49-98;99-9999999999.9'.
+    ranges: A string of ranges in the format '1-9-302.0;10-48-300.0;...'.
     quantity: The quantity of the item.
 
     Returns:
@@ -221,15 +223,45 @@ def get_price(ranges, quantity):
     """
     ranges = ranges.split(';')
     for r in ranges:
-        try :
+        try:
             lower, upper, price = map(float, r.split('-'))
         except ValueError as e:
             print(ranges)
-            print(r,lower, upper, price)
+            print(r, lower, upper, price)
             raise Exception
-        if lower <= quantity < upper:
-            return price  # Return the price directly
-    return None  # Or handle the case where quantity is outside all ranges
+        if lower <= quantity <= upper:
+            return price
+    return None
+
+# Objective function (negative number of coins to minimize)
+def objective_function(x):
+    return -x[0]  # Access the first element of the array x
+
+# Constraint function (budget constraint)
+def constraint(x, budget, price_ranges, delivery_fee_ranges):
+    price_per_coin_ = lambda x: get_price(price_ranges, x)
+    delivery_fees_ = lambda x: get_price(delivery_fee_ranges, x * price_per_coin_(x))
+    return budget - (x[0] * price_per_coin_(x[0]) + delivery_fees_(x[0]))  # Access x[0]
+
+# Function to find the maximum coins
+def find_max_coins(budget, price_ranges, delivery_fee_ranges):
+    # Initial guess for x (can be improved)
+    x0 = pd.Series([1])
+
+    # Define the constraint dictionary
+    constraint_dict = {'type': 'ineq', 'fun': lambda x: constraint(x, budget, price_ranges, delivery_fee_ranges)}
+
+    # Perform numerical optimization using minimize
+    result = minimize(
+        objective_function,
+        x0,
+        bounds=[(0, budget)],  # Specify bounds as a list of tuples
+        constraints=constraint_dict,
+        method='SLSQP'  # Choose a suitable method for constrained optimization
+    )
+
+    max_coins = int(round(result.x[0]))  # Access the solution from result.x[0]
+    return max_coins
 
 def get_country_flag_image(country_code):
     """
@@ -475,12 +507,12 @@ def serve_dashboard():
                 dcc.Slider(
                     id='quantity-slider',
                     min=1,
-                    max=150,
+                    max=750,
                     step=1,
                     value=3,  # Default value
                     marks={
                         1: '1',
-                        150: '150',
+                        750: '750',
                         # Add more marks if needed
                     },
                     tooltip={"placement": "bottom", "always_visible": True,"style": {"color": "gold", "fontSize": "14px"}},
@@ -799,61 +831,74 @@ def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_
             items_df = filtered_df  # Update items_df with the filtered DataFrame
 
         # Pre-process the 'buy_premiums' column before the loops
-        items_df['buy_premiums'] = items_df['buy_premiums'].apply(lambda x: [float(i) for i in x.split(';')])
+        #items_df['buy_premiums'] = items_df['buy_premiums'].apply(lambda x: [float(i) for i in x.split(';')])
 
         budget_min, budget_max = budget_range
 
         total_count = len(items_df)
         total_processed_count = 0
 
-        for q_max in reversed(range(1,quantity+1)):
-            if total_count <= total_processed_count:
-                break
-            df_copy = items_df.copy()
+        # def calculate_premiums(x, q_max):
+        #     """
+        #     Calculates the minimum premium and its index within the first q_max elements of a list.
+        #
+        #     Args:
+        #       x: A list of premiums.
+        #       q_max: The maximum number of elements to consider.
+        #
+        #     Returns:
+        #       A pandas Series with the minimum premium and its index.
+        #     """
+        #     # min_premium = -min((x, -i) for i, x in enumerate(x[:q_max]))[1]
+        #     # print(min_premium)
+        #     # min_premium = min(x[:q_max])
+        #     # print(min_premium)
+        #     premium_index = min(range(len(x[:q_max])), key=lambda i: x[:q_max][i]-i)
+        #     return pd.Series({'buy_premiums': x[premium_index], 'premium_index': premium_index})
+        #
+        # for q_max in reversed(range(1,quantity+1)):
+        #     print(q_max,total_count,total_processed_count)
+        #     if total_count <= total_processed_count:
+        #         print('i')
+        #         break
+        #     df_copy = items_df.copy()
+        #
+        #     df_copy[['buy_premiums', 'premium_index']] = df_copy['buy_premiums'].apply(
+        #         lambda x: calculate_premiums(x, q_max))
+        #
+        #     # Cheapest offer analysis and recommendations
+        #     results = df_copy.sort_values(by='buy_premiums')
 
-            def calculate_premiums(x, q_max):
-                """
-                Calculates the minimum premium and its index within the first q_max elements of a list.
+        for i, row in items_df.iterrows():
 
-                Args:
-                  x: A list of premiums.
-                  q_max: The maximum number of elements to consider.
+            if not quantity >= row['minimum']:
+                continue
 
-                Returns:
-                  A pandas Series with the minimum premium and its index.
-                """
-                min_premium = min(x[:q_max])
-                premium_index = x.index(min_premium)
-                return pd.Series({'buy_premiums': min_premium, 'premium_index': premium_index})
+            res = find_max_coins(budget_max, row['price_ranges'], row['delivery_fees'])
+            print(row['name'],row['source'],res)
+            continue
+            # Calculate total cost (using bullion_type)
 
-            df_copy[['buy_premiums', 'premium_index']] = df_copy['buy_premiums'].apply(
-                lambda x: calculate_premiums(x, q_max))
+            total_quantity = row['quantity'] * int(row['premium_index'] + 1) if row['minimum'] == 1 else int(row['premium_index']+1) * quantity
+            spot_cost = weights[row['name']] * metal_price
+            total_cost = (spot_cost  + (row['buy_premiums']  / 100.0)*spot_cost) * total_quantity
+            # Check if the offer meets the budget
+            if row['id'] not in seen_offers and budget_min <= total_cost <= budget_max and quantity >= total_quantity:#and quantity >= total_quantity :
+                ppc = (spot_cost + (row['buy_premiums'] / 100.0) * spot_cost)
+                cheapest_offers.append({
+                    'name': row['name'].upper(),
+                    'source': row['source'],
+                    'premium': row['buy_premiums'] ,
+                    'price_per_coin': f"{ppc:.2f} €" ,
+                    'quantity': str(int(row['premium_index'] + 1)) if row['quantity'] == 1 and row['minimum'] == 1 else str(int(row['premium_index'] + 1)) + ' x ' + str(row['quantity']) + ' ({total_quantity})'.format(total_quantity=str(total_quantity)) if row['quantity'] > 1 else quantity ,
+                    'delivery_fees': get_price(row['delivery_fees'],total_cost),
+                    'total_cost': total_cost
+                })
+                seen_offers.add(row['id'])
+                total_processed_count += 1
 
-            # Cheapest offer analysis and recommendations
-            results = df_copy.sort_values(by='buy_premiums')
-
-            for i, row in results.iterrows():
-                # Calculate total cost (using bullion_type)
-                spot_cost = weights[row['name']] * metal_price
-                total_quantity = row['quantity'] * int(row['premium_index'] + 1) if row['minimum'] == 1 else int(row['premium_index'] + 1) * quantity
-                total_cost = (spot_cost  + (row['buy_premiums']  / 100.0)*spot_cost) * total_quantity
-                # Check if the offer meets the budget
-                if row['id'] not in seen_offers and budget_min <= total_cost <= budget_max and quantity >= row['minimum'] :#and quantity >= total_quantity :
-                    ppc = (spot_cost + (row['buy_premiums'] / 100.0) * spot_cost)
-                    cheapest_offers.append({
-                        'name': row['name'].upper(),
-                        'source': row['source'],
-                        'premium': row['buy_premiums'] ,
-                        'price_per_coin': f"{ppc:.2f} €" ,
-                        'quantity': str(int(row['premium_index'] + 1)) if row['quantity'] == 1 and row['minimum'] == 1 else str(int(row['premium_index'] + 1)) + ' x ' + str(row['quantity']) + ' ({total_quantity})'.format(total_quantity=str(total_quantity)) if row['quantity'] > 1 else quantity ,
-                        'delivery_fees': get_price(row['delivery_fees'],total_cost),
-                        'total_cost': total_cost
-                    })
-                    seen_offers.add(row['id'])
-                    total_count += 1
-
-            # Sort offers by premium (lowest first)
-            cheapest_offers.sort(key=lambda x: x['premium'])
+        # Sort offers by premium (lowest first)
+        cheapest_offers.sort(key=lambda x: x['premium'])
 
         for offer in cheapest_offers[:40]:
             table_rows.append(

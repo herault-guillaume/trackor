@@ -29,28 +29,6 @@ CMN = {'20 Francs Marianne Coq': 'or - 20 francs fr coq marianne',
  '20 Francs Tunisie': 'or - 20 francs tunisie',
  '5 Roubles': 'or - 5 roubles'}
 
-def get_delivery_price(price):
-    if 0 <= price <= 600:
-        return 10.0
-    elif 600.01 <= price <= 1500:
-        return 18.0
-    elif 1500.01 <= price <= 3000:
-        return 28.0
-    elif 3000.01 <= price <= 5000:
-        return 38.0
-    elif 5000.01 <= price <= 7500:
-        return 60.0
-    elif 7500.01 <= price <= 10000:
-        return 70.0
-    elif 10000.01 <= price <= 15000:
-        return 85.0
-    elif 15000.01 <= price <= 20000:
-        return 90.0
-    else:  # price > 15000.01
-        return 0.0  # Free delivery
-
-
-
 def get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_price_silver):
     """
     Retrieves the 'or - 20 francs coq marianne' coin purchase price from Change de la Bourse using requests and BeautifulSoup.
@@ -139,7 +117,7 @@ def get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_pri
                             price_ranges=';'.join(['{min_}-{max_}-{price}'.format(min_=r[0],max_=r[1],price=r[2].amount_float) for r in price_ranges]),
                             buy_premiums=';'.join(
                                 ['{:.2f}'.format(((price_between(minimum,price_ranges)/quantity + price_between(price_between(minimum,price_ranges)*minimum,delivery_ranges)/(quantity*minimum)) - (buy_price * weights[name])) * 100.0 / (buy_price * weights[name])) for i in range(1, minimum)] +
-                                ['{:.2f}'.format(((price_between(i,price_ranges)/quantity + price_between(price_between(i,price_ranges),delivery_ranges)/(quantity*i)) - (buy_price * weights[name])) * 100.0 / (buy_price * weights[name])) for i in range(minimum, 151)]
+                                ['{:.2f}'.format(((price_between(i,price_ranges)/quantity + price_between(price_between(i,price_ranges),delivery_ranges)/(quantity*i)) - (buy_price * weights[name])) * 100.0 / (buy_price * weights[name])) for i in range(minimum, 751)]
                             ),
                             delivery_fees=';'.join(['{min_}-{max_}-{price}'.format(min_=r[0],max_=r[1],price=r[2]) for r in delivery_ranges]),
                             source=url,
