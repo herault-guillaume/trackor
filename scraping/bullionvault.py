@@ -7,7 +7,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from scraping.dashboard.database import MetalPrice
 
-def get(session_prod,session_staging,session_id,driver):
+def get(session_prod,session_id,driver):
     """Uses Selenium to click the currency button, then scrapes the 1 kg gold price in Euros."""
 
     try:
@@ -57,13 +57,11 @@ def get(session_prod,session_staging,session_id,driver):
         g_sell_price_eur = float(sell_price_text.split('€')[0].replace('\xa0', '').replace(',', '.').replace(' ',''))/1000.0  # Remove € and nbsp
 
         # # Create GoldPrice object and add to session_prod
-        gold_price = MetalPrice(buy_price=g_buy_price_eur, sell_price=g_sell_price_eur, session_id=session_id, bullion_type='or',timestamp=datetime.now(pytz.timezone('CET')).replace(second=0, microsecond=0))
+        gold_price = MetalPrice(buy_price=g_buy_price_eur, sell_price=g_sell_price_eur, session_id=session_id, bullion_type='or',timestamp=datetime.now(pytz.timezone('CET')))
         session_prod.add(gold_price)
         print('i',g_buy_price_eur,g_sell_price_eur,session_id,'or')
         session_prod.commit()
-        session_prod.expunge(gold_price)
-        new_coin = session_staging.merge(gold_price, load=False)
-        session_staging.commit()
+
         print('i')
         # Extract the price from the span
         buy_price_element = driver.find_element(By.CSS_SELECTOR, '#buySILVERPrice span.EUR')
@@ -82,13 +80,11 @@ def get(session_prod,session_staging,session_id,driver):
         print(s_buy_price_eur,s_sell_price_eur)
 
         # Create GoldPrice object and add to session_prod
-        silver_price = MetalPrice(buy_price=s_buy_price_eur, sell_price=s_sell_price_eur, session_id=session_id, bullion_type='ar',timestamp=datetime.now(pytz.timezone('CET')).replace(second=0, microsecond=0))
+        silver_price = MetalPrice(buy_price=s_buy_price_eur, sell_price=s_sell_price_eur, session_id=session_id, bullion_type='ar',timestamp=datetime.now(pytz.timezone('CET')))
 
         session_prod.add(silver_price)
         session_prod.commit()
-        session_prod.expunge(silver_price)
-        new_coin = session_staging.merge(silver_price, load=False)
-        session_staging.commit()
+
         print(g_buy_price_eur,g_sell_price_eur,s_buy_price_eur,s_sell_price_eur)
 
         return g_buy_price_eur,g_sell_price_eur,s_buy_price_eur,s_sell_price_eur

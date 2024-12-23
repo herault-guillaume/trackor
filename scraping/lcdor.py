@@ -33,7 +33,7 @@ CMN = {
 }
 
 #via panier
-def get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_price_silver):
+def get_price_for(session_prod,session_id,buy_price_gold,buy_price_silver):
     url = 'https://lcdor.fr/achat-or/pieces-dor/'
     logger.debug(url)
     print(url)
@@ -72,7 +72,7 @@ def get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_pri
                 else:
                     buy_price = buy_price_silver
 
-                delivery_ranges = [(0.0,price.amount_float,7.0),(price.amount_float,float('inf'),0.0)]
+                delivery_ranges = [(0.0,price.amount_float,7.0),(price.amount_float,99999999999999.9,0.01)]
                 price_ranges = [(minimum,9999999999,price)]
 
                 def price_between(value, ranges):
@@ -80,7 +80,7 @@ def get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_pri
                     Returns the price per unit for a given quantity.
                     """
                     for min_qty, max_qty, price in ranges:
-                        if min_qty <= value <= max_qty:
+                        if min_qty <= value < max_qty:
                             if isinstance(price, Price):
                                 return price.amount_float
                             else:
@@ -97,14 +97,12 @@ def get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_pri
                             session_id=session_id,
                             bullion_type=bullion_type,
                             quantity=quantity,
-                            minimum=minimum, timestamp=datetime.now(pytz.timezone('CET')).replace(second=0, microsecond=0)
+                            minimum=minimum, timestamp=datetime.now(pytz.timezone('CET'))
 )
 
                 session_prod.add(coin)
                 session_prod.commit()
-                session_prod.expunge(coin)
-                new_coin = session_staging.merge(coin, load=False)
-                session_staging.commit()
+
 
 
 

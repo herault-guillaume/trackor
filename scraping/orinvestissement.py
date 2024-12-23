@@ -35,7 +35,7 @@ CMN = {
 }
 
 # https://or-investissement.fr/information-or-investissement/1-livraison-achat-or-investissement
-def get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_price_silver):
+def get_price_for(session_prod,session_id,buy_price_gold,buy_price_silver):
     """
     Retrieves the 'or - 20 francs coq marianne' coin purchase price from Or-Investissement using requests and BeautifulSoup.
     """
@@ -93,7 +93,7 @@ def get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_pri
                         Returns the price per unit for a given quantity.
                         """
                         for min_qty, max_qty, price in ranges:
-                            if min_qty <= value <= max_qty:
+                            if min_qty <= value < max_qty:
                                 if isinstance(price, Price):
                                     return price.amount_float
                                 else:
@@ -110,14 +110,12 @@ def get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_pri
                                 session_id=session_id,
                                 bullion_type=bullion_type,
                                 quantity=quantity,
-                                minimum=minimum, timestamp=datetime.now(pytz.timezone('CET')).replace(second=0, microsecond=0)
+                                minimum=minimum, timestamp=datetime.now(pytz.timezone('CET'))
 )
 
                     session_prod.add(coin)
                     session_prod.commit()
-                    session_prod.expunge(coin)
-                    new_coin = session_staging.merge(coin, load=False)
-                    session_staging.commit()
+
 
                 except KeyError as e:
                     logger.error(f"KeyError: {name}")

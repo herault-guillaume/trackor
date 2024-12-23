@@ -175,7 +175,7 @@ class MetalPrice(Base):
         session.close()
         return query_to_dict(query.all())
 
-class PrecalculatedOffer(Item):  # Inherit from Item Base
+class PrecalculatedOffer(Base):  # Inherit from Item Base
     __tablename__ = 'precalculated_offer'
     id = Column(Integer, primary_key=True)  # Own primary key
     timestamp = Column(DateTime)
@@ -189,9 +189,6 @@ class PrecalculatedOffer(Item):  # Inherit from Item Base
     price_per_coin = Column(Float)
     delivery_fees = Column(Float)
     total_cost = Column(Float)
-    # Add a foreign key to the Item table
-    item_id = Column(Integer, ForeignKey('item.id'))
-    item = relationship("Item")  # Establish the relationship
 
 Base.metadata.create_all(engine)  # Add this line to create the tables
 
@@ -289,9 +286,10 @@ def pre_calculate_and_store_offers():
 
     # Create PrecalculatedOffer entries
     for offer in cheapest_offers[:40]:
-        print(offer)
+        france_timezone = pytz.timezone('Europe/Paris')
+        now_france = datetime.datetime.now(france_timezone)
         new_offer = PrecalculatedOffer(
-            timestamp=datetime.datetime.now(),
+            timestamp=now_france,
             budget_min=standard_budget_range[0],
             budget_max=standard_budget_range[1],
             quantity=standard_quantity,

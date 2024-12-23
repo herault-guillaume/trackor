@@ -73,7 +73,7 @@ def get_delivery_price(price):
         return 25.0
 # forfait
 
-def get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_price_silver):
+def get_price_for(session_prod,session_id,buy_price_gold,buy_price_silver):
 
 
     urls =["https://www.joubert-change.fr/or-investissement/cours/prix.html",""]
@@ -133,7 +133,7 @@ def get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_pri
                                 session_id=session_id,
                                 bullion_type=CMN[:2],
                                 quantity=quantity,
-                                minimum=minimum, timestamp=datetime.now(pytz.timezone('CET')).replace(second=0, microsecond=0)
+                                minimum=minimum, timestamp=datetime.now(pytz.timezone('CET'))
 )
 
                     session_prod.add(coin)

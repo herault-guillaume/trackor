@@ -55,7 +55,7 @@ CMN = {
     "PANDA ARGENT 30 GR...": "ar - 10 yuan panda 30g",
 }
 
-def get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_price_silver):
+def get_price_for(session_prod,session_id,buy_price_gold,buy_price_silver):
     """
     Retrieves the 'or - 20 francs coq marianne' coin purchase price from Oretchange using requests and BeautifulSoup.
     """
@@ -72,7 +72,7 @@ def get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_pri
     (5000.01, 7500, 50.0), # Price 5000.01-7500, delivery cost 50.0
     (7500.01, 10000, 56.0),# Price 7500.01-10000, delivery cost 56.0
     (10000.01, 15000, 65.0),# Price 10000.01-15000, delivery cost 65.0
-    (15000.01, float('inf'), 0.0)  # Price 15000.01+, free delivery
+    (15000.01, 999999999999.9, 0.0)  # Price 15000.01+, free delivery
 ]
 
     for url in urls:
@@ -137,7 +137,7 @@ def get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_pri
                     """
 
                     for min_qty, max_qty, price in ranges:
-                        if min_qty <= value <= max_qty:
+                        if min_qty <= value < max_qty:
                             if isinstance(price, Price):
                                 return price.amount_float
                             else:
@@ -150,19 +150,17 @@ def get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_pri
                                 ['{:.2f}'.format(((price_between(i,price_ranges)/quantity + price_between(price_between(i,price_ranges),delivery_ranges)/(quantity*i)) - (buy_price * weights[name])) * 100.0 / (buy_price * weights[name])) for i in range(minimum, 751)]
                             ),
                             delivery_fees=';'.join(['{min_}-{max_}-{price}'.format(min_=r[0],max_=r[1],price=r[2]) for r in delivery_ranges]),
-                            source=url,
+                            source=source,
                             session_id=session_id,
                             bullion_type=bullion_type,
                             quantity=quantity,
-                            minimum=minimum, timestamp=datetime.now(pytz.timezone('CET')).replace(second=0, microsecond=0)
+                            minimum=minimum, timestamp=datetime.now(pytz.timezone('CET'))
 )
 
 
                 session_prod.add(coin)
                 session_prod.commit()
-                session_prod.expunge(coin)
-                new_coin = session_staging.merge(coin, load=False)
-                session_staging.commit()
+
 
             except KeyError as e:
                 logger.error(f"KeyError: {product_name}")

@@ -11,7 +11,7 @@ import pytz
 # Get a logger instance
 logger = logging.getLogger(__name__)
 
-def get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_price_silver):
+def get_price_for(session_prod,session_id,buy_price_gold,buy_price_silver):
     """
     Retrieves the 'or - 20 francs fr coq marianne' coin purchase price from Goldforex using requests and BeautifulSoup.
     """
@@ -117,7 +117,7 @@ def get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_pri
                     Returns the price per unit for a given quantity.
                     """
                     for min_qty, max_qty, price in ranges:
-                        if (min_qty <= value <=max_qty):
+                        if (min_qty <= value < max_qty):
                             if isinstance(price,Price):
                                 return price.amount_float
                             else:
@@ -134,13 +134,10 @@ def get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_pri
                             session_id=session_id,
                             bullion_type=bullion_type,
                             quantity=quantity,
-                            minimum=minimum, timestamp=datetime.now(pytz.timezone('CET')).replace(second=0, microsecond=0)
+                            minimum=minimum, timestamp=datetime.now(pytz.timezone('CET'))
                 )
                 session_prod.add(coin)
                 session_prod.commit()
-                session_prod.expunge(coin)
-                new_coin = session_staging.merge(coin, load=False)
-                session_staging.commit()
 
         except requests.exceptions.RequestException as e:
             logger.error(f"Request error: {e}")

@@ -196,7 +196,7 @@ CMN = {
     '5 lire vittorio emanuele II argent': 'ar - 5 lire vittorio emanuele II',
 }
 
-def get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_price_silver):
+def get_price_for(session_prod,session_id,buy_price_gold,buy_price_silver):
 
     base_url = 'https://www.acheter-or-argent.fr/index2.php/categorie-produit/'
     urls = [base_url+'pieces-dor/page/{i}/'.format(i=i) for i in range(1,17)] + [base_url+'/pieces-dargent/page/{i}/'.format(i=i) for i in range(1,25)]
@@ -266,7 +266,7 @@ def get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_pri
                     """
 
                     for min_qty, max_qty, price in ranges:
-                        if min_qty <= value <= max_qty:
+                        if min_qty <= value < max_qty:
                             if isinstance(price, Price):
                                 return price.amount_float
                             else:
@@ -285,13 +285,11 @@ def get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_pri
                             session_id=session_id,
                             bullion_type=bullion_type,
                             quantity=quantity,
-                            minimum=minimum, timestamp=datetime.now(pytz.timezone('CET')).replace(second=0, microsecond=0)
+                            minimum=minimum, timestamp=datetime.now(pytz.timezone('CET'))
 )
                 session_prod.add(coin)
                 session_prod.commit()
-                session_prod.expunge(coin)
-                new_coin = session_staging.merge(coin, load=False)
-                session_staging.commit()
+
 
             except KeyError as e:
 

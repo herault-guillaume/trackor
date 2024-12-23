@@ -92,7 +92,7 @@ CMN = {
     "Sachet Scellé 45 pièces d'Ecu 5 Francs" : ('ar - 5 francs fr ecu (1854-1860)',45),
 }
 
-def get_price_for(session_prod,session_staging, session_id, buy_price_gold,buy_price_silver,driver):
+def get_price_for(session_prod, session_id, buy_price_gold,buy_price_silver,driver):
 
     base_url = "https://www.achat-or-et-argent.fr"
     print(base_url)
@@ -114,7 +114,7 @@ def get_price_for(session_prod,session_staging, session_id, buy_price_gold,buy_p
         (5000.01,7500.0,50.0),
         (7500.01,10000.0,56.0),
         (10000.01,15000.0,65.0),
-        (15000.01,100000000000000.0,0.0),
+        (15000.01,100000000000000.0,0.01),
     ]
 
     for url in urls:
@@ -187,7 +187,7 @@ def get_price_for(session_prod,session_staging, session_id, buy_price_gold,buy_p
                         match = re.search(r"(\d+)\s*\D+\s*(\d+)", qty_div.get_text(strip=True))
                         if match:
                             min = int(match.group(1))
-                            max = int(match.group(2))
+                            max = int(match.group(2))+1
                         else:
                             min = int(re.search(r"\d+", qty_div.get_text(strip=True)).group())
                             max = 9999999999
@@ -214,7 +214,7 @@ def get_price_for(session_prod,session_staging, session_id, buy_price_gold,buy_p
                     """
 
                     for min_qty, max_qty, price in ranges:
-                        if min_qty <= value <= max_qty:
+                        if min_qty <= value < max_qty:
                             if isinstance(price, Price):
                                 return price.amount_float
                             else:
@@ -231,13 +231,11 @@ def get_price_for(session_prod,session_staging, session_id, buy_price_gold,buy_p
                             session_id=session_id,
                             bullion_type=bullion_type,
                             quantity=quantity,
-                            minimum=minimum, timestamp=datetime.now(pytz.timezone('CET')).replace(second=0, microsecond=0)
+                            minimum=minimum, timestamp=datetime.now(pytz.timezone('CET'))
 )
                 session_prod.add(coin)
                 session_prod.commit()
-                session_prod.expunge(coin)
-                new_coin = session_staging.merge(coin, load=False)
-                session_staging.commit()
+
 
             except KeyError as e:
                 logger.error(f"KeyError: {product_name}")

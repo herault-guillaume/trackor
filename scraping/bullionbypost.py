@@ -74,12 +74,12 @@ urls = {
     "ar - 10 yuan panda 30g": "https://www.bullionbypost.fr/pieces-argent/panda-argent/piece-30g-panda-chinois-argent-notre-choix/",
     "ar - 1 oz": "https://www.bullionbypost.fr/pieces-argent/pieces-argent-1-once-notre-choix/piece-argent-1-once-meilleure-offreb/",
 }
-def get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_price_silver,driver):
+def get_price_for(session_prod,session_id,buy_price_gold,buy_price_silver,driver):
     print("https://www.bullionbypost.fr/")
     logger.debug(f"Scraping started for https://www.bullionbypost.fr/")
 
     delivery_ranges = [
-        (0.0,99999999999.0,0.0)
+        (0.0,99999999999.0,0.01)
     ]
     # test de la première url
     try :
@@ -133,7 +133,7 @@ def get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_pri
                 if i == len(rows)-1 :
                     max = 9999999999
                 else:
-                    max = int(rows[i+1].find_elements(By.TAG_NAME, "td")[0].text.replace('+',''))-1
+                    max = int(rows[i+1].find_elements(By.TAG_NAME, "td")[0].text.replace('+',''))
 
                 try :
                     row.find_elements(By.TAG_NAME, "td")[3].find_element(By.TAG_NAME,'del')
@@ -149,7 +149,7 @@ def get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_pri
                 """
 
                 for min_qty, max_qty, price in ranges:
-                    if min_qty <= value <= max_qty:
+                    if min_qty <= value < max_qty:
                         if isinstance(price, Price):
                             return price.amount_float
                         else:
@@ -166,14 +166,12 @@ def get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_pri
                         session_id=session_id,
                         bullion_type=bullion_type,
                         quantity=quantity,
-                        minimum=minimum, timestamp=datetime.now(pytz.timezone('CET')).replace(second=0, microsecond=0)
+                        minimum=minimum, timestamp=datetime.now(pytz.timezone('CET'))
 )
 
             session_prod.add(coin)
             session_prod.commit()
-            session_prod.expunge(coin)
-            new_coin = session_staging.merge(coin, load=False)
-            session_staging.commit()
+
 
         except KeyError as e:
 

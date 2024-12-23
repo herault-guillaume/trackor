@@ -92,7 +92,7 @@ CMN = {
 
 }
 
-def get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_price_silver):
+def get_price_for(session_prod,session_id,buy_price_gold,buy_price_silver):
     """
     Retrieves the 'or - 20 francs coq marianne' coin purchase price from Oretchange using requests and BeautifulSoup.
     """
@@ -102,7 +102,7 @@ def get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_pri
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
     }
 
-    delivery_ranges = [(0, 400, 10.0),(400.01, 800, 15.0), (800.01, 900, 21.0)] + [ (900.01 + (i * 100), 900.0 + ((i+1) * 100), 21.0 + (0.2 * (i+1))) for i,v in enumerate(range(900,15000,100))] + [(15000.01, float('inf'), 0.0)]
+    delivery_ranges = [(0, 400, 10.0),(400.01, 800, 15.0), (800.01, 900, 21.0)] + [ (900.01 + (i * 100), 900.0 + ((i+1) * 100), 21.0 + (0.2 * (i+1))) for i,v in enumerate(range(900,15000,100))] + [(15000.01, 999999999999.9, 0.0)]
 
     print(delivery_ranges)
     for url,item_data in CMN.items():
@@ -133,7 +133,7 @@ def get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_pri
 
                 elif "plus de" in quantity_str or "et plus" in quantity_str :
                     min_q = int(re.findall(r'\d+', quantity_str)[0])
-                    price_ranges.append((min_q, float('inf'),Price.fromstring(price_str)))
+                    price_ranges.append((min_q, 999999999999.9,Price.fromstring(price_str)))
                     if minimum is None:  # Save the first minimum
                         minimum = min_q
                 elif "indifférente" in quantity_str:
@@ -162,7 +162,7 @@ def get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_pri
                 """
 
                 for min_qty, max_qty, price in ranges:
-                    if min_qty <= value <= max_qty:
+                    if min_qty <= value < max_qty:
                         if isinstance(price, Price):
                             return price.amount_float
                         else:
@@ -179,13 +179,11 @@ def get_price_for(session_prod,session_staging,session_id,buy_price_gold,buy_pri
                         session_id=session_id,
                         bullion_type=bullion_type,
                         quantity=quantity,
-                        minimum=minimum, timestamp=datetime.now(pytz.timezone('CET')).replace(second=0, microsecond=0))
+                        minimum=minimum, timestamp=datetime.now(pytz.timezone('CET')))
             print(name,url,price_ranges)
             session_prod.add(coin)
             session_prod.commit()
-            session_prod.expunge(coin)
-            new_coin = session_staging.merge(coin, load=False)
-            session_staging.commit()
+
 
         except KeyError as e:
             logger.error(f"KeyError: {name}")
