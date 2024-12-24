@@ -102,9 +102,8 @@ def get_price_for(session_prod,session_id,buy_price_gold,buy_price_silver):
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
     }
 
-    delivery_ranges = [(0, 400, 10.0),(400.01, 800, 15.0), (800.01, 900, 21.0)] + [ (900.01 + (i * 100), 900.0 + ((i+1) * 100), 21.0 + (0.2 * (i+1))) for i,v in enumerate(range(900,15000,100))] + [(15000.01, 999999999999.9, 0.0)]
+    delivery_ranges = [(0, 400, 10.0),(400.01, 800, 15.0), (800.01, 900, 21.0)] + [ (900.01 + (i * 100), 900.0 + ((i+1) * 100), 21.0 + (0.2 * (i+1))) for i,v in enumerate(range(900,15000,100))] + [(15000.01, 999999999999.9, 0.01)]
 
-    print(delivery_ranges)
     for url,item_data in CMN.items():
         try:
             response = requests.get(url, headers=headers)

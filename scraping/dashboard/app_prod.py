@@ -6,7 +6,7 @@ import pandas as pd
 import dash
 from dash import dcc, html, Input, Output, State, callback_context
 import dash_bootstrap_components as dbc
-from articles import article1, article2, article3, article4, article5, article6, article7, article8, article9
+import article1, article2, article3, article4, article5, article6, article7, article8, article9
 
 from flask import Flask, request, session, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
@@ -142,6 +142,20 @@ class UserChoice(db.Model):
     bullion_type = db.Column(db.String(2))
     selected_coins = db.Column(db.JSON)  # Store selected coins as JSON
 
+class PrecalculatedOffer(db.Model):  # Inherit from Item Base
+    __tablename__ = 'precalculated_offer'
+    id = db.Column(db.Integer, primary_key=True)  # Own primary key
+    timestamp = db.Column(db.DateTime)
+    budget_min = db.Column(db.Float)
+    budget_max = db.Column(db.Float)
+    quantity = db.Column(db.Integer)
+    bullion_type = db.Column(db.String(2))
+    name = db.Column(db.String(255))
+    source = db.Column(db.String(1024))
+    premium = db.Column(db.Float)  # Assuming premium is a single float value
+    price_per_coin = db.Column(db.Float)
+    delivery_fees = db.Column(db.Float)
+    total_cost = db.Column(db.Float)
 
 app = dash.Dash(__name__,
                 server=server,
@@ -154,9 +168,9 @@ app = dash.Dash(__name__,
                     {"name": "title", "content": "Bullion Sniper"},
                     {"property": "og:title", "content": "Bullion Sniper"},  # For social media sharing
                     {"name": "description",
-                     "content": "Trouver facilement les meilleurs offres de pièces d'investissement en ligne."},
+                     "content": "Trouver facilement les meilleures offres de pièces d'investissement en ligne."},
                     {"property": "og:description",
-                     "content": "Trouver facilement les meilleurs offres de pièces d'investissement en ligne."},
+                     "content": "Trouver facilement les meilleures offres de pièces d'investissement en ligne."},
                     {"name": "keywords",
                      "content": "pièces d'investissement, or, argent, lingots, achat, vente, bullion, investissement, métaux précieux"},
                     {
@@ -166,45 +180,260 @@ app = dash.Dash(__name__,
                 ]
                 )
 
+#### UTILS #############################################################################################################
+def get_price(ranges, quantity):
+    """
+    Calculates the price based on the quantity and given ranges.
+
+    Args:
+    ranges: A string of ranges in the format '1-9;10-48;49-98;99-9999999999.9'.
+    quantity: The quantity of the item.
+
+    Returns:
+    The price as a float.
+    """
+    ranges = ranges.split(';')
+    for r in ranges:
+        try :
+            lower, upper, price = map(float, r.split('-'))
+        except ValueError as e:
+            print(ranges)
+            print(r,lower, upper, price)
+            raise Exception
+        if lower <= quantity < upper:
+            return price  # Return the price directly
+    return None  # Or handle the case where quantity is outside all ranges
+
+def get_country_flag_image(country_code):
+    """
+    Generates an HTML img tag for a country flag image from a 2-letter country code.
+    Uses images from the provided URL with the format "https://hatscripts.github.io/circle-flags/flags/{code}.svg".
+    """
+    if len(country_code) == 2:
+        return html.Img(
+            src=f"/assets/{country_code.lower()}.svg",  # Use assets folder
+            alt=country_code,
+            style={'width': '20px', 'marginRight': '5px'}
+        )
+    else:
+        return ""
+
+#### NAVIGATION ########################################################################################################
+# Define the navigation bar
+navbar = dbc.NavbarSimple(
+    children=[
+        dbc.NavItem(dbc.NavLink("Tableau de bord", href="/", id="nav-home")),
+        #dbc.NavItem(dbc.NavLink("FAQ", href="/faq", id="nav-faq")),
+        dbc.DropdownMenu(
+            label="Articles Métaux Précieux",
+            children=[
+                dbc.DropdownMenuItem("1. Fondamentaux", href="/articles/1-fondamentaux",id="nav-article1"),
+                dbc.DropdownMenuItem("2. Compléments", href="/articles/2-complements",id="nav-article2"),
+                dbc.DropdownMenuItem("3. Argent", href="/articles/3-argent",id="nav-article3"),
+                dbc.DropdownMenuItem("4. Fiscalité", href="/articles/4-fiscalite",id="nav-article4"),
+                dbc.DropdownMenuItem("5. Diversification", href="/articles/5-diversification",id="nav-article5"),
+                dbc.DropdownMenuItem("6. Biais", href="/articles/6-biais",id="nav-article6"),
+                dbc.DropdownMenuItem("7. Contrefaçons", href="/articles/7-contrefaçon",id="nav-article7"),
+                dbc.DropdownMenuItem("8. Avenir Monnaie", href="/articles/8-avenir-monnaie",id="nav-article8"),
+                dbc.DropdownMenuItem("9. Étude de cas", href="/articles/9-etude-de-cas",id="nav-article9"),
+            ],
+            nav=True,
+            in_navbar=True,
+            id="nav-article"
+        ),
+
+        #dbc.NavItem(dbc.NavLink("Analyse Prime Napoléon d'Or", href="/analyse-prime-napoleon-d-or", id="nav-analyse")),
+        #dbc.NavItem(dbc.NavLink("Qui suis je ?", href="/qui-suis-je", id="nav-whoami")),
+        # Add more navigation items as needed
+    ],
+    brand="",  # Your app's brand name
+    brand_href="/",  # Link for the brand name
+    color="dark",  # Background color
+    dark=True,  # Use dark text color
+    className="mb-4",  # Add margin-bottom for spacing
+    style={"paddingTop": "0","paddingBottom": "0"},  # Add margin-bottom for spacing
+)
+
+header = dbc.Row([html.Img(src='/assets/logo-bullion-sniper.webp', style={'height': '150px', 'width': '450px'}),
+             html.Div(  # Add the text here
+                 "Votre comparateur de prix  pour l'investissement dans les métaux précieux.",
+                 className='mb-4 mt-4', style={'text-align': 'center', 'fontSize': '16px', 'font-weight' : 'bold','color': 'gold'}
+             ),
+             html.Div(  # Add the text here
+                 "100% Indépendant, 0% Affiliation. Plus de 20 plateformes recensées chaque jour.",
+                 className='mb-1 mt-1',style={'text-align': 'center', 'fontSize': '16px', 'font-weight' : 'bold','color': 'gold'}
+             ),], className="mb-4 mt-1",justify="center")
+footer = html.Div([
+            dbc.Row(
+                [
+                    dbc.Col(
+                        [
+                            dbc.Card(
+                            [
+                                dbc.CardHeader(
+                                    [
+                                        html.I(className="fa-solid fa-circle-exclamation fa-beat-fade", style={'fontSize': '22px'}),
+                                        "  Bullion-sniper.fr ne donne pas de conseils en investissement.",
+
+                                    ],
+                                ),
+                                dbc.CardBody([
+                                "Nous attachons un soin particulier à créer et entretenir le présent site et à veiller à l’exactitude et à l’actualité de son contenu.",html.Br(),html.Br(), "Néanmoins, les éléments présentés dans ce site sont susceptibles de modifications fréquentes sans préavis. Bullion-sniper.fr ne garantit pas l’exactitude et l’actualité du contenu du site. Les éléments présentés Bullion-sniper.fr sont mis à disposition des utilisateurs sans aucune garantie d’aucune sorte et ne peuvent donner lieu à un quelconque droit à dédommagement.",
+                            ])], style={'text-align': 'center'}
+                            )
+                        ],
+                        width=12)
+                ], className="mb-4 mt-4",justify="center"),
+
+            html.Div([
+                "2025 - Bullion-sniper.fr x ",
+                html.A("Dash ",href="https://dash.plotly.com/"),
+                html.I(className="fa-solid fa-heart fa-beat", style={'fontSize': '16px', 'color' : 'red'}),], className="text-center mb-2"),
+        ], id="footer-content")
+
+app.layout = html.Div([
+    dcc.Location(id='url', refresh=False),
+    html.Div(id='google-analytics-container'),
+    dcc.Store(id='cookie-consent', storage_type='local'),  # Changed to local storage
+    html.Div(
+        id='cookie-banner',
+        children=[
+            html.Div(className="cookie-consent", children=[
+                html.Div([
+                    html.P("Salut les investisseurs ! 👋"),
+                    html.P(
+                        "Bullion-Sniper est un site 100% gratuit et sans pub, conçu par un passionné pour vous aider à trouver les meilleures offres. Pour que je puisse continuer à améliorer le site et vous offrir la meilleure expérience possible, j'ai besoin de collecter quelques données anonymes grâce aux cookies."),
+                    html.P(
+                        "C'est un petit coup de pouce de votre part qui m'aide énormément ! 😊 Acceptez-vous les cookies analytiques pour m'aider à faire grandir Bullion-Sniper ?")
+                ],
+                    className="cookie-message mb-3 text-center text-white",
+                    style={"max-width": "400px", "margin": "0 auto"}
+                ),
+                dcc.Checklist(
+                    id='cookie-checklist',
+                    options=[
+                        {'label': 'Cookies essentiels', 'value': 'essential'},
+                        {'label': 'Cookies analytiques', 'value': 'analytics'}
+                    ],
+                    value=['essential', 'analytics'],
+                    inline=False,
+                    inputClassName="form-check-input",
+                    labelClassName="form-check-label",
+                    className="mb-3"
+                ),
+                html.Button("Enregistrer mes préférences", id='save-cookie-preferences', n_clicks=0,
+                            className="btn btn-warning mt-3")
+            ]),
+        ],
+        style={'display': 'none'}
+    ),
+    navbar,
+    header,
+    dbc.Container(id="page-content", fluid=False),
+    dcc.Store(id='initial-load', data=True),
+])
+
+
+@app.callback(Output("page-content", "children"),
+              [Input("url", "pathname"),
+               Input("nav-home", "n_clicks"),
+               Input("nav-article1", "n_clicks"),
+               Input("nav-article2", "n_clicks"),
+               Input("nav-article3", "n_clicks"),
+               Input("nav-article4", "n_clicks"),
+               Input("nav-article5", "n_clicks"),
+               Input("nav-article6", "n_clicks"),
+               Input("nav-article7", "n_clicks"),
+               Input("nav-article8", "n_clicks"),
+               Input("nav-article9", "n_clicks"),
+               # Input("nav-faq", "n_clicks"),
+               # Input("nav-analyse", "n_clicks"),
+               # Input("nav-whoami", "n_clicks")
+               ])
+
+def render_page_content(pathname, n_clicks_home,
+                        n_clicks_article1, n_clicks_article2, n_clicks_article3,
+                        n_clicks_article4, n_clicks_article5, n_clicks_article6,
+                        n_clicks_article7, n_clicks_article8, n_clicks_article9,
+                        #n_clicks_faq, n_clicks_analyse,n_clicks_whoami
+                        ):
+
+    ctx = callback_context
+    triggered_id, _ = ctx.triggered[0]['prop_id'].split('.')
+
+    if triggered_id == "url" or triggered_id == "nav-home":
+        return serve_dashboard()
+    elif pathname.startswith("/articles/"):  # Check if the path starts with "/articles/"
+        if triggered_id == "nav-article1" or pathname == "/articles/1-fondamentaux":
+            return article1.layout()
+        elif triggered_id == "nav-article2" or pathname == "/articles/2-complements":
+            return article2.layout()
+        elif triggered_id == "nav-article3" or pathname == "/articles/3-argent":
+            return article3.layout()
+        elif triggered_id == "nav-article4" or pathname == "/articles/4-fiscalite":
+            return article4.layout()
+        elif triggered_id == "nav-article5" or pathname == "/articles/5-diversification":
+            return article5.layout()
+        elif triggered_id == "nav-article6" or pathname == "/articles/6-biais":
+            return article6.layout()
+        elif triggered_id == "nav-article7" or pathname == "/articles/7-contrefaçon":
+            return article7.layout()
+        elif triggered_id == "nav-article8" or pathname == "/articles/8-avenir-monnaie":
+            return article8.layout()
+        elif triggered_id == "nav-article9" or pathname == "/articles/9-etude-de-cas":
+            return article9.layout()
+    else:
+        return serve_dashboard()
+    # elif triggered_id == "nav-faq" or pathname == "/faq":
+    #     return html.Div([
+    #         html.H1("FAQ"),
+    #         html.P("Voici les questions fréquemment posées :"),
+    #         html.Ul([
+    #             html.Li("Question 1 ? Réponse 1."),
+    #             html.Li("Question 2 ? Réponse 2."),
+    #             html.Li("Question 3 ? Réponse 3."),
+    #             # ... add more FAQ items
+    #         ])
+    #     ])
+    # elif triggered_id == "nav-analyse" or pathname == "/analyse-prime-napoleon-d-or":
+    #     return serve_analysis()
+    # elif triggered_id == "nav-whoami" or pathname == "/qui-suis-je":
+    #     return html.Div([
+    #         html.H1("Qui suis je ?"),
+    #         html.P("Je suis un passionné de métaux précieux et j'ai créé ce site pour partager mes connaissances et mes analyses."),
+    #         # ... add more information about yourself
+    #     ])
+
+
+@server.route('/sitemap.xml')
+def send_sitemap():
+    return send_from_directory(server.root_path, "assets/sitemap.xml")
+
 @server.route('/ads.txt')
 def serve_ads_txt():
     return send_from_directory(server.root_path, 'assets/ads.txt')
 
-def serve_layout():
+#### DASHBOARD #########################################################################################################
+def serve_dashboard():
     return dbc.Container([
-        html.Div([
-    dcc.Location(id='url', refresh=True),
-        # Add the InMobi Choice script tag
-    dcc.Loading(id="loading-1",type="default",children=html.Div(id="tawk-to-widget")),
-    # Rest of your Dash app layout
-    ]),
-
-    dbc.Row([html.Img(src='/assets/logo-bullion-sniper.webp', style={'height': '150px', 'width': 'auto'}),             html.Div(  # Add the text here
-                 "Votre comparateur de prix  pour l'investissement dans les métaux précieux.",
-                 className='mb-4 mt-4', style={'text-align': 'center', 'font-size': '16px', 'font-weight' : 'bold','color': 'gold'}
-             ),
-             html.Div(  # Add the text here
-                 "100% Indépendant, 0% Affiliation. Plus de 20 plateformes recensées chaque jour.",
-                 className='mb-1 mt-1',style={'text-align': 'center', 'font-size': '16px', 'font-weight' : 'bold','color': 'gold'}
-             ),], className="mb-4 mt-1",justify="center"),
 
     dbc.Row([
         dbc.Col(
             dbc.Card([
-                dbc.CardHeader([html.I(className="fa-solid fa-bullseye fa-bounce", style={'font-size': '16px'}),"  Mon budget (€)",dbc.Tooltip("Le budget que je souhaite me fixer.", target="cardheader-budget")],style = {'text-align': 'center'}),
+                dbc.CardHeader([html.I(className="fa-solid fa-bullseye fa-bounce", style={'fontSize': '16px'}),"  Mon budget (€)",dbc.Tooltip("Le budget que je souhaite me fixer.", target="cardheader-budget")],style = {'text-align': 'center'}),
                 dbc.CardBody([
                     dcc.RangeSlider(
                         id='budget-slider',
                         min=0,
                         max=20000,
                         step=100,
-                        value=[0, 5000],  # Default range
+                        value=[0, 2000],  # Default range
                         marks={
                             0: '0 €',
                             20000: '20k €',
                         },
                         allowCross=False,
-                        persistence=True,
+                        persistence=False,
                         tooltip={"placement": "bottom", "always_visible": True,"style": {"color": "gold", "fontSize": "14px"}},
                         updatemode='mouseup',# Show tooltip always
                     )
@@ -214,22 +443,22 @@ def serve_layout():
         ),
         dbc.Col(
             dbc.Card([
-                dbc.CardHeader([html.I(className="fa-sharp fa-solid fa-coins fa-bounce", style={'font-size': '16px'}),"  Quantité max.",dbc.Tooltip("Le nombre maximum de pièces que je souhaite acheter.", target="cardheader-quantity")],style = {'text-align': 'center'}),
+                dbc.CardHeader([html.I(className="fa-sharp fa-solid fa-coins fa-bounce", style={'fontSize': '16px'}),"  Quantité max.",dbc.Tooltip("Le nombre maximum de pièces que je souhaite acheter.", target="cardheader-quantity")],style = {'text-align': 'center'}),
                 dbc.CardBody([
                 dcc.Slider(
                     id='quantity-slider',
                     min=1,
                     max=150,
                     step=1,
-                    value=7,  # Default value
+                    value=3,  # Default value
                     marks={
                         1: '1',
                         150: '150',
                         # Add more marks if needed
                     },
                     tooltip={"placement": "bottom", "always_visible": True,"style": {"color": "gold", "fontSize": "14px"}},
-                    persistence=True,
-                    updatemode='mouseup',  # Update the value while dragging
+                    persistence=False,
+                    updatemode='mouseup'  # Update the value while dragging
                 )
                 ],id="cardheader-quantity"),
             ]),
@@ -238,7 +467,7 @@ def serve_layout():
 
         dbc.Col(
             dbc.Card([
-                dbc.CardHeader([html.I(className="fa-solid fa-cube", style={'font-size': '16px'}),"  Bullion", dbc.Tooltip("Source cours du métal : BullionVault.", target="cardheader-bullion")], style={'text-align': 'center'}),
+                dbc.CardHeader([html.I(className="fa-solid fa-cube", style={'fontSize': '16px'}),"  Bullion", dbc.Tooltip("Source cours du métal : BullionVault.", target="cardheader-bullion")], style={'text-align': 'center'}),
                 dbc.CardBody([
                     html.Div(
                         [
@@ -248,7 +477,7 @@ def serve_layout():
                                 label="",
                                 value=True,
                                 className="gold-silver-switch larger-switch",
-                                persistence = True,
+                                persistence = False,
                             ),
                             html.Span("Or", className="ms-2"),
                         ],
@@ -262,7 +491,7 @@ def serve_layout():
         ),
         dbc.Col(
             dbc.Card([
-                dbc.CardHeader([html.I(className="fa-solid fa-magnifying-glass", style={'font-size': '16px'}), "  Effigie/Année", dbc.Tooltip("Je récupère les offres pour un ou plusieurs types de pièce.", target="cardheader-years")], style={'text-align': 'center'}),  # New card for name selection
+                dbc.CardHeader([html.I(className="fa-solid fa-magnifying-glass", style={'fontSize': '16px'}), "  Effigie/Année", dbc.Tooltip("Je récupère les offres pour un ou plusieurs types de pièce.", target="cardheader-years")], style={'text-align': 'center'}),  # New card for name selection
                 dbc.CardBody([
                     dcc.Dropdown(
                         id='piece-dropdown',
@@ -279,53 +508,57 @@ def serve_layout():
         ),
     ], className="mb-4 equal-height-cards"),  # Add margin-bottom to the row
     dbc.Spinner(id="loading-output", children=[
-        html.Div(id='last-update-info', className="text-center mb-2"),  # Add a div to display the last update info
-
+        html.Div(id='last-update-info', className="textCenter mb-2"),  # Add a div to display the last update info
 
         dbc.Table([  # Create the table structure in the layout
             html.Thead(
                 html.Tr([
-                    html.Th([html.I(className="fa-solid fa-shop", style={'font-size': '16px'}), "  Site marchand",
-                             html.Span(id='source-arrow', className="fa fa-sort ms-2")],style={'text-align': 'center'}, id='source-header',n_clicks=0),
-                    html.Th([html.I(className="fa-solid fa-hashtag", style={'font-size': '16px'}),"  Nom",
-                             html.Span(id='name-arrow', className="fa fa-sort ms-2")], style={'text-align': 'center'}, id='name-header', n_clicks=0),
+                    html.Th([html.I(className="fa-solid fa-shop", style={'fontSize': '16px'}), "  Site marchand",
+                             html.Span(id='source-arrow', className="fa fa-sort ms-2")], style={'textAlign': 'center'},
+                            id='source-header', n_clicks=0),
+                    html.Th([html.I(className="fa-solid fa-hashtag", style={'fontSize': '16px'}), "  Nom",
+                             html.Span(id='name-arrow', className="fa fa-sort ms-2")], style={'textAlign': 'center'},
+                            id='name-header', n_clicks=0),
                     html.Th(
                         [
-                            html.I(className="fa-solid fa-arrow-trend-down", style={'font-size': '16px'}),
+                            html.I(className="fa-solid fa-arrow-trend-down", style={'fontSize': '16px'}),
                             "  Prime",
                             html.Span(id='premium-arrow', className="fa fa-sort ms-2"),
-                            dbc.Tooltip("La prime inclue les frais de port et le prix dégressif. Valable uniquement à l'horaire affichée ci-dessus.",target="premium-header")  # The tooltip
+                            dbc.Tooltip(
+                                "La prime inclue les frais de port et le prix dégressif. Valable uniquement à l'horaire affichée ci-dessus.",
+                                target="premium-header")  # The tooltip
                         ],
                         id="premium-header",
-                        style={'text-align': 'center'},n_clicks=0),
+                        style={'textAlign': 'center'}, n_clicks=0),
                     html.Th(
                         [
-                            html.I(className="fa-solid fa-circle-info", style={'font-size': '16px'}),
+                            html.I(className="fa-solid fa-circle-info", style={'fontSize': '16px'}),
                             "  Prix Unitaire FDPI",
                             html.Span(id='ppc-arrow', className="fa fa-sort ms-2"),
                             dbc.Tooltip("Prix unitaire, frais de port inclus, d'une pièce du lot.", target="ppc-header")
                         ],
                         id="ppc-header",
-                        style={'text-align': 'center'}, n_clicks=0),
+                        style={'textAlign': 'center'}, n_clicks=0),
                     html.Th(
                         [
-                            html.I(className="fa-solid fa-chart-line", style={'font-size': '16px'}),
+                            html.I(className="fa-solid fa-chart-line", style={'fontSize': '16px'}),
                             "  Quantité",
                             html.Span(id='quantity-arrow', className="fa fa-sort ms-2"),
                             dbc.Tooltip("Quantité minimum pour obtenir la prime affichée.", target="quantity-header")
                         ],
                         id="quantity-header",
-                        style={'text-align': 'center'}, n_clicks=0),
-                    html.Th([html.I(className="fa-solid fa-tag", style={'font-size': '16px'}),"  Total FDPI",
-                             html.Span(id='total_cost-arrow', className="fa fa-sort ms-2"),], style={'text-align': 'center'}, id='total_cost-header', n_clicks=0),
+                        style={'textAlign': 'center'}, n_clicks=0),
+                    html.Th([html.I(className="fa-solid fa-tag", style={'fontSize': '16px'}), "  Total FDPI",
+                             html.Span(id='total_cost-arrow', className="fa fa-sort ms-2"), ],
+                            style={'textAlign': 'center'}, id='total_cost-header', n_clicks=0),
 
-                    html.Th([html.I(className="fa-solid fa-truck fa-tag", style={'font-size': '16px'}), "  FDP",
+                    html.Th([html.I(className="fa-solid fa-truck fa-tag", style={'fontSize': '16px'}), "  FDP",
                              html.Span(id='delivery-arrow', className="fa fa-sort ms-2"), ],
-                            style={'text-align': 'center'}, id='delivery-header', n_clicks=0),
+                            style={'textAlign': 'center'}, id='delivery-header', n_clicks=0),
 
                 ])
-            , id='table-header'), # Apply spinner only to the tbody
-                    html.Tbody(id='cheapest-offer-table-body'),
+                , id='table-header'),  # Apply spinner only to the tbody
+            html.Tbody(id='cheapest-offer-table-body'),
         ], bordered=True, hover=True, responsive=True, striped=True, dark=True),
 
 
@@ -334,37 +567,12 @@ def serve_layout():
         interval=30*60*1000,  # in milliseconds (30 minutes)
         n_intervals=0
     ),
-
-    dbc.Row(
-        [
-            dbc.Col(
-                [
-                    dbc.Card(
-                    [
-                        dbc.CardHeader(
-                            [
-                                html.I(className="fa-solid fa-circle-exclamation fa-beat-fade", style={'font-size': '22px'}),
-                                "  Bullion-sniper.fr ne donne pas de conseils en investissement.",
-
-                            ],
-                        ),
-                        dbc.CardBody([
-                        "Nous attachons un soin particulier à créer et entretenir le présent site et à veiller à l’exactitude et à l’actualité de son contenu.",html.Br(),html.Br(), "Néanmoins, les éléments présentés dans ce site sont susceptibles de modifications fréquentes sans préavis. Bullion-sniper.fr ne garantit pas l’exactitude et l’actualité du contenu du site. Les éléments présentés Bullion-sniper.fr sont mis à disposition des utilisateurs sans aucune garantie d’aucune sorte et ne peuvent donner lieu à un quelconque droit à dédommagement.",
-                    ])], style={'text-align': 'center'}
-                    )
-                ],
-                width=12)
-        ], className="mb-4 mt-4"),
-
-    html.Div([
-        "2025 - Bullion-sniper.fr x ",
-        html.A("Dash ",href="https://dash.plotly.com/"),
-        html.I(className="fa-solid fa-heart fa-beat", style={'font-size': '16px', 'color' : 'red'}),], className="text-center mb-2"),  # Add a div to display the last update info
-
+    dcc.Loading(id="loading-1",type="default",children=html.Div(id="tawk-to-widget")),
+    footer,
     ],  color="gold", type="border", spinner_style={"position": "absolute", "top": "3em"}),
     ])
 
-
+#### DASHBOARD CALLBACKS ###############################################################################################
 
 @app.callback(
     Output('cheapest-offer-table-body', 'children'),
@@ -373,8 +581,10 @@ def serve_layout():
     Output('name-arrow', 'className'),  # Output for the arrow icon's className
     Output('premium-arrow', 'className'),  # Output for the arrow icon's className
     Output('quantity-arrow', 'className'),  # Output for the arrow icon's className
+    Output('ppc-arrow', 'className'),  # Output for the arrow icon's className
     Output('total_cost-arrow', 'className'),
     Output('delivery-arrow', 'className'),
+    Output('initial-load', 'data'),
     [Input('budget-slider', 'value'),
      Input('quantity-slider', 'value'),
      Input('bullion-type-switch', 'value'),
@@ -386,7 +596,8 @@ def serve_layout():
      Input('ppc-header', 'n_clicks'),
      Input('quantity-header', 'n_clicks'),
      Input('total_cost-header', 'n_clicks'),
-     Input('delivery-header', 'n_clicks')],
+     Input('delivery-header', 'n_clicks'),
+     Input('initial-load', 'data')],  # Add the dcc.Store as input
     [State('cheapest-offer-table-body', 'children'),
      State('source-arrow', 'className'),  # Add states for the arrow class names
      State('name-arrow', 'className'),
@@ -398,7 +609,8 @@ def serve_layout():
 )
 def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_coins, n,
                           source_clicks, name_clicks, premium_clicks, ppc_clicks, quantity_clicks, total_cost_clicks, delivery_clicks,
-                          current_table, source_arrow, name_arrow, premium_arrow, ppc_arrow,quantity_arrow, total_cost_arrow, delivery_arrow):
+                          initial_load,current_table, source_arrow, name_arrow, premium_arrow, ppc_arrow,quantity_arrow, total_cost_arrow, delivery_arrow,
+                          ):
     ctx = callback_context
     triggered_id, triggered_prop = ctx.triggered[0]['prop_id'].split('.')
 
@@ -412,6 +624,46 @@ def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_
         'total_cost-arrow': "fa fa-sort ms-2",
         'delivery-arrow': "fa fa-sort ms-2"
     }
+
+    if initial_load:
+        # 2. Fetch pre-calculated offers from the database
+
+        bullion_type = 'or' if bullion_type_switch else 'ar'
+        france_timezone = pytz.timezone('Europe/Paris')
+        now_france = datetime.datetime.now(france_timezone)
+        thirty_minutes_ago = now_france - datetime.timedelta(minutes=30)
+
+        results = MetalPrice.get_previous_price(bullion_type)
+        metal_prices_df = pd.DataFrame(results)
+
+        metal_price = metal_prices_df['buy_price'].iloc[0]
+        session_id = metal_prices_df['session_id'].iloc[0]
+        latest_timestamp = metal_prices_df['timestamp'].iloc[0]
+        formatted_timestamp = latest_timestamp.strftime('%d/%m/%Y à %Hh%M.')
+
+        precalculated_offers = db.session.query(PrecalculatedOffer).all()
+
+        # 3. Create table rows from pre-calculated offers
+        table_rows = []
+        for offer in precalculated_offers:
+            table_rows.append(
+                html.Tr([
+                    html.Td(html.A(html.I(className="fas fa-external-link-alt", style={'color': 'gold'}),
+                                   href=offer.source, target="_blank",
+                                   style={'textDecoration': 'none', 'text_align': 'center'}),
+                            style={'textAlign': 'center'}),
+                    html.Td(offer.name[4:]),
+                    html.Td(offer.premium, style={'textAlign': 'center'}),
+                    html.Td(str(offer.price_per_coin) + ' €', style={'textAlign': 'center'}),
+                    html.Td(offer.quantity, style={'textAlign': 'center'}),
+                    html.Td(f"{offer.total_cost:.2f} €", style={'textAlign': 'center'}),
+                    html.Td(f"{offer.delivery_fees:.2f} €", style={'textAlign': 'center'})
+                ])
+            )
+        return (table_rows, html.P(f"Dernière mise à jour le {formatted_timestamp}", style={'fontSize': '0.8em','textAlign' : 'center'}),
+                arrow_classNames['source-arrow'], arrow_classNames['name-arrow'],
+                arrow_classNames['premium-arrow'], arrow_classNames['quantity-arrow'], arrow_classNames['ppc-arrow'],
+                arrow_classNames['total_cost-arrow'],arrow_classNames['delivery-arrow'], False)
 
     if triggered_prop == 'n_clicks':
         # if triggered_id == 'source-header':
@@ -474,8 +726,8 @@ def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_
         arrow_classNames[arrow_icon_id] = "fa fa-sort-down ms-2" if ascending else "fa fa-sort-up ms-2"
 
         return (current_table, dash.no_update, arrow_classNames['source-arrow'], arrow_classNames['name-arrow'],
-                arrow_classNames['premium-arrow'], arrow_classNames['quantity-arrow'],
-                arrow_classNames['total_cost-arrow'],arrow_classNames['delivery-arrow'])
+                arrow_classNames['premium-arrow'], arrow_classNames['quantity-arrow'], arrow_classNames['ppc-arrow'],
+                arrow_classNames['total_cost-arrow'],arrow_classNames['delivery-arrow'], False)
     else :
 
         bullion_type = 'or' if bullion_type_switch else 'ar'
@@ -513,7 +765,8 @@ def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_
         if selected_coins:
             filtered_df = pd.DataFrame()  # Create an empty DataFrame to store filtered rows
             for coin in selected_coins:
-                filtered_df = pd.concat([filtered_df, items_df[items_df['name'].str.contains(coin, regex=True)]])
+                pattern = coin.replace('(', r'\(').replace(')', r'\)')
+                filtered_df = pd.concat([filtered_df, items_df[items_df['name'].str.contains(pattern, regex=True)]])
             items_df = filtered_df  # Update items_df with the filtered DataFrame
 
         # Pre-process the 'buy_premiums' column before the loops
@@ -524,26 +777,15 @@ def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_
         total_count = len(items_df)
         total_processed_count = 0
 
+        def calculate_premiums(x, q_max):
+            premium_index = min(range(len(x[:q_max])), key=lambda i: x[:q_max][i] - i)
+            return pd.Series({'buy_premiums': x[premium_index], 'premium_index': premium_index})
+
         for q_max in reversed(range(1,quantity+1)):
             if total_count <= total_processed_count:
                 break
+
             df_copy = items_df.copy()
-
-            def calculate_premiums(x, q_max):
-                """
-                Calculates the minimum premium and its index within the first q_max elements of a list.
-
-                Args:
-                  x: A list of premiums.
-                  q_max: The maximum number of elements to consider.
-
-                Returns:
-                  A pandas Series with the minimum premium and its index.
-                """
-                min_premium = min(x[:q_max])
-                premium_index = x.index(min_premium)
-                return pd.Series({'buy_premiums': min_premium, 'premium_index': premium_index})
-
             df_copy[['buy_premiums', 'premium_index']] = df_copy['buy_premiums'].apply(
                 lambda x: calculate_premiums(x, q_max))
 
@@ -551,17 +793,20 @@ def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_
             results = df_copy.sort_values(by='buy_premiums')
 
             for i, row in results.iterrows():
+                if not quantity >= row['minimum']:
+                    continue
                 # Calculate total cost (using bullion_type)
-                spot_cost = weights[row['name']] * metal_price
+
                 total_quantity = row['quantity'] * int(row['premium_index'] + 1) if row['minimum'] == 1 else int(row['premium_index'] + 1) * quantity
-                total_cost = (spot_cost  + (row['buy_premiums']  / 100.0)*spot_cost) * total_quantity
+                spot_cost = weights[row['name']] * metal_price
+                total_cost = (spot_cost + (row['buy_premiums'] / 100.0) * spot_cost) * total_quantity
                 # Check if the offer meets the budget
-                if row['id'] not in seen_offers and budget_min <= total_cost <= budget_max and quantity >= row['minimum'] :#and quantity >= total_quantity :
+                if row['id'] not in seen_offers and budget_min <= total_cost <= budget_max and quantity >= total_quantity:  # and quantity >= total_quantity :
                     ppc = (spot_cost + (row['buy_premiums'] / 100.0) * spot_cost)
                     cheapest_offers.append({
                         'name': row['name'].upper(),
                         'source': row['source'],
-                        'premium': row['buy_premiums'],
+                        'premium': row['buy_premiums'] ,
                         'price_per_coin': f"{ppc:.2f} €" ,
                         'quantity': str(int(row['premium_index'] + 1)) if row['quantity'] == 1 and row['minimum'] == 1 else str(int(row['premium_index'] + 1)) + ' x ' + str(row['quantity']) + ' ({total_quantity})'.format(total_quantity=str(total_quantity)) if row['quantity'] > 1 else quantity ,
                         'delivery_fees': get_price(row['delivery_fees'],total_cost),
@@ -581,43 +826,46 @@ def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_
                             html.I(className="fas fa-external-link-alt", style={'color': 'gold'}),  # External link icon
                             href=offer['source'],  # URL of the source
                             target="_blank",  # Open link in a new tab
-                            style={'text-decoration': 'none', 'text_align':'center'}  # Remove underline from the link
+                            style={'textDecoration': 'none', 'textAlign':'center'}  # Remove underline from the link
                         ),
-                        style={'text-align': 'center'}
+                        style={'textAlign': 'center'}
                     ),
                     html.Td(offer['name'][4:]),
-                    html.Td(offer['premium'],style={'text-align': 'center'}),
-                    html.Td(offer['price_per_coin'],style={'text-align': 'center'}),
-                    html.Td(offer['quantity'],style={'text-align': 'center'}),
-                    html.Td(f"{offer['total_cost']:.2f} €",style={'text-align': 'center'}),
-                    html.Td(f"{offer['delivery_fees']:.2f} €",style={'text-align': 'center'})
+                    html.Td(offer['premium'],style={'textAlign': 'center'}),
+                    html.Td(offer['price_per_coin'],style={'textAlign': 'center'}),
+                    html.Td(offer['quantity'],style={'textAlign': 'center'}),
+                    html.Td(f"{offer['total_cost']:.2f} €",style={'textAlign': 'center'}),
+                    html.Td(f"{offer['delivery_fees']:.2f} €",style={'textAlign': 'center'})
                 ])
             )
 
         if table_rows == []:
-            DEBUG_icon = html.I(className="fas fa-triangle-exclamation", style={'color': 'orange', 'font-size': '16px'})  # Adjust color and size as needed
+            DEBUG_icon = html.I(className="fas fa-triangle-exclamation", style={'color': 'orange', 'fontSize': '16px'})  # Adjust color and size as needed
             table_rows.append(
                 html.Tr([
-                    html.Td(DEBUG_icon, style={'text-align': 'center'}),
+                    html.Td(DEBUG_icon, style={'textAlign': 'center'}),
                     html.Td("Veuillez augmenter votre budget pour voir les offres."),
-                    html.Td(DEBUG_icon, style={'text-align': 'center'}),
-                    html.Td(DEBUG_icon, style={'text-align': 'center'}),
-                    html.Td(DEBUG_icon, style={'text-align': 'center'}),
-                    html.Td(DEBUG_icon, style={'text-align': 'center'}),
-                    html.Td(DEBUG_icon, style={'text-align': 'center'})
+                    html.Td(DEBUG_icon, style={'textAlign': 'center'}),
+                    html.Td(DEBUG_icon, style={'textAlign': 'center'}),
+                    html.Td(DEBUG_icon, style={'textAlign': 'center'}),
+                    html.Td(DEBUG_icon, style={'textAlign': 'center'}),
+                    html.Td(DEBUG_icon, style={'textAlign': 'center'})
                 ])
             )
 
         return (table_rows,
-                html.P(f"Dernière mise à jour le {formatted_timestamp}", style={'font-size': '0.8em'}),
+                html.P(f"Dernière mise à jour le {formatted_timestamp}", style={'fontSize': '0.8em', 'textAlign' : 'center'}),
                 arrow_classNames['source-arrow'],
                 arrow_classNames['name-arrow'],
                 arrow_classNames['premium-arrow'],
                 arrow_classNames['quantity-arrow'],
+                arrow_classNames['ppc-arrow'],
                 arrow_classNames['total_cost-arrow'],
                 arrow_classNames['delivery-arrow'],
-                )
+                False,)
 
+
+########################################################################################################################
 @app.callback(
     Output('piece-dropdown', 'options'),
     Output('piece-dropdown', 'value'),
@@ -636,9 +884,9 @@ def update_piece_dropdown(bullion_type_switch):
 )
 def update_quantity_dropdown(bullion_type_switch,quantity):
     if bullion_type_switch:
-        return 7
+        return 3
     else:
-        return 100
+        return 30
 
 @app.callback(
     Output('metal-price-output', 'children'),
@@ -647,18 +895,22 @@ def update_quantity_dropdown(bullion_type_switch,quantity):
 )
 def update_metal_price(bullion_type_switch, n):
     bullion_type = 'or' if bullion_type_switch else 'ar'
+
     results = MetalPrice.get_previous_price(bullion_type)
     metal_prices_df = pd.DataFrame(results)
+
+    # Get buying gold and silver coin values
     metal_price = metal_prices_df['buy_price'].iloc[0]
-    db.session.close()
+
     return html.Div(
         [
             html.Hr(style={'margin': '5px 0'}),  # Add a horizontal rule for separation
-            html.P(f"{metal_price:.3f} €/g ", style={'font-size': '0.8em', 'margin-bottom': '0','text-align':'center'})
+            html.P(f"{metal_price:.3f} €/g ", style={'fontSize': '0.8em', 'marginBottom': '0','textAlign':'center'})
         ]
     )
-
     return current_table
+
+########################################################################################################################
 
 app.clientside_callback(
         """
@@ -666,7 +918,7 @@ app.clientside_callback(
             setTimeout(function() {
                 var s1=document.createElement("script");
                 s1.async=true;
-                s1.src='https://embed.tawk.to/673851ed4304e3196ae37e76/1icq0025a';
+                s1.articles='https://embed.tawk.to/673851ed4304e3196ae37e76/1icq0025a';
                 s1.charset='UTF-8';
                 s1.setAttribute('crossorigin','*');
                 document.body.appendChild(s1); // Append to the end of <body>
@@ -681,60 +933,72 @@ app.clientside_callback(
     Input("tawk-to-widget", "n_clicks"),
 )
 
-def get_price(ranges, quantity):
+
+# Clientside callback to manage cookie consent, banner visibility, and Google Analytics
+app.clientside_callback(
     """
-    Calculates the price based on the quantity and given ranges.
+    function(href, saveClicks, checklistValues) {
+        let essentialConsent = localStorage.getItem('essential-cookies');
+        let analyticsConsent = localStorage.getItem('analytics-cookies');
 
-    Args:
-    ranges: A string of ranges in the format '1-9;10-48;49-98;99-9999999999.9'.
-    quantity: The quantity of the item.
+        if (saveClicks > 0) {
+            localStorage.setItem('essential-cookies', checklistValues.includes('essential'));
+            localStorage.setItem('analytics-cookies', checklistValues.includes('analytics'));
+            essentialConsent = checklistValues.includes('essential') ? 'true' : 'false';
+            analyticsConsent = checklistValues.includes('analytics') ? 'true' : 'false';
 
-    Returns:
-    The price as a float.
-    """
-    ranges = ranges.split(';')
+            // Inject Google Analytics if consent is given
+            if (analyticsConsent === 'true') {
+                const scriptId = 'gtag-script';
+                if (!document.getElementById(scriptId)) {
+                    const script = document.createElement('script');
+                    script.id = scriptId;
+                    script.src = 'https://www.googletagmanager.com/gtag/js?id=G-DBDM228K9G';
+                    document.head.appendChild(script);
 
-    for r in ranges:
-        lower, upper, price = map(float, r.split('-'))
-        if lower <= quantity < upper:
-            return price  # Return the price directly
-    return None  # Or handle the case where quantity is outside all ranges
+                    window.dataLayer = window.dataLayer || [];
+                    function gtag(){dataLayer.push(arguments);}
+                    gtag('js', new Date());
+                    gtag('config', 'G-DBDM228K9G');
+                }
+            }
+        }
 
-def get_country_flag_image(country_code):
-    """
-    Generates an HTML img tag for a country flag image from a 2-letter country code.
-    Uses images from the provided URL with the format "https://hatscripts.github.io/circle-flags/flags/{code}.svg".
-    """
-    if len(country_code) == 2:
-        return html.Img(
-            src=f"/assets/{country_code.lower()}.svg",  # Use assets folder
-            alt=country_code,
-            style={'width': '20px', 'margin-right': '5px'}
-        )
-    else:
-        return ""
+        if (essentialConsent === null || analyticsConsent === null) {
+            document.getElementById('cookie-banner').style.display = 'block';
+        } else {
+            document.getElementById('cookie-banner').style.display = 'none';
+        }
+        return [
+            essentialConsent === 'true',
+            analyticsConsent === 'true'
+        ];
+    }
+    """,
+    Output('cookie-consent', 'data'),
+    Input('url', 'href'),
+    Input('save-cookie-preferences', 'n_clicks'),
+    Input('cookie-checklist', 'value')
+)
 
+########################################################################################################################
 
 with app.server.app_context():
-    # db.init_app(server)
-    # db.create_all()
-
-    # Simplified layout and callback
-    app.layout = serve_layout()
     results = MetalPrice.get_previous_price('or')
     metal_prices_df = pd.DataFrame(results)
 
     metal_price = metal_prices_df['buy_price'].iloc[0]
     session_id = metal_prices_df['session_id'].iloc[0]
     # SQL query to fetch the latest complete session and its data from both tables
-    results = Item.get_items_by_bullion_type_and_quantity( 'or', session_id, 1)
+    results = Item.get_items_by_bullion_type_and_quantity('or', session_id, 1)
     items_df = pd.DataFrame(results).copy()
+
     items_df.drop_duplicates(subset=['name'], inplace=True)
     items_df.sort_values(by='name', inplace=True)
     or_options_quick_filter = [
                                   {'label': html.Span(
                                       [get_country_flag_image('fr'), "Toutes les 20 francs Napoléon d'Or"]),
-                                   'value': 'or - 20 francs fr *'},
+                                      'value': 'or - 20 francs fr *'},
                                   {'label': html.Span([get_country_flag_image('fr'), "Toutes les 5 francs"]),
                                    'value': 'or - 5 francs fr *'},
                                   {'label': html.Span([get_country_flag_image('fr'), "Toutes les 10 francs"]),
@@ -775,6 +1039,7 @@ with app.server.app_context():
 
     results = Item.get_items_by_bullion_type_and_quantity('ar', session_id, 1)
     items_df = pd.DataFrame(results).copy()
+
     items_df.drop_duplicates(subset=['name'], inplace=True)
     items_df.sort_values(by='name', inplace=True)
     ar_options_quick_filter = [
@@ -790,14 +1055,173 @@ with app.server.app_context():
                                    'value': 'ar - 10 francs *'},
                                   {'label': html.Span([get_country_flag_image('fr'), "Toutes les 20 francs"]),
                                    'value': 'ar - 20 francs *'},
-                                  {'label': html.Span([get_country_flag_image('fr'), "Toutes les 50 francs"]),
+                                  {'label': html.Span([get_country_flag_image('fr'), "Toutes les 50 francs Hercule"]),
                                    'value': 'ar - 50 francs *'},
-                                  {'label': html.Span([get_country_flag_image('fr'), "Toutes les 100 francs"]),
+                                  {'label': html.Span([get_country_flag_image('fr'), "Toutes les 100 francs Hercule"]),
                                    'value': 'ar - 100 francs *'},
                                   {'label': "Toutes les 1 Oz", 'value': 'ar - 1 oz *'},
                               ] + [{'label': html.Span(row['name'][4:].upper()), 'value': row['name']} for _, row in
                                    items_df.iterrows()]
-    db.session.close()
+
+
+########################################################################################################################
+
+def serve_analysis():
+
+    return html.Div([
+        dbc.Row([
+            dbc.Col(
+                dcc.Dropdown(
+                    id='napoleon-type-dropdown',
+                    options=[
+                        {'label': "Tous les 20 Francs Or", 'value': 'all'},
+                        # Add other specific 20 Francs Or types here
+                        {'label': "Marianne Coq", 'value': 'Marianne Coq'},
+                        # ...
+                    ],
+                    value='all',  # Default value
+                    clearable=False,
+                    style={'width': '100%', 'color': 'black', 'textAlign': 'center'}
+                ),
+                width=6,  # Adjust width as needed
+            ),
+        ]),
+
+    ])
+
+@app.callback(
+    Output("cross-platform-analysis-graph", "figure"),
+    [Input("url", "pathname"),
+     Input("napoleon-type-dropdown", "value")]
+)
+def update_cross_platform_analysis(pathname, napoleon_type):
+    if pathname == "/analyses":
+
+        # 1. Construct the filter condition based on dropdown selection
+        if napoleon_type == 'all':
+            name_filter = Item.name.like('or - 20 francs fr%')
+        else:
+            name_filter = Item.name.like(f'or - 20 francs fr {napoleon_type}%')
+
+        # 2. Fetch data using SQLAlchemy ORM with the filter
+        results = (
+            db.session.query(
+                func.DATE_FORMAT(Item.timestamp, '%Y-%m').label('month'),
+                Item.source,
+                Item.buy_premiums
+            )
+            .filter(name_filter)
+            .group_by('month', Item.source)
+            .all()
+        )
+
+        df = pd.DataFrame(results, columns=['month', 'source', 'buy_premiums'])
+
+        # 3. Pre-process the 'buy_premiums' column
+        df['buy_premiums'] = df['buy_premiums'].apply(lambda x: [float(i) for i in x.split(';')][:5])
+
+        # 4. Calculate the standard deviation for each stack size (1 to 5) without NumPy
+        def calculate_std_dev_for_stacks(row):
+            premiums_list = row['buy_premiums']
+            std_devs = []
+            for stack_size in range(1, 6):
+                stack_premiums = premiums_list[:stack_size]
+                mean = sum(stack_premiums) / len(stack_premiums)
+                variance = sum([(x - mean) ** 2 for x in stack_premiums]) / len(stack_premiums)
+                std_dev = variance ** 0.5
+                std_devs.append(std_dev)
+            return pd.Series(std_devs)
+
+        df[[f'stack_{i}' for i in range(1, 6)]] = df.apply(calculate_std_dev_for_stacks, axis=1)
+
+        # 5. Melt the DataFrame to long format for Dash
+        df_melted = df.melt(
+            id_vars=['month', 'source'],
+            value_vars=[f'stack_{i}' for i in range(1, 6)],
+            var_name='stack_size',
+            value_name='std_dev'
+        )
+        df_melted['stack_size'] = df_melted['stack_size'].str.replace('stack_', '').astype(int)
+
+        # 6. Create the chart using dash-core-components (dcc.Graph)
+        fig = {
+            'data': [
+                {
+                    'x': df_melted[df_melted['source'] == source]['stack_size'],
+                    'y': df_melted[df_melted['source'] == source]['std_dev'],
+                    'type': 'line',
+                    'name': source,
+                } for source in df_melted['source'].unique()
+            ],
+            'layout': {
+                'title': "Cross-Platform Premium Deviation Analysis for 20 Francs Napoléon (First 5)",
+                'xaxis': {'title': 'Stack Size'},
+                'yaxis': {'title': 'Standard Deviation (%)'},
+            },
+            'frames': [
+                {
+                    'name': month,
+                    'data': [
+                        {
+                            'x': df_melted[(df_melted['source'] == source) & (df_melted['month'] == month)]['stack_size'],
+                            'y': df_melted[(df_melted['source'] == source) & (df_melted['month'] == month)]['std_dev'],
+                        } for source in df_melted['source'].unique()
+                    ]
+                } for month in df_melted['month'].unique()
+            ]
+        }
+
+        return fig
+
+    else:
+        return {}
+
+@app.callback(
+        Output("tax-comparison-graph", "figure"),
+        [Input("total-amount", "value"),
+         Input("annual-yield", "value")]
+    )
+def update_graph(total_amount, annual_yield):
+    years = list(range(0, 23))  # Years 0 to 23
+    initial_amount = total_amount
+    amount_after_tax_11_5 = []
+    amount_after_tax_36_2 = []
+
+    for year in years:
+        # Calculate amount after yield
+        amount_with_yield = initial_amount * (1 + annual_yield / 100) ** year
+
+        # Calculate amount after tax for 11.5% (remains the same)
+        amount_after_tax_11_5.append(amount_with_yield * (1 - 0.115))
+
+        # Calculate amount after tax for 36.2% with reduction and condition
+        if amount_with_yield > initial_amount:  # Only apply tax if there's a profit
+            if year <= 2:
+                tax_36_2 = (amount_with_yield - initial_amount) * 0.362  # Tax on the profit only
+            else:
+                reduction = 0.05 * (year - 2)
+                effective_tax_rate = 0.362 * (1 - reduction)
+                tax_36_2 = (amount_with_yield - initial_amount) * effective_tax_rate
+            amount_after_tax_36_2.append(amount_with_yield - tax_36_2)
+        else:
+            amount_after_tax_36_2.append(amount_with_yield)  # No tax if no profit
+
+    fig = {
+        'data': [
+            {'x': str(years) + 'ans', 'y': amount_after_tax_36_2, 'type': 'line', 'name': "TPV 36.2%", 'hoverinfo': 'y'},
+            {'x': str(years) + 'ans', 'y': amount_after_tax_11_5, 'type': 'line', 'name': "TMP 11.5%",'hoverinfo': 'y'},
+        ],
+        'layout': {
+            'title': "Montant récupéré après impôt selon la période de détention",
+            'xaxis': {'title': "Année de possession", 'dtick': 1,
+                     'tickvals': years,  # Set tickvals to the years list
+                     'ticktext': [f'{year} ans' if year > 1 else f'{year} an' for year in years ]},
+            'yaxis': {'title': "Montant après impôts (€)", 'tickformat': '.2f','ticksuffix': ' €'},
+            'hovermode': 'x unified'
+        }
+    }
+
+    return fig
 
 if __name__ == '__main__':
 

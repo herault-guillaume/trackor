@@ -480,166 +480,160 @@ def serve_ads_txt():
 
 #### DASHBOARD #########################################################################################################
 def serve_dashboard():
-    return dbc.Container([
-
-    dbc.Row([
-        dbc.Col(
-            dbc.Card([
-                dbc.CardHeader([html.I(className="fa-solid fa-bullseye fa-bounce", style={'fontSize': '16px'}),"  Mon budget (€)",dbc.Tooltip("Le budget que je souhaite me fixer.", target="cardheader-budget")],style = {'textAlign': 'center'}),
-                dbc.CardBody([
-                    dcc.RangeSlider(
-                        id='budget-slider',
-                        min=0,
-                        max=20000,
-                        step=100,
-                        value=[0, 2000],  # Default range
-                        marks={
-                            0: '0 €',
-                            20000: '20k €',
-                        },
-                        allowCross=False,
-                        persistence=False,
-                        tooltip={"placement": "bottom", "always_visible": True,"style": {"color": "gold", "fontSize": "14px"}},
-                        updatemode='mouseup',# Show tooltip always
-                    )
-                ],id="cardheader-budget"),
-            ]),
-            xs=12, sm=12, md=6, lg=6, xl=6,xxl=7, className="mb-4"  # Adjust width for larger screens
-        ),
-        dbc.Col(
-            dbc.Card([
-                dbc.CardHeader([html.I(className="fa-sharp fa-solid fa-coins fa-bounce", style={'fontSize': '16px'}),"  Quantité max.",dbc.Tooltip("Le nombre maximum de pièces que je souhaite acheter.", target="cardheader-quantity")],style = {'textAlign': 'center'}),
-                dbc.CardBody([
-                dcc.Slider(
-                    id='quantity-slider',
-                    min=1,
-                    max=2000,
-                    step=1,
-                    value=2000,  # Default value
-                    marks={
-                        1: '1',
-                        2000: '2000',
-                        # Add more marks if needed
-                    },
-                    tooltip={"placement": "bottom", "always_visible": True,"style": {"color": "gold", "fontSize": "14px"}},
-                    persistence=False,
-                    updatemode='mouseup'  # Update the value while dragging
-                )
-                ],id="cardheader-quantity"),
-            ]),
-            xs=6, sm=6, md=3, lg=3, xl=3,xxl=3,className="mb-4"
-        ),
-
-        dbc.Col(
-            dbc.Card([
-                dbc.CardHeader([html.I(className="fa-solid fa-cube", style={'fontSize': '16px'}),"  Bullion", dbc.Tooltip("Source cours du métal : BullionVault.", target="cardheader-bullion")], style={'textAlign': 'center'}),
-                dbc.CardBody([
-                    html.Div(
-                        [
-                            html.Span("Argent", className="me-2"),
-                            dbc.Switch(
-                                id='bullion-type-switch',
-                                label="",
-                                value=True,
-                                className="gold-silver-switch larger-switch",
+    options = [{'label': f'{i}', 'value': i} for i in range(1, 5000)]
+    options.insert(0, {'label': 'Pas de limite', 'value': 5000})
+    return (
+        dbc.Container([
+            dbc.Row([
+                dbc.Col(
+                    dbc.Card([
+                        dbc.CardHeader([html.I(className="fa-solid fa-bullseye fa-bounce", style={'fontSize': '16px'}),"  Mon budget (€)",dbc.Tooltip("Le budget que je souhaite me fixer.", target="cardheader-budget")],style = {'textAlign': 'center'}),
+                        dbc.CardBody([
+                            dcc.RangeSlider(
+                                id='budget-slider',
+                                min=0,
+                                max=20000,
+                                step=100,
+                                value=[0, 2000],  # Default range
+                                marks={
+                                    0: '0 €',
+                                    20000: '20k €',
+                                },
+                                allowCross=False,
                                 persistence=False,
+                                tooltip={"placement": "bottom", "always_visible": True,"style": {"color": "gold", "fontSize": "14px"}},
+                                updatemode='mouseup',# Show tooltip always
+                            )
+                        ],id="cardheader-budget"),
+                    ]),
+                    xs=12, sm=12, md=6, lg=6, xl=6,xxl=7, className="mb-4"  # Adjust width for larger screens
+                ),
+                dbc.Col(
+                    dbc.Card([
+                        dbc.CardHeader([html.I(className="fa-sharp fa-solid fa-coins fa-bounce", style={'fontSize': '16px'}),"  Quantité max.",dbc.Tooltip("Le nombre maximum de pièces que je souhaite acheter.", target="cardheader-quantity")],style = {'textAlign': 'center'}),
+                        dbc.CardBody([
+                            dcc.Dropdown(
+                                id='quantity-value',
+                                options=options,
+                                multi=False,
+                                value=5000,  # No default selection
+                                clearable=False,  # Allow clearing the selection
+                                style={'width': '100%', 'color': 'black', 'textAlign': 'center'}
                             ),
-                            html.Span("Or", className="ms-2"),
-                        ],
-                        className="d-flex align-items-center justify-content-between"  # No need for width: 100% here
-                    )
-                ,html.Div(id='metal-price-output'),
-                ],id="cardheader-bullion")
-            ],                # The tooltip
-            ),  # Set a fixed width for the Card
-            xs=6, sm=6, md=3, lg=3, xl=2,xxl=2, className="mb-4"
-        ),
-        dbc.Col(
-            dbc.Card([
-                dbc.CardHeader([html.I(className="fa-solid fa-magnifying-glass", style={'fontSize': '16px'}), "  Effigie/Année", dbc.Tooltip("Je récupère les offres pour un ou plusieurs types de pièce.", target="cardheader-years")], style={'textAlign': 'center'}),  # New card for name selection
-                dbc.CardBody([
-                    dcc.Dropdown(
-                        id='piece-dropdown',
-                        options=[],
-                        multi=True,
-                        value=None,  # No default selection
-                        placeholder="Sélectionnez une pièce",  # Placeholder text
-                        clearable=True,  # Allow clearing the selection
-                        style={'width': '100%', 'color': 'black', 'textAlign': 'center'}
-                    ),
-                ]),
-            ],id="cardheader-years"),
-            xs=12, sm=12, md=8, lg=6, xl=4, xxl=4, className="mb-4"
-        ),
-    ], className="mb-4 equal-height-cards"),  # Add margin-bottom to the row
-    dbc.Spinner(id="loading-output", children=[
-        html.Div(id='last-update-info', className="text-center mb-2"),  # Add a div to display the last update info
+                        ],id="cardheader-quantity"),
+                    ]),
+                    xs=6, sm=6, md=3, lg=3, xl=3,xxl=3,className="mb-4"
+                ),
 
-        dbc.Table([  # Create the table structure in the layout
-            html.Thead(
-                html.Tr([
-                    html.Th([html.I(className="fa-solid fa-shop", style={'fontSize': '16px'}), "  Site marchand",
-                             html.Span(id='source-arrow', className="fa fa-sort ms-2")], style={'textAlign': 'center'},
-                            id='source-header', n_clicks=0),
-                    html.Th([html.I(className="fa-solid fa-hashtag", style={'fontSize': '16px'}), "  Nom",
-                             html.Span(id='name-arrow', className="fa fa-sort ms-2")], style={'textAlign': 'center'},
-                            id='name-header', n_clicks=0),
-                    html.Th(
-                        [
-                            html.I(className="fa-solid fa-arrow-trend-down", style={'fontSize': '16px'}),
-                            "  Prime",
-                            html.Span(id='premium-arrow', className="fa fa-sort ms-2"),
-                            dbc.Tooltip(
-                                "La prime inclue les frais de port et le prix dégressif. Valable uniquement à l'horaire affichée ci-dessus.",
-                                target="premium-header")  # The tooltip
-                        ],
-                        id="premium-header",
-                        style={'textAlign': 'center'}, n_clicks=0),
-                    html.Th(
-                        [
-                            html.I(className="fa-solid fa-circle-info", style={'fontSize': '16px'}),
-                            "  Prix Unitaire FDPI",
-                            html.Span(id='ppc-arrow', className="fa fa-sort ms-2"),
-                            dbc.Tooltip("Prix unitaire, frais de port inclus, d'une pièce du lot.", target="ppc-header")
-                        ],
-                        id="ppc-header",
-                        style={'textAlign': 'center'}, n_clicks=0),
-                    html.Th(
-                        [
-                            html.I(className="fa-solid fa-chart-line", style={'fontSize': '16px'}),
-                            "  Quantité",
-                            html.Span(id='quantity-arrow', className="fa fa-sort ms-2"),
-                            dbc.Tooltip("Quantité minimum pour obtenir la prime affichée.", target="quantity-header")
-                        ],
-                        id="quantity-header",
-                        style={'textAlign': 'center'}, n_clicks=0),
-                    html.Th([html.I(className="fa-solid fa-tag", style={'fontSize': '16px'}), "  Total FDPI",
-                             html.Span(id='total_cost-arrow', className="fa fa-sort ms-2"), ],
-                            style={'textAlign': 'center'}, id='total_cost-header', n_clicks=0),
+                dbc.Col(
+                    dbc.Card([
+                        dbc.CardHeader([html.I(className="fa-solid fa-cube", style={'fontSize': '16px'}),"  Bullion", dbc.Tooltip("Source cours du métal : BullionVault.", target="cardheader-bullion")], style={'textAlign': 'center'}),
+                        dbc.CardBody([
+                            html.Div(
+                                [
+                                    html.Span("Argent", className="me-2"),
+                                    dbc.Switch(
+                                        id='bullion-type-switch',
+                                        label="",
+                                        value=True,
+                                        className="gold-silver-switch larger-switch",
+                                        persistence=False,
+                                    ),
+                                    html.Span("Or", className="ms-2"),
+                                ],
+                                className="d-flex align-items-center justify-content-between"  # No need for width: 100% here
+                            )
+                        ,html.Div(id='metal-price-output'),
+                        ],id="cardheader-bullion")
+                    ],                # The tooltip
+                    ),  # Set a fixed width for the Card
+                    xs=6, sm=6, md=3, lg=3, xl=2,xxl=2, className="mb-4"
+                ),
+                dbc.Col(
+                    dbc.Card([
+                        dbc.CardHeader([html.I(className="fa-solid fa-magnifying-glass", style={'fontSize': '16px'}), "  Effigie/Année", dbc.Tooltip("Je récupère les offres pour un ou plusieurs types de pièce.", target="cardheader-years")], style={'textAlign': 'center'}),  # New card for name selection
+                        dbc.CardBody([
+                            dcc.Dropdown(
+                                id='piece-dropdown',
+                                options=[],
+                                multi=True,
+                                value=None,  # No default selection
+                                placeholder="Sélectionnez une pièce",  # Placeholder text
+                                clearable=True,  # Allow clearing the selection
+                                style={'width': '100%', 'color': 'black', 'textAlign': 'center'}
+                            ),
+                        ]),
+                    ],id="cardheader-years"),
+                    xs=12, sm=12, md=8, lg=6, xl=4, xxl=4, className="mb-4"
+                ),
+            ], className="mb-4 equal-height-cards"),  # Add margin-bottom to the row
+            dbc.Spinner(id="loading-output", children=[
+                html.Div(id='last-update-info', className="text-center mb-2"),  # Add a div to display the last update info
 
-                    html.Th([html.I(className="fa-solid fa-truck fa-tag", style={'fontSize': '16px'}), "  FDP",
-                             html.Span(id='delivery-arrow', className="fa fa-sort ms-2"), ],
-                            style={'textAlign': 'center'}, id='delivery-header', n_clicks=0),
+                dbc.Table([  # Create the table structure in the layout
+                    html.Thead(
+                        html.Tr([
+                            html.Th([html.I(className="fa-solid fa-shop", style={'fontSize': '16px'}), "  Site marchand",
+                                     html.Span(id='source-arrow', className="fa fa-sort ms-2")], style={'textAlign': 'center'},
+                                    id='source-header', n_clicks=0),
+                            html.Th([html.I(className="fa-solid fa-hashtag", style={'fontSize': '16px'}), "  Nom",
+                                     html.Span(id='name-arrow', className="fa fa-sort ms-2")], style={'textAlign': 'center'},
+                                    id='name-header', n_clicks=0),
+                            html.Th(
+                                [
+                                    html.I(className="fa-solid fa-arrow-trend-down", style={'fontSize': '16px'}),
+                                    "  Prime",
+                                    html.Span(id='premium-arrow', className="fa fa-sort ms-2"),
+                                    dbc.Tooltip(
+                                        "La prime inclue les frais de port et le prix dégressif. Valable uniquement à l'horaire affichée ci-dessus.",
+                                        target="premium-header")  # The tooltip
+                                ],
+                                id="premium-header",
+                                style={'textAlign': 'center'}, n_clicks=0),
+                            html.Th(
+                                [
+                                    html.I(className="fa-solid fa-circle-info", style={'fontSize': '16px'}),
+                                    "  Prix Unitaire FDPI",
+                                    html.Span(id='ppc-arrow', className="fa fa-sort ms-2"),
+                                    dbc.Tooltip("Prix unitaire, frais de port inclus, d'une pièce du lot.", target="ppc-header")
+                                ],
+                                id="ppc-header",
+                                style={'textAlign': 'center'}, n_clicks=0),
+                            html.Th(
+                                [
+                                    html.I(className="fa-solid fa-chart-line", style={'fontSize': '16px'}),
+                                    "  Quantité",
+                                    html.Span(id='quantity-arrow', className="fa fa-sort ms-2"),
+                                    dbc.Tooltip("Quantité minimum pour obtenir la prime affichée.", target="quantity-header")
+                                ],
+                                id="quantity-header",
+                                style={'textAlign': 'center'}, n_clicks=0),
+                            html.Th([html.I(className="fa-solid fa-tag", style={'fontSize': '16px'}), "  Total FDPI",
+                                     html.Span(id='total_cost-arrow', className="fa fa-sort ms-2"), ],
+                                    style={'textAlign': 'center'}, id='total_cost-header', n_clicks=0),
 
-                ])
-                , id='table-header'),  # Apply spinner only to the tbody
-            html.Tbody(id='cheapest-offer-table-body'),
-        ], bordered=True, hover=True, responsive=True, striped=True, dark=True),
+                            html.Th([html.I(className="fa-solid fa-truck fa-tag", style={'fontSize': '16px'}), "  FDP",
+                                     html.Span(id='delivery-arrow', className="fa fa-sort ms-2"), ],
+                                    style={'textAlign': 'center'}, id='delivery-header', n_clicks=0),
+
+                        ])
+                        , id='table-header'),  # Apply spinner only to the tbody
+                    html.Tbody(id='cheapest-offer-table-body'),
+                ], bordered=True, hover=True, responsive=True, striped=True, dark=True),
 
 
-    dcc.Interval(
-        id='interval-component',
-        interval=30*60*1000,  # in milliseconds (30 minutes)
-        n_intervals=0
-    ),
+            dcc.Interval(
+                id='interval-component',
+                interval=30*60*1000,  # in milliseconds (30 minutes)
+                n_intervals=0
+            ),
 
-    dcc.Loading(id="loading-1",type="default",children=html.Div(id="tawk-to-widget")),
-    footer,
-    ],  color="gold", type="border", spinner_style={"position": "absolute", "top": "3em"}),
+            dcc.Loading(id="loading-1",type="default",children=html.Div(id="tawk-to-widget")),
+            footer,
+            ],  color="gold", type="border", spinner_style={"position": "absolute", "top": "3em"}),
 
-    ])
+            ]))
 
-#
 # #### DASHBOARD CALLBACKS ###############################################################################################
 @app.callback(
     Output('cheapest-offer-table-body', 'children'),
@@ -653,7 +647,7 @@ def serve_dashboard():
     Output('delivery-arrow', 'className'),
     Output('initial-load', 'data'),
     [Input('budget-slider', 'value'),
-     Input('quantity-slider', 'value'),
+     Input('quantity-value', 'value'),
      Input('bullion-type-switch', 'value'),
      Input('piece-dropdown', 'value'),
      Input('interval-component', 'n_intervals'),
@@ -720,11 +714,11 @@ def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_
                                    style={'textDecoration': 'none', 'text_align': 'center'}),
                             style={'textAlign': 'center'}),
                     html.Td(offer.name[4:]),
-                    html.Td(offer.premium, style={'textAlign': 'center'}),
-                    html.Td(offer.price_per_coin, style={'textAlign': 'center'}),
-                    html.Td(offer.quantity, style={'textAlign': 'center'}),
-                    html.Td(f"{offer.total_cost:.2f} €", style={'textAlign': 'center'}),
-                    html.Td(f"{offer.delivery_fees:.2f} €", style={'textAlign': 'center'})
+                    html.Td(f"{offer.premium:.2f}",style={'textAlign': 'center'}),
+                    html.Td(f"{offer.price_per_coin:.2f} €",style={'textAlign': 'center'}),
+                    html.Td(offer.quantity,style={'textAlign': 'center'}),
+                    html.Td(f"{offer.total_cost:.2f} €",style={'textAlign': 'center'}),
+                    html.Td(f"{offer.delivery_fees:.2f} €",style={'textAlign': 'center'})
                 ])
             )
         return (table_rows, html.P(f"Dernière mise à jour le {formatted_timestamp}", style={'fontSize': '0.8em'}),

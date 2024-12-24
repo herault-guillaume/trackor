@@ -9,6 +9,7 @@ from sqlalchemy import create_engine, func, Column, Integer, String, Float, Date
 from sqlalchemy.orm import sessionmaker, declarative_base, relationship
 from sqlalchemy.exc import SQLAlchemyError
 from apscheduler.schedulers.background import BackgroundScheduler
+from scipy.optimize import minimize
 
 import pytz
 from pieces import weights
@@ -65,6 +66,45 @@ def get_price(ranges, quantity):
         if lower <= quantity < upper:
             return price  # Return the price directly
     return None  # Or handle the case where quantity is outside all ranges
+
+
+# Objective function (negative number of coins to minimize)
+def objective_function(x):
+    return -x[0]  # Access the first element of the array x
+
+def constraint(x, budget, price_ranges, delivery_fee_ranges):
+
+    price_per_coin_ = lambda x: get_price(price_ranges, x)
+    delivery_fees_ = lambda x: get_price(delivery_fee_ranges, x * price_per_coin_(x))
+
+    price = price_per_coin_(x[0])
+
+    delivery_fee = delivery_fees_(x[0])  # Calculate delivery_fee only after checking price
+
+    if delivery_fee is None:
+        return 0  # Return 0 if delivery_fee is None
+
+    return budget - (x[0] * price + delivery_fee)
+
+# Function to find the maximum coins
+def find_max_coins(max_quantity, max_budget, price_ranges, delivery_fee_ranges,minimum):
+    # Initial guess for x (can be improved)
+    x0 = pd.Series(max([1,minimum]))
+
+    constraint_dict = [
+        {'type': 'ineq', 'fun': lambda x: constraint(x, max_budget, price_ranges, delivery_fee_ranges)},
+    ]
+    # Perform numerical optimization using minimize
+    result = minimize(
+        objective_function,
+        x0,
+        bounds=[(minimum, max_quantity)],  # Set the lower bound to the minimum
+        constraints=constraint_dict,
+        method='SLSQP'
+    )
+
+    max_coins = int(round(result.x[0]))  # Access the solution from result.x[0]
+    return max_coins
 
 def query_to_dict(rset):
     """
@@ -192,6 +232,7 @@ class PrecalculatedOffer(Base):  # Inherit from Item Base
 
 Base.metadata.create_all(engine)  # Add this line to create the tables
 
+
 def pre_calculate_and_store_offers():
     """
     Pre-calculates offer data with standard values and stores it in the database.
@@ -199,7 +240,7 @@ def pre_calculate_and_store_offers():
 
     # 1. Define standard values
     standard_budget_range = [0, 2000]
-    standard_quantity = 3
+    standard_quantity = 2000
     standard_bullion_type = 'or'
     standard_selected_coins = None
 
@@ -231,53 +272,38 @@ def pre_calculate_and_store_offers():
             filtered_df = pd.concat([filtered_df, items_df[items_df['name'].str.contains(coin, regex=True)]])
         items_df = filtered_df
 
-    items_df['buy_premiums'] = items_df['buy_premiums'].apply(lambda x: [float(i) for i in x.split(';')])
-
     budget_min, budget_max = standard_budget_range
 
-    total_count = len(items_df)
-    total_processed_count = 0
+    for i, row in items_df.iterrows():
 
-    def calculate_premiums(x, q_max):
-        premium_index = min(range(len(x[:q_max])), key=lambda i: x[:q_max][i] - i)
-        return pd.Series({'buy_premiums': x[premium_index], 'premium_index': premium_index})
+        total_quantity = find_max_coins(standard_quantity, budget_max, row['price_ranges'], row['delivery_fees'], row['minimum'])
 
-    for q_max in reversed(range(1, standard_quantity + 1)):
-        if total_count <= total_processed_count:
-            break
-        df_copy = items_df.copy()
+        # obligé de retirer les offres inferieur a la quantité, le solveur doit pouvoir descendre en dessous du minimum de pièce pour calculer.
+        if total_quantity < row['minimum']:
+            continue
 
-        df_copy[['buy_premiums', 'premium_index']] = df_copy['buy_premiums'].apply(
-            lambda x: calculate_premiums(x, q_max))
+        price_per_coin = get_price(row['price_ranges'], total_quantity) / row['quantity']
+        delivery_cost = get_price(row['delivery_fees'], total_quantity)
+        ppc_ipc = price_per_coin + (delivery_cost / total_quantity)
+        spot_cost = weights[row['name']] * metal_price
+        premium = ppc_ipc - spot_cost
+        premium_percentage = (premium / spot_cost) * 100
+        total_cost = ppc_ipc * total_quantity * row['quantity']
 
-        results = df_copy.sort_values(by='buy_premiums')
+        if total_cost > budget_max or total_quantity > standard_quantity:
+            continue
 
-        for i, row in results.iterrows():
-            if not standard_quantity >= row['minimum']:
-                continue
-            # Calculate total cost (using bullion_type)
-
-            total_quantity = row['quantity'] * int(row['premium_index'] + 1) if row['minimum'] == 1 else int(row['premium_index'] + 1) * standard_quantity
-            spot_cost = weights[row['name']] * metal_price
-            total_cost = (spot_cost + (row['buy_premiums'] / 100.0) * spot_cost) * total_quantity
-            # Check if the offer meets the budget
-            if row['id'] not in seen_offers and budget_min <= total_cost <= budget_max and standard_quantity >= total_quantity:  # and quantity >= total_quantity :
-                ppc = (spot_cost + (row['buy_premiums'] / 100.0) * spot_cost)
-
-                cheapest_offers.append({
-                    'name': row['name'].upper(),
-                    'source': row['source'],
-                    'premium': row['buy_premiums'],
-                    'price_per_coin': f"{ppc:.2f} €",
-                    'quantity': str(int(row['premium_index'] + 1)) if row['quantity'] == 1 and row[
-                        'minimum'] == 1 else str(int(row['premium_index'] + 1)) + ' x ' + str(
-                        row['quantity']) + ' ({total_quantity})'.format(
-                        total_quantity=str(total_quantity)) if row['quantity'] > 1 else standard_quantity,
-                    'delivery_fees': get_price(row['delivery_fees'], total_cost),
-                    'total_cost': float(total_cost)
-                })
-                seen_offers.add(row['id'])
-                total_count += 1
+        cheapest_offers.append({
+            'name': row['name'].upper(),
+            'source': row['source'],
+            'premium': premium_percentage,
+            'price_per_coin': ppc_ipc,
+            'quantity': total_quantity if row['quantity'] == 1 else str(total_quantity) + ' x ' + str(
+                row['quantity']) + ' ({total_quantity})'.format(total_quantity=str(total_quantity * row['quantity'])),
+            'delivery_fees': 0 if get_price(row['delivery_fees'], total_cost) == 0.01 else get_price(
+                row['delivery_fees'], total_cost),
+            'total_cost': total_cost
+        })
 
     cheapest_offers.sort(key=lambda x: x['premium'])
 
@@ -292,11 +318,11 @@ def pre_calculate_and_store_offers():
             timestamp=now_france,
             budget_min=standard_budget_range[0],
             budget_max=standard_budget_range[1],
-            quantity=standard_quantity,
+            quantity=offer['quantity'],
             bullion_type=standard_bullion_type,
             name=offer['name'],
             source=offer['source'],
-            premium=offer['premium'],
+            premium=float(offer['premium']),
             price_per_coin=offer['price_per_coin'],
             delivery_fees=offer['delivery_fees'],
             total_cost=offer['total_cost']

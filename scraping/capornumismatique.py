@@ -49,7 +49,7 @@ def get_price_for(session_prod,session_id,buy_price_gold,buy_price_silver):
     (7500.01, 10000, 70.0),
     (10000.01, 15000, 85.0),
     (15000.01, 20000, 90.0),
-    (20000.01, 999999999999.9, 0.0)  # Free delivery above 20000
+    (20000.01, 999999999999.9, 0.01)  # Free delivery above 20000
 ]
     try :
         response = requests.get('https://capornumismatique.com/produits/or/or-bourse', headers=headers)

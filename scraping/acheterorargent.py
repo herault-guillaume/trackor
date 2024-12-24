@@ -211,7 +211,7 @@ def get_price_for(session_prod,session_id,buy_price_gold,buy_price_silver):
       (50000.0, 75000.0, 150.0),
       (75000.0, 100000.0, 180.0),
       (100000.0, 150000.0, 240.0),
-      (150000.0, 9999999999.0, 0.0)  # Use float('inf') for infinity
+      (150000.0, 9999999999.0, 0.01)  # Use float('inf') for infinity
   ]
     print(base_url)
 

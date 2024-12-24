@@ -72,7 +72,7 @@ def get_price_for(session_prod,session_id,buy_price_gold,buy_price_silver):
     (5000.01, 7500, 50.0), # Price 5000.01-7500, delivery cost 50.0
     (7500.01, 10000, 56.0),# Price 7500.01-10000, delivery cost 56.0
     (10000.01, 15000, 65.0),# Price 10000.01-15000, delivery cost 65.0
-    (15000.01, 999999999999.9, 0.0)  # Price 15000.01+, free delivery
+    (15000.01, 999999999999.9, 0.01)  # Price 15000.01+, free delivery
 ]
 
     for url in urls:
