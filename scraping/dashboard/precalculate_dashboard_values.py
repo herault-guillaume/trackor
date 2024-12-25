@@ -10,6 +10,7 @@ from sqlalchemy.orm import sessionmaker, declarative_base, relationship
 from sqlalchemy.exc import SQLAlchemyError
 from apscheduler.schedulers.background import BackgroundScheduler
 from scipy.optimize import minimize
+from math import floor
 
 import pytz
 from pieces import weights
@@ -103,8 +104,11 @@ def find_max_coins(max_quantity, max_budget, price_ranges, delivery_fee_ranges,m
         method='SLSQP'
     )
 
-    max_coins = int(round(result.x[0]))  # Access the solution from result.x[0]
-    return max_coins
+    floor_max = floor(result.x[0])  # Access the solution from result.x[0]
+    if result.x[0]-floor_max > 0.9:
+        return int(round(result.x[0]))
+    else:
+        return floor_max
 
 def query_to_dict(rset):
     """
@@ -283,14 +287,13 @@ def pre_calculate_and_store_offers():
             continue
 
         price_per_coin = get_price(row['price_ranges'], total_quantity) / row['quantity']
-        delivery_cost = get_price(row['delivery_fees'], total_quantity)
-        ppc_ipc = price_per_coin + (delivery_cost / total_quantity)
+        delivery_cost = get_price(row['delivery_fees'], price_per_coin * total_quantity)
+        ppc_ipc = price_per_coin + (delivery_cost / row['quantity'])
         spot_cost = weights[row['name']] * metal_price
         premium = ppc_ipc - spot_cost
         premium_percentage = (premium / spot_cost) * 100
         total_cost = ppc_ipc * total_quantity * row['quantity']
-
-        if total_cost > budget_max or total_quantity > standard_quantity:
+        if total_cost > budget_max * 1.1 or total_quantity * row['quantity'] > quantity:
             continue
 
         cheapest_offers.append({

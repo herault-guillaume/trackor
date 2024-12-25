@@ -243,7 +243,7 @@ def get_price_for(session_prod,session_id,buy_price_gold,buy_price_silver,driver
         (1,500,2.95),
         (500,1000,3.95),
         (1000,1500,4.95),
-        (1500,2500,5.95)] + [(2500.0 + (i * 500), 2500.0 + ((i+1) * 500), 5.95 + (1.0 * (i+1))) for i,v in enumerate(range(2500,15000,500))]
+        (1500,2500,5.95)] + [(2500.0 + (i * 500), 2500.0 + ((i+1) * 500), 5.95 + (1.0 * (i+1))) for i,v in enumerate(range(2500,25000,500))]
 
     for url in urls :
         try:

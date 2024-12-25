@@ -80,7 +80,7 @@ def fetch_and_update_data():
                 abacor.get_price_for(session_prod,session_id,buy_price_gold,buy_price_silver)
                 achatoretargent.get_price_for(session_prod,session_id,buy_price_gold,buy_price_silver,driver)
                 acheterorargent.get_price_for(session_prod,session_id,buy_price_gold,buy_price_silver)
-                aucoffre.get_price_for(session_prod,session_id,buy_price_gold,buy_price_silver)
+                #aucoffre.get_price_for(session_prod,session_id,buy_price_gold,buy_price_silver)
                 bdor.get_price_for(session_prod,session_id,buy_price_gold,buy_price_silver,driver)
                 bullionbypost.get_price_for(session_prod,session_id,buy_price_gold,buy_price_silver,driver)
                 capornumismatique.get_price_for(session_prod,session_id,buy_price_gold,buy_price_silver)
