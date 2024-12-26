@@ -840,7 +840,11 @@ def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_
 
         for i, row in items_df.iterrows():
 
-            total_quantity = find_max_coins(quantity,budget_max, row['price_ranges'], row['delivery_fees'],row['minimum'])
+            try :
+                total_quantity = find_max_coins(quantity,budget_max, row['price_ranges'], row['delivery_fees'],row['minimum'])
+            except Exception as e:
+                print(row['source'], row['name'])
+                continue
 
             #obligé de retirer les offres inferieur a la quantité, le solveur doit pouvoir descendre en dessous du minimum de pièce pour calculer.
             # if total_quantity < row['minimum']:
@@ -848,13 +852,26 @@ def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_
 
             price_per_coin = get_price(row['price_ranges'],total_quantity) / row['quantity']
             delivery_cost = get_price(row['delivery_fees'],price_per_coin*total_quantity)
-            ppc_ipc = price_per_coin + (delivery_cost/row['quantity'])
-            spot_cost = weights[row['name']] * metal_price
-            premium = ppc_ipc - spot_cost
-            premium_percentage = (premium / spot_cost) * 100
-            total_cost = ppc_ipc * total_quantity * row['quantity']
-            if total_cost > budget_max * 1.1 or total_quantity * row['quantity'] > quantity :
-                print(row['source'],row['name'])
+            try :
+                ppc_ipc = price_per_coin + (delivery_cost/ (total_quantity*row['quantity']))
+
+                spot_cost = weights[row['name']] * metal_price
+                premium = ppc_ipc - spot_cost
+                premium_percentage = (premium / spot_cost) * 100
+                total_cost = ppc_ipc * total_quantity * row['quantity']
+            except Exception as e:
+                print(row['name'],row['source'],delivery_cost,price_per_coin,total_quantity,row['quantity'])
+            if total_cost > budget_max * 1.2 or total_quantity * row['quantity'] > quantity :
+                # print(row['source'],row['name'],
+                #       'total_cost',total_cost,
+                #       'total_quantity',total_quantity,
+                #       'price_per_coin',price_per_coin,
+                #       'delivery_cost',delivery_cost,
+                #       'ppc_ipc',ppc_ipc,
+                #       'spot_cost',spot_cost,
+                #       'premium',premium,
+                #       'premium_percentage',premium_percentage,
+                # total_cost > budget_max * 1.2, total_quantity * row['quantity'] > quantity)
                 continue
 
             cheapest_offers.append({

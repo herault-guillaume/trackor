@@ -71,7 +71,7 @@ def get_price_for(session_prod,session_id,buy_price_gold,buy_price_silver):
                     else:
                         buy_price = buy_price_silver
 
-                    delivery_ranges = [(0.0,9999999.9,15.79)]
+                    delivery_ranges = [(0.0,9999999999.9,15.79)]
                     price_ranges = [(minimum,9999999999,price)]
 
                     def price_between(value, ranges):

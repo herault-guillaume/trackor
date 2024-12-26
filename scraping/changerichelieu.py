@@ -67,12 +67,12 @@ def get_price_for(session_prod,session_id,buy_price_gold,buy_price_silver):
 
     delivery_ranges = [
     (0, 600, 10.0),      # Price 0-600, delivery cost 10.0
-    (600.01, 2500, 20.0),  # Price 600.01-2500, delivery cost 20.0
-    (2500.01, 5000, 34.0), # Price 2500.01-5000, delivery cost 34.0
-    (5000.01, 7500, 50.0), # Price 5000.01-7500, delivery cost 50.0
-    (7500.01, 10000, 56.0),# Price 7500.01-10000, delivery cost 56.0
-    (10000.01, 15000, 65.0),# Price 10000.01-15000, delivery cost 65.0
-    (15000.01, 9999999999999999.9, 0.01)  # Price 15000.01+, free delivery
+    (600.00, 2500, 20.0),  # Price 600.00-2500, delivery cost 20.0
+    (2500.00, 5000, 34.0), # Price 2500.00-5000, delivery cost 34.0
+    (5000.00, 7500, 50.0), # Price 5000.00-7500, delivery cost 50.0
+    (7500.00, 10000, 56.0),# Price 7500.00-10000, delivery cost 56.0
+    (10000.00, 15000, 65.0),# Price 10000.00-15000, delivery cost 65.0
+    (15000.00, 9999999999999999.9, 0.01)  # Price 15000.01+, free delivery
 ]
 
     for url in urls:

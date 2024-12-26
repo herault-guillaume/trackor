@@ -1,5 +1,6 @@
 weights  = {
                         'or - 1 ducat': 3.44,
+                        'or - 4 escudos ferdinand VII 1819': 11.84,
                         'or - 1 oz' : 31.103,
                         'or - 1 oz EpargnOr' : 31.103,
                         'or - 1 oz buffalo': 31.103,
@@ -8,39 +9,11 @@ weights  = {
                         'or - 1 oz philharmonique': 31.103,
                         'or - 1 oz britannia' : 31.103,
                         'or - 1 oz panda' : 31.103,
-                        'or - 1 oz dragon chinois 2024' : 31.103,
-                        'or - 1 oz kangourou 2024' : 31.103,
-                        'or - 1 oz cygne 2024' : 31.103,
                         'or - 1 oz dragon et koï 2024' : 31.103,
-                        'or - 1 oz 125e anniv perth mint 2024' : 31.103,
-                        'or - 1 oz koala 2024 RAM' : 31.103,
-                        'or - 1 oz dragon 2024 lunar III' : 31.103,
                         'or - 1 oz lunar' : 31.103,
-                        'or - 1 oz dragon chinois 2018' : 31.103,
-                        'or - 1 oz dragon chinois 2022' : 31.103,
-                        'or - 1 oz dragon chinois 2023' : 31.103,
-                        'or - 1 oz dragon tudor beasts 2024' : 31.103,
-                        'or - 1 oz st george et le dragon 2024' : 31.103,
-                        'or - 1 oz britannia 2022' : 31.103,
-                        'or - 1 oz buffalo 2024' : 31.103,
                         'or - 1 oz american eagle' : 31.103,
-                        'or - 1 oz britannia 2024' : 31.103,
-                        'or - 1 oz maple leaf 2024' : 31.103,
                         'or - 1 oz maple leaf' : 31.103,
-                        'or - 1 oz philharmonique 2024' : 31.103,
-                        "or - 1 oz lion d'angleterre tudor beasts 2022" : 31.103,
-                        'or - 1 oz beowulf et grendel mythes et légendes 2024' : 31.103,
-                        'or - 1 oz britannia et liberty 2024' : 31.103,
-                        'or - 1 oz lion et aigle 2024' : 31.103,
-                        'or - 1 oz bond of the 1970s 2024' : 31.103,
-                        'or - 1 oz bond of the 1960s 2024' : 31.103,
-                        'or - 1 oz licorne de seymour tudor beasts 2024' : 31.103,
-                        'or - 1 oz morgan le fay mythes et légendes 2024' : 31.103,
-                        'or - 1 oz the royal arms 2023' : 31.103,
                         'or - 1 oz cygne 2017' : 31.103,
-                        'or - 1 oz britannia elizabeth II 2023' : 31.103,
-                        'or - 1 oz taureau de clarence tudor beasts 2023' : 31.103,
-                        'or - 1 oz serpent 2025 lunar III' : 31.103,
                         'or - 1 rand sud-africains': 3.648,
                         'or - 2 rand sud-africains': 7.322,
                         'or - 1/10 oz': 3.11,
@@ -52,16 +25,7 @@ weights  = {
                         'or - 1/10 oz maple leaf': 3.11,
                         'or - 1/10 oz nugget / kangourou': 3.11,
                         'or - 1/10 oz lunar': 3.11,
-                        'or - 1/10 oz kangourou 2024': 3.11,
-                        'or - 1/10 oz kookaburra 2024': 3.11,
-                        'or - 1/10 oz dragon 2024 lunar III': 3.11,
-                        'or - 1/10 oz chien 2018 Lunar II': 3.11,
-                        'or - 1/10 oz lapin 2023 lunar III': 3.11,
-                        'or - 1/10 oz britannia 2024': 3.11,
                         'or - 1/10 oz britannia': 3.11,
-                        'or - 1/10 oz britannia charles III 2023': 3.11,
-                        'or - 1/10 oz american eagle 2024': 3.11,
-                        'or - 1/10 oz couronnement charles III 2023': 3.11,
                         'or - 1/10 oz EpargnOr': 3.11,
                         'or - 1/2 oz': 15.552,
                         'or - 1/2 oz lunar': 15.552,
@@ -70,11 +34,6 @@ weights  = {
                         'or - 1/2 oz krugerrand': 15.55,
                         'or - 1/2 oz maple leaf': 15.552,
                         'or - 1/2 oz nugget / kangourou': 15.552,
-                        'or - 1/2 oz kangourou 2024': 15.552,
-                        'or - 1/2 oz dragon 2024 lunar III': 15.552,
-                        'or - 1/2 oz lapin 2023 lunar III': 15.552,
-                        'or - 1/2 oz american eagle 2024': 15.552,  # -> CPor
-                        'or - 1/2 oz britannia 2024': 15.552,
                         'or - 1/2 oz britannia': 15.552,
                         'or - 1/2 oz philharmonique 2024': 15.552,
                         'or - 1/2 oz philharmonique': 15.552,
@@ -86,36 +45,22 @@ weights  = {
                         'or - 1/2 souverain victoria jubilee arm.': 3.661, # -> CPor
                         'or - 1/2 souverain victoria voilée': 3.661, # -> CPor
                         'or - 1/2 souverain victoria': 3.661, # -> CPor
-                        'or - 1/10 oz koala 2023': 3.11, # -> CPor
+                        'or - 1/2 souverain victoria 1er portrait': 3.661, # -> CPor
                         'or - 1/20 oz': 1.55,
+                        'or - 1/20 oz kangourou': 1.55,
                         'or - 1/20 oz lunar': 1.55,
                         'or - 1/20 oz maple leaf': 1.55,
                         'or - 1/20 oz nugget / kangourou': 1.55,
-                        'or - 1/20 oz dragon 2024 lunar III': 1.55,
-                        'or - 1/20 oz lapin 2023 lunar III': 1.55,
-                        'or - 1/20 oz boeuf 2021 Lunar III': 1.55,
                         'or - 1/4 oz': 7.776,
                         'or - 1/4 oz american eagle': 7.776,
                         'or - 1/4 oz panda': 7.776,
                         'or - 1/4 oz krugerrand': 7.776,
                         'or - 1/4 oz maple leaf': 7.776,
                         'or - 1/4 oz nugget / kangourou': 7.776,
-                        'or - 1/4 oz kangourou 2024': 7.776,
-                        'or - 1/4 oz dragon 2024 lunar III': 7.776,
-                        'or - 1/4 oz lapin 2023 lunar III': 7.776,
-                        'or - 1/4 oz tigre 2022 lunar III': 7.776,
                         'or - 1/4 oz lunar': 7.776,
-                        'or - 1/4 oz dragon tudor beasts 2024': 7.776,
-                        'or - 1/4 oz st george et le dragon 2024': 7.776,
-                        'or - 1/4 oz britannia 2024': 7.776,
                         'or - 1/4 oz britannia': 7.776,
                         'or - 1/4 oz american eagle 2024': 7.776,
-                        'or - 1/4 oz souris 2020 Lunar III': 7.776,
-                        'or - 1/4 oz britannia charles III 2023': 7.776,
-                        'or - 1/4 oz couronnement charles III 2023': 7.776,
                         'or - 1/4 oz philharmonique': 7.776,
-                        'or - 1/4 oz éale de beaufort tudor beasts 2023': 7.776,
-                        "or - 1/4 oz lion d'angleterre tudor beasts 2022": 7.776,
                         'or - 10 couronnes françois joseph I': 3.096,
                         'or - 10 dollars liberté': 15.047,
                         'or - 10 dollars tête indien': 15.047,
@@ -128,6 +73,7 @@ weights  = {
                         'or - 10 francs fr': 2.903, # -> CPor
                         'or - 10 francs fr coq marianne': 2.903, # -> CPor
                         'or - 10 francs fr cérès 1850-1851': 2.903,
+                        'or - 10 francs fr cérès': 2.903,
                         'or - 10 francs fr napoléon III': 2.903,
                         'or - 10 francs fr napoléon III laurée': 2.903,
                         'or - 10 francs sui vreneli croix': 2.903,
@@ -146,7 +92,6 @@ weights  = {
                         'or - 100 francs fr napoléon III tête nue': 29.02,
                         'or - 100 francs fr napoléon III tête laurée': 29.02,
                         'or - 100 francs fr génie DPF': 29.02,
-                        'or - 100 francs fr génie LEF': 29.02,
                         'or - 100 francs fr génie LEF': 29.02,
                         'or - 100 francs bel albert I': 29.02,
                         'or - 100 francs charles III': 29.02,
@@ -228,6 +173,7 @@ weights  = {
                         'or - 40 francs fr louis philippe': 11.61,
                         'or - 40 lire napoléon I': 11.61,
                         'or - 40 lire maria luigia': 11.61,
+                        'or - 80 lire charles felix': 11.61,
                         'or - 5 dollars liberté': 7.523, # -> CPor
                         'or - 5 dollars tête indien': 7.523, # -> CPor
                         'or - 2.5 dollars liberté': 3.762, # -> CPor
@@ -275,17 +221,7 @@ weights  = {
                         'or - 1 souverain victoria Australie': 7.318,
                         'or - 1 souverain victoria jeune': 7.318,
                         'or - 1 souverain victoria jeune armoiries': 7.318,
-                        'or - 1 souverain 2024 charles III': 7.318, # -> CPor
-                        'or - 1 souverain 2023 charles III': 7.318, # -> CPor
-                        'or - 1 souverain 2022 charles III': 7.318, # -> CPor
-                        'or - 1 souverain 2022 charles III': 7.318, # -> CPor
-                        'or - 1/2 souverain 2024 charles III': 3.6612, # -> CPor
-                        'or - 1/2 souverain 2023 charles III': 3.6612, # -> CPor
-                        'or - 1/2 souverain 2022 charles III': 3.6612, # -> CPor
                         'or - 1/2 souverain edouard VII': 3.6612, # -> CPor
-                        'or - 1/4 souverain 2024 charles III': 1.83, # -> CPor
-                        'or - 2 souverain 2024 charles III': 14.64, # -> CPor
-                        'or - 2 souverain 2022 charles III': 14.64, # -> CPor
                         'or - 2 souverain': 14.64, # -> CPor
                         'or - 5 livres souverain': 36.613, # -> CPor
                         'or - 50 soles péruviens': 21.06, # -> CPor
@@ -295,6 +231,7 @@ weights  = {
                         # Argent
                         'ar - lingot 5 kg' : 5000.0,
                         'ar - 50 francs fr hercule (1974-1980)': 30.0 * 0.900,
+                        'ar - 50 francs mercure': 12.5 * 0.835,
                         'ar - 10 francs fr hercule (1965-1973)': 10.0 * 0.900,
                         'ar - 5 francs fr semeuse (1959-1969)': 12.0 * 0.835,
                         'ar - 5 francs fr hercule': 22.5,
@@ -302,11 +239,15 @@ weights  = {
                         'ar - 5 francs fr napoléon III tête laurée': 22.5,
                         'ar - 5 francs fr cérès': 22.5,
                         'ar - 2 francs fr semeuse': 10.0 * 0.835,
+                        'ar - 2 francs fr cérès': 10.0 * 0.835,
                         'ar - 1 franc fr semeuse': 5 * 0.835,
+                        'ar - 1 franc fr cérès': 5 * 0.835,
                         'ar - 50 centimes francs fr semeuse': 2.5 * 0.835,
+                        'ar - 50 centimes francs fr cérès': 2.5 * 0.835,
                         'ar - 100 francs fr génie (1878-1914)': 32.258 * 0.900,
                         'ar - 100 francs fr panthéon': 15.0 * 0.900,
                         'ar - 100 francs fr': 15.0 * 0.900,
+
 
                         'ar - 250 francs baudouin roi des belges': 25.0 * 0.835,
                         'ar - 20 francs fr turin (1860-1928)': 20.0 * 0.680,
@@ -322,31 +263,14 @@ weights  = {
                         'ar - 1 oz nugget / kangourou': 31.103,
                         'ar - 1 oz philharmonique': 31.103,
                         'ar - 1 oz britannia' : 31.103,
-                        'ar - 1 oz dragon chinois 2024' : 31.103,
-                        'ar - 1 oz kangourou 2024' : 31.103,
                         'ar - 1 oz kangourou' : 31.103,
-                        'ar - 1 oz cygne 2024' : 31.103,
-                        'ar - 1 oz dragon et koï 2024' : 31.103,
-                        'ar - 1 oz 125e anniv perth mint 2024' : 31.103,
-                        'ar - 1 oz koala 2024 RAM' : 31.103,
                         'ar - 1 oz koala' : 31.103,
                         'ar - 1 kg koala' : 1000.0,
                         'ar - 1 kg lunar' : 1000.0,
                         'ar - 1 oz libertad' : 31.103,
-                        'ar - 1 oz dragon 2024 lunar III' : 31.103,
-                        'ar - 1 oz dragon chinois 2018' : 31.103,
-                        'ar - 1 oz dragon chinois 2022' : 31.103,
-                        'ar - 1 oz dragon chinois 2023' : 31.103,
-                        'ar - 1 oz dragon tudor beasts 2024' : 31.103,
-                        'ar - 1 oz st george et le dragon 2024' : 31.103,
-                        'ar - 1 oz britannia 2022' : 31.103,
-                        'ar - 1 oz buffalo 2024' : 31.103,
                         'ar - 1 oz american eagle' : 31.103,
-                        'ar - 1 oz britannia 2024' : 31.103,
-                        'ar - 1 oz maple leaf 2024' : 31.103,
                         'ar - 1 oz maple leaf' : 31.103,
                         'ar - 1 oz silver eagle' : 31.103,
-
                         'ar - 1 dollar peace' : 24.06,
                         'ar - 1 dollar morgan' : 24.06,
                         'ar - 1 dollar commémorative argent' : 24.06,
