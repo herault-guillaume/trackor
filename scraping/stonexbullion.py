@@ -245,6 +245,7 @@ def get_price_for(session_prod,session_id,buy_price_gold,buy_price_silver,driver
         (1000,1500,4.95),
         (1500,2500,5.95)] + [(2500.0 + (i * 500), 2500.0 + ((i+1) * 500), 5.95 + (1.0 * (i+1))) for i,v in enumerate(range(2500,25000,500))]
 
+    already_added = set()
     for url in urls :
         try:
             print(url)
@@ -319,12 +320,13 @@ def get_price_for(session_prod,session_id,buy_price_gold,buy_price_silver,driver
                                     return price.amount_float
                                 else:
                                     return price
-
+                    if source in already_added :
+                        continue
                     coin = Item(name=name,
                                 price_ranges=';'.join(['{min_}-{max_}-{price}'.format(min_=r[0],max_=r[1],price=r[2].amount_float) for r in price_ranges]),
                                 buy_premiums=';'.join(
-                                    ['{:.2f}'.format(((price_between(minimum,price_ranges)/quantity + price_between(price_between(minimum,price_ranges)*minimum,delivery_ranges)/(quantity*minimum)) - (buy_price * weights[name])) * 100.0 / (buy_price * weights[name])) for i in range(1, minimum)] +
-                                    ['{:.2f}'.format(((price_between(i,price_ranges)/quantity + price_between(price_between(i,price_ranges),delivery_ranges)/(quantity*i)) - (buy_price * weights[name])) * 100.0 / (buy_price * weights[name])) for i in range(minimum, 751)]
+                                    ['{:.2f}'.format(((price_between(minimum,price_ranges)/quantity + price_between(price_between(minimum,price_ranges)*minimum,delivery_ranges)/(quantity*minimum)) - (buy_price * weights[name][0] * weights[name][1])) * 100.0 / (buy_price * weights[name][0] * weights[name][1])) for i in range(1, minimum)] +
+                                    ['{:.2f}'.format(((price_between(i,price_ranges)/quantity + price_between(price_between(i,price_ranges),delivery_ranges)/(quantity*i)) - (buy_price * weights[name][0] * weights[name][1])) * 100.0 / (buy_price * weights[name][0] * weights[name][1])) for i in range(minimum, 751)]
                                 ),
                                 delivery_fees=';'.join(['{min_}-{max_}-{price}'.format(min_=r[0],max_=r[1],price=r[2]) for r in delivery_ranges]),
                                 source="https://stonexbullion.com/fr" + source,
@@ -335,7 +337,7 @@ def get_price_for(session_prod,session_id,buy_price_gold,buy_price_silver,driver
                     )
                     session_prod.add(coin)
                     session_prod.commit()
-
+                    already_added.add(source)
 
                 except requests.exceptions.RequestException as e:
                     logger.error(f"Request error: {e}")

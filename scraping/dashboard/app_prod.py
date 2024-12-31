@@ -798,7 +798,7 @@ def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_
                 # Calculate total cost (using bullion_type)
 
                 total_quantity = row['quantity'] * int(row['premium_index'] + 1) if row['minimum'] == 1 else int(row['premium_index'] + 1) * quantity
-                spot_cost = weights[row['name']] * metal_price
+                spot_cost = weights[row['name']][0] * weights[row['name']][1] * metal_price
                 total_cost = (spot_cost + (row['buy_premiums'] / 100.0) * spot_cost) * total_quantity
                 # Check if the offer meets the budget
                 if row['id'] not in seen_offers and budget_min <= total_cost <= budget_max and quantity >= total_quantity:  # and quantity >= total_quantity :

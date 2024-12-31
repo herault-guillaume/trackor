@@ -289,7 +289,7 @@ def pre_calculate_and_store_offers():
         price_per_coin = get_price(row['price_ranges'], total_quantity) / row['quantity']
         delivery_cost = get_price(row['delivery_fees'], price_per_coin * total_quantity)
         ppc_ipc = price_per_coin + (delivery_cost / (total_quantity * row['quantity']))
-        spot_cost = weights[row['name']] * metal_price
+        spot_cost = weights[row['name']][0] * weights[row['name']][1] * metal_price
         premium = ppc_ipc - spot_cost
         premium_percentage = (premium / spot_cost) * 100
         total_cost = ppc_ipc * total_quantity * row['quantity']
@@ -297,7 +297,7 @@ def pre_calculate_and_store_offers():
             continue
 
         cheapest_offers.append({
-            'name': row['name'].upper(),
+            'name': row['name'],
             'source': row['source'],
             'premium': premium_percentage,
             'price_per_coin': ppc_ipc,

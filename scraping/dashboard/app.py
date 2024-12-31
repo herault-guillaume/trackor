@@ -399,7 +399,8 @@ app.layout = html.Div([
             ]),
         ],
         style={'display': 'none'}
-    )
+    ),
+    dcc.Loading(id="loading-1", type="default", children=html.Div(id="tawk-to-widget")),
 ])
 
 @app.callback(Output("page-content", "children"),
@@ -585,8 +586,41 @@ def serve_dashboard():
                                     id='name-header', n_clicks=0),
                             html.Th(
                                 [
+                                    html.I(className="fa-regular fa-circle-dot", style={'fontSize': '16px'}),
+                                    "  Finesse (‰)",
+                                    html.Span(id='purity-arrow', className="fa fa-sort ms-2"),
+                                    dbc.Tooltip(
+                                        "Teneur en métal fin de la pièce en millièmes.",
+                                        target="purity-header")  # The tooltip
+                                ],
+                                id="purity-header",
+                                style={'textAlign': 'center'}, n_clicks=0),
+                            html.Th(
+                                [
+                                    html.I(className="fa-solid fa-weight-hanging", style={'fontSize': '16px'}),
+                                    "  Poid Total (g)",
+                                    html.Span(id='weight-arrow', className="fa fa-sort ms-2"),
+                                    dbc.Tooltip(
+                                        "Poid total des métaux qui composent la pièce en grammes.",
+                                        target="weight-header")  # The tooltip
+                                ],
+                                id="weight-header",
+                                style={'textAlign': 'center'}, n_clicks=0),
+                            html.Th(
+                                [
+                                    html.I(className="fa-solid fa-weight-hanging", style={'fontSize': '16px'}),
+                                    "  Poid fin (g)",
+                                    html.Span(id='bullion-weight-arrow', className="fa fa-sort ms-2"),
+                                    dbc.Tooltip(
+                                        "Poid en métal précieux de la pièce en gramme.",
+                                        target="bullion-weight-header")  # The tooltip
+                                ],
+                                id="bullion-weight-header",
+                                style={'textAlign': 'center'}, n_clicks=0),
+                            html.Th(
+                                [
                                     html.I(className="fa-solid fa-arrow-trend-down", style={'fontSize': '16px'}),
-                                    "  Prime",
+                                    "  Prime (%)",
                                     html.Span(id='premium-arrow', className="fa fa-sort ms-2"),
                                     dbc.Tooltip(
                                         "La prime inclue les frais de port et le prix dégressif. Valable uniquement à l'horaire affichée ci-dessus.",
@@ -597,7 +631,7 @@ def serve_dashboard():
                             html.Th(
                                 [
                                     html.I(className="fa-solid fa-circle-info", style={'fontSize': '16px'}),
-                                    "  Prix Unitaire FDPI",
+                                    "  Prix Unitaire FDPI (€)",
                                     html.Span(id='ppc-arrow', className="fa fa-sort ms-2"),
                                     dbc.Tooltip("Prix unitaire, frais de port inclus, d'une pièce du lot.", target="ppc-header")
                                 ],
@@ -606,17 +640,17 @@ def serve_dashboard():
                             html.Th(
                                 [
                                     html.I(className="fa-solid fa-chart-line", style={'fontSize': '16px'}),
-                                    "  Quantité",
+                                    "  Quantité (U)",
                                     html.Span(id='quantity-arrow', className="fa fa-sort ms-2"),
                                     dbc.Tooltip("Quantité minimum pour obtenir la prime affichée.", target="quantity-header")
                                 ],
                                 id="quantity-header",
                                 style={'textAlign': 'center'}, n_clicks=0),
-                            html.Th([html.I(className="fa-solid fa-tag", style={'fontSize': '16px'}), "  Total FDPI",
+                            html.Th([html.I(className="fa-solid fa-tag", style={'fontSize': '16px'}), "  Total FDPI (€)",
                                      html.Span(id='total_cost-arrow', className="fa fa-sort ms-2"), ],
                                     style={'textAlign': 'center'}, id='total_cost-header', n_clicks=0),
 
-                            html.Th([html.I(className="fa-solid fa-truck fa-tag", style={'fontSize': '16px'}), "  FDP",
+                            html.Th([html.I(className="fa-solid fa-truck fa-tag", style={'fontSize': '16px'}), "  FDP (€)",
                                      html.Span(id='delivery-arrow', className="fa fa-sort ms-2"), ],
                                     style={'textAlign': 'center'}, id='delivery-header', n_clicks=0),
 
@@ -631,11 +665,8 @@ def serve_dashboard():
                 interval=30*60*1000,  # in milliseconds (30 minutes)
                 n_intervals=0
             ),
-
-            dcc.Loading(id="loading-1",type="default",children=html.Div(id="tawk-to-widget")),
             footer,
             ],  color="gold", type="border", spinner_style={"position": "absolute", "top": "3em"}),
-
             ]))
 
 # #### DASHBOARD CALLBACKS ###############################################################################################
@@ -644,6 +675,9 @@ def serve_dashboard():
     Output('last-update-info', 'children'),
     Output('source-arrow', 'className'),  # Output for the arrow icon's className
     Output('name-arrow', 'className'),  # Output for the arrow icon's className
+    Output('purity-arrow', 'className'),  # Output for the arrow icon's className
+    Output('weight-arrow', 'className'),  # Output for the arrow icon's className
+    Output('bullion-weight-arrow', 'className'),  # Output for the arrow icon's className
     Output('premium-arrow', 'className'),  # Output for the arrow icon's className
     Output('quantity-arrow', 'className'),  # Output for the arrow icon's className
     Output('ppc-arrow', 'className'),  # Output for the arrow icon's className
@@ -657,6 +691,9 @@ def serve_dashboard():
      Input('interval-component', 'n_intervals'),
      Input('source-header', 'n_clicks'),  # Input for each header's n_clicks
      Input('name-header', 'n_clicks'),
+     Input('purity-header', 'n_clicks'),
+     Input('weight-header', 'n_clicks'),
+     Input('bullion-weight-header', 'n_clicks'),
      Input('premium-header', 'n_clicks'),
      Input('ppc-header', 'n_clicks'),
      Input('quantity-header', 'n_clicks'),
@@ -666,6 +703,9 @@ def serve_dashboard():
     [State('cheapest-offer-table-body', 'children'),
      State('source-arrow', 'className'),  # Add states for the arrow class names
      State('name-arrow', 'className'),
+     State('purity-arrow', 'className'),
+     State('weight-arrow', 'className'),
+     State('bullion-weight-arrow', 'className'),
      State('premium-arrow', 'className'),
      State('ppc-arrow', 'className'),
      State('quantity-arrow', 'className'),
@@ -673,8 +713,8 @@ def serve_dashboard():
      State('delivery-arrow', 'className')]
 )
 def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_coins, n,
-                          source_clicks, name_clicks, premium_clicks, ppc_clicks, quantity_clicks, total_cost_clicks, delivery_clicks,
-                          initial_load,current_table, source_arrow, name_arrow, premium_arrow, ppc_arrow,quantity_arrow, total_cost_arrow, delivery_arrow,
+                          source_clicks, name_clicks,purity_clicks,weight_clicks,bullion_weight_clicks, premium_clicks, ppc_clicks, quantity_clicks, total_cost_clicks, delivery_clicks,
+                          initial_load,current_table, source_arrow, name_arrow,purity_arrow,weight_arrow,bullion_weight_arrow, premium_arrow, ppc_arrow,quantity_arrow, total_cost_arrow, delivery_arrow,
                           ):
     ctx = callback_context
     triggered_id, triggered_prop = ctx.triggered[0]['prop_id'].split('.')
@@ -683,6 +723,9 @@ def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_
     arrow_classNames = {
         'source-arrow': "fa fa-sort ms-2",
         'name-arrow': "fa fa-sort ms-2",
+        'purity-arrow': "fa fa-sort ms-2",
+        'weight-arrow': "fa fa-sort ms-2",
+        'bullion-weight-arrow': "fa fa-sort ms-2",
         'premium-arrow': "fa fa-sort ms-2",
         'ppc-arrow': "fa fa-sort ms-2",
         'quantity-arrow': "fa fa-sort ms-2",
@@ -710,23 +753,34 @@ def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_
 
         # 3. Create table rows from pre-calculated offers
         table_rows = []
-        for offer in precalculated_offers:
+        for i,offer in enumerate(precalculated_offers):
             table_rows.append(
                 html.Tr([
                     html.Td(html.A(html.I(className="fas fa-external-link-alt", style={'color': 'gold'}),
                                    href=offer.source, target="_blank",
                                    style={'textDecoration': 'none', 'text_align': 'center'}),
                             style={'textAlign': 'center'}),
-                    html.Td(offer.name[4:]),
+                    html.Td([
+                        offer.name[4:].upper(),
+                        dbc.Tooltip(
+                            f'Poid Fin: {weights[offer.name][0]*weights[offer.name][1]:.2f} g. Poid Total: {weights[offer.name][0]:.2f} g.',
+                            target=f"tooltip-target-name-{i}",
+                            placement="left",
+                        ),
+                    ], id=f"tooltip-target-name-{i}"),
+                    html.Td(f"{weights[offer.name][1] * 1000.0:.1f}", style={'textAlign': 'center'}),
+                    html.Td(f"{weights[offer.name][0] * offer.total_cost / offer.price_per_coin:.2f}", style={'textAlign': 'center'}),
+                    html.Td(f"{weights[offer.name][1] * weights[offer.name][0] * offer.total_cost / offer.price_per_coin:.2f}", style={'textAlign': 'center'}),
                     html.Td(f"{offer.premium:.2f}",style={'textAlign': 'center'}),
-                    html.Td(f"{offer.price_per_coin:.2f} €",style={'textAlign': 'center'}),
+                    html.Td(f"{offer.price_per_coin:.2f}",style={'textAlign': 'center'}),
                     html.Td(offer.quantity,style={'textAlign': 'center'}),
-                    html.Td(f"{offer.total_cost:.2f} €",style={'textAlign': 'center'}),
-                    html.Td(f"{offer.delivery_fees:.2f} €",style={'textAlign': 'center'})
+                    html.Td(f"{offer.total_cost:.2f}",style={'textAlign': 'center'}),
+                    html.Td(f"{offer.delivery_fees:.2f}",style={'textAlign': 'center'})
                 ])
             )
         return (table_rows, html.P(f"Dernière mise à jour le {formatted_timestamp}", style={'fontSize': '0.8em'}),
                 arrow_classNames['source-arrow'], arrow_classNames['name-arrow'],
+                arrow_classNames['purity-arrow'],arrow_classNames['weight-arrow'],arrow_classNames['bullion-weight-arrow'],
                 arrow_classNames['premium-arrow'], arrow_classNames['quantity-arrow'], arrow_classNames['ppc-arrow'],
                 arrow_classNames['total_cost-arrow'],arrow_classNames['delivery-arrow'], False)
 
@@ -737,20 +791,29 @@ def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_
         if triggered_id == 'name-header':
             column_index = 1
             sort_key = 'name'
-        elif triggered_id == 'premium-header':
+        elif triggered_id == 'purity-header':
             column_index = 2
+            sort_key = 'purity'
+        elif triggered_id == 'weight-header':
+            column_index = 3
+            sort_key = 'weight'
+        elif triggered_id == 'bullion-weight-header':
+            column_index = 4
+            sort_key = 'bullion-weight'
+        elif triggered_id == 'premium-header':
+            column_index = 5
             sort_key = 'premium'
         elif triggered_id == 'ppc-header':
-            column_index = 3
+            column_index = 6
             sort_key = 'ppc'
         elif triggered_id == 'quantity-header':
-            column_index = 4
+            column_index = 7
             sort_key = 'quantity'
         elif triggered_id == 'total_cost-header':
-            column_index = 5
+            column_index = 8
             sort_key = 'total_cost'
         elif triggered_id == 'delivery-header':
-            column_index = 6
+            column_index = 9
             sort_key = 'delivery_fees'
 
         if sort_key == 'total_cost':
@@ -791,6 +854,7 @@ def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_
         arrow_classNames[arrow_icon_id] = "fa fa-sort-down ms-2" if ascending else "fa fa-sort-up ms-2"
 
         return (current_table, dash.no_update, arrow_classNames['source-arrow'], arrow_classNames['name-arrow'],
+                arrow_classNames['purity-arrow'],arrow_classNames['weight-arrow'],arrow_classNames['bullion-weight-arrow'],
                 arrow_classNames['premium-arrow'], arrow_classNames['quantity-arrow'], arrow_classNames['ppc-arrow'],
                 arrow_classNames['total_cost-arrow'],arrow_classNames['delivery-arrow'], False)
     else :
@@ -855,7 +919,7 @@ def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_
             try :
                 ppc_ipc = price_per_coin + (delivery_cost/ (total_quantity*row['quantity']))
 
-                spot_cost = weights[row['name']] * metal_price
+                spot_cost = weights[row['name']][0] * weights[row['name']][1] * metal_price
                 premium = ppc_ipc - spot_cost
                 premium_percentage = (premium / spot_cost) * 100
                 total_cost = ppc_ipc * total_quantity * row['quantity']
@@ -875,8 +939,11 @@ def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_
                 continue
 
             cheapest_offers.append({
-                'name': row['name'].upper(),
+                'name': row['name'],
                 'source': row['source'],
+                'purity': weights[row['name']][1],
+                'weight': weights[row['name']][0]*total_quantity * row['quantity'],
+                'bullion_weight': weights[row['name']][0]*weights[row['name']][1] * total_quantity * row['quantity'],
                 'premium':premium_percentage,
                 'price_per_coin': ppc_ipc,
                 'quantity': total_quantity if row['quantity'] == 1 else str(total_quantity) + ' x ' + str(row['quantity']) + ' ({total_quantity})'.format(total_quantity=str(total_quantity * row['quantity'])) ,
@@ -887,7 +954,7 @@ def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_
         # Sort offers by premium (lowest first)
         cheapest_offers.sort(key=lambda x: x['premium'])
 
-        for offer in cheapest_offers[:40]:
+        for i, offer in enumerate(cheapest_offers[:40]):
             table_rows.append(
                 html.Tr([
                     html.Td(
@@ -899,12 +966,22 @@ def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_
                         ),
                         style={'textAlign': 'center'}
                     ),
-                    html.Td(offer['name'][4:]),
+                    html.Td([
+                        offer['name'][4:].upper(),
+                        dbc.Tooltip(
+                            f'Poid Fin: {weights[offer["name"]][0]*weights[offer["name"]][1]:.2f} g. Poid Total: {weights[offer["name"]][0]:.2f} g.',
+                            target=f"tooltip-target-name-{i}",
+                            placement="left",
+                        ),
+                    ], id=f"tooltip-target-name-{i}"),
+                    html.Td(f"{offer['purity']*1000.0:.1f}",style={'textAlign': 'center'}),
+                    html.Td(f"{offer['weight']:.2f}",style={'textAlign': 'center'}),
+                    html.Td(f"{offer['bullion_weight']:.2f}",style={'textAlign': 'center'}),
                     html.Td(f"{offer['premium']:.2f}",style={'textAlign': 'center'}),
-                    html.Td(f"{offer['price_per_coin']:.2f} €",style={'textAlign': 'center'}),
+                    html.Td(f"{offer['price_per_coin']:.2f}",style={'textAlign': 'center'}),
                     html.Td(offer['quantity'],style={'textAlign': 'center'}),
-                    html.Td(f"{offer['total_cost']:.2f} €",style={'textAlign': 'center'}),
-                    html.Td(f"{offer['delivery_fees']:.2f} €",style={'textAlign': 'center'})
+                    html.Td(f"{offer['total_cost']:.2f}",style={'textAlign': 'center'}),
+                    html.Td(f"{offer['delivery_fees']:.2f}",style={'textAlign': 'center'})
                 ])
             )
 
@@ -918,6 +995,9 @@ def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_
                     html.Td(DEBUG_icon, style={'textAlign': 'center'}),
                     html.Td(DEBUG_icon, style={'textAlign': 'center'}),
                     html.Td(DEBUG_icon, style={'textAlign': 'center'}),
+                    html.Td(DEBUG_icon, style={'textAlign': 'center'}),
+                    html.Td(DEBUG_icon, style={'textAlign': 'center'}),
+                    html.Td(DEBUG_icon, style={'textAlign': 'center'}),
                     html.Td(DEBUG_icon, style={'textAlign': 'center'})
                 ])
             )
@@ -926,6 +1006,9 @@ def update_and_sort_table(budget_range, quantity, bullion_type_switch, selected_
                 html.P(f"Dernière mise à jour le {formatted_timestamp}", style={'fontSize': '0.8em'}),
                 arrow_classNames['source-arrow'],
                 arrow_classNames['name-arrow'],
+                arrow_classNames['purity-arrow'],
+                arrow_classNames['weight-arrow'],
+                arrow_classNames['bullion-weight-arrow'],
                 arrow_classNames['premium-arrow'],
                 arrow_classNames['quantity-arrow'],
                 arrow_classNames['ppc-arrow'],
