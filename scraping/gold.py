@@ -36,7 +36,7 @@ CMN = {
 }
 #https://www.gold.fr/informations-sur-l-or/nous-connaitre/conditions-generales-dutilisation#frais-et-commissions
 
-def get_price_for(session_prod, session_id,buy_price_gold,buy_price_silver):
+def get_price_for(session_prod, session_id,buy_price_gold,buy_price_silver,driver=None):
     url_domain = "https://www.gold.fr"
     url = "https://www.gold.fr/achat-piece-or/"
     logger.debug("https://www.gold.fr/achat-piece-or/")

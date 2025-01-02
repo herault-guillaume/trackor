@@ -1,6 +1,6 @@
 import random
 import time
-
+from seleniumbase import Driver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -74,7 +74,9 @@ urls = {
     "ar - 10 yuan panda 30g": "https://www.bullionbypost.fr/pieces-argent/panda-argent/piece-30g-panda-chinois-argent-notre-choix/",
     "ar - 1 oz": "https://www.bullionbypost.fr/pieces-argent/pieces-argent-1-once-notre-choix/piece-argent-1-once-meilleure-offreb/",
 }
-def get_price_for(session_prod,session_id,buy_price_gold,buy_price_silver,driver):
+def get_price_for(session_prod,session_id,buy_price_gold,buy_price_silver,driver=None):
+    if not driver:
+        driver = Driver(uc=True, headless=True)
     print("https://www.bullionbypost.fr/")
     logger.debug(f"Scraping started for https://www.bullionbypost.fr/")
 

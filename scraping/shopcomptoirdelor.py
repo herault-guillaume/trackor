@@ -5,6 +5,7 @@ from scraping.dashboard.pieces import weights
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from seleniumbase import Driver
 from price_parser import Price
 import traceback
 import logging
@@ -63,10 +64,9 @@ CMN = {
 
 }
 
-def get_price_for(session_prod, session_id,buy_price_gold,buy_price_silver,driver):
-    """
-    Retrieves coin purchase prices from Orobel using Selenium.
-    """
+def get_price_for(session_prod, session_id,buy_price_gold,buy_price_silver,driver=None):
+    if not driver:
+        driver = Driver(uc=True, headless=True)
 
     urls = ["https://www.shop-comptoirdelor.be/achat-or/pieces?page=1",
             "https://www.shop-comptoirdelor.be/achat-or/pieces?page=2",

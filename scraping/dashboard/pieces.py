@@ -105,6 +105,7 @@ weights  = {
                         'or - 20 kroner frederik VIII': (8.9606 , 0.9),
                         'or - 20 dollars': (33.437 , 0.9), # -> CPor
                         'or - 20 dollars tete indien': (33.437 , 0.9), # -> CPor
+                        'or - 20 dollars liberté': (33.437 , 0.9), # -> CPor
                         'or - 20 dollars liberté longacre': (33.437 , 0.9), # -> CPor
                         'or - 20 dollars liberté st gaudens': (33.437 , 0.9), # -> CPor
                         'or - 20 francs fr': (6.45 , 0.9), # -> CPor

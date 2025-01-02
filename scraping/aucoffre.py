@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 #https://www.aucoffre.com/acheter/tarifs-aucoffre-com
 
-def get_price_for(session_prod,session_id,buy_price_gold,buy_price_silver):
+def get_price_for(session_prod,session_id,buy_price_gold,buy_price_silver,driver=None):
     """
     Fetches the buy price of the 20 Francs Marianne coin from AuCOFFRE using requests and BeautifulSoup.
     """

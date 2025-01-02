@@ -11,7 +11,7 @@ import pytz
 # Get a logger instance
 logger = logging.getLogger(__name__)
 
-def get_price_for(session_prod,session_id,buy_price_gold,buy_price_silver):
+def get_price_for(session_prod,session_id,buy_price_gold,buy_price_silver,driver=None):
     """
     Retrieves the 'or - 20 francs fr coq marianne' coin purchase price from Goldforex using requests and BeautifulSoup.
     """

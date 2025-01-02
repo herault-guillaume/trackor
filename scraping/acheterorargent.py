@@ -218,7 +218,7 @@ CMN = {
     '5 lire vittorio emanuele II argent': 'ar - 5 lire vittorio emanuele II',
 }
 
-def get_price_for(session_prod,session_id,buy_price_gold,buy_price_silver):
+def get_price_for(session_prod,session_id,buy_price_gold,buy_price_silver,driver=None):
 
     base_url = 'https://www.acheter-or-argent.fr/index2.php/categorie-produit/'
     urls = [base_url+'pieces-dor/page/{i}/'.format(i=i) for i in range(1,17)] + [base_url+'/pieces-dargent/page/{i}/'.format(i=i) for i in range(1,25)]

@@ -73,7 +73,7 @@ def get_delivery_price(price):
         return 25.0
 # forfait
 
-def get_price_for(session_prod,session_id,buy_price_gold,buy_price_silver):
+def get_price_for(session_prod,session_id,buy_price_gold,buy_price_silver,driver=None):
 
 
     urls =["https://www.joubert-change.fr/or-investissement/cours/prix.html",""]

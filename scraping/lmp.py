@@ -31,7 +31,7 @@ CMN = {
     "10 Francs Hercule": "ar - 10 francs fr turin (1860-1928)",
 
 }
-def get_price_for(session_prod,session_id,buy_price_gold,buy_price_silver):
+def get_price_for(session_prod,session_id,buy_price_gold,buy_price_silver,driver=None):
     urls = ['https://www.lesmetauxprecieux.com/achat-vente-or/pieces-or/','https://www.lesmetauxprecieux.com/achat-vente-argent/piece-argent/']
     logger.debug('https://www.lesmetauxprecieux.com/achat-vente-or/pieces-or/')
     headers = {'User-Agent': 'Mozilla/5.0'}  # Mimic browser behavior

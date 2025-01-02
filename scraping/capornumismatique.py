@@ -29,7 +29,7 @@ CMN = {'20 Francs Marianne Coq': 'or - 20 francs fr coq marianne',
  '20 Francs Tunisie': 'or - 20 francs tunisie',
  '5 Roubles': 'or - 5 roubles'}
 
-def get_price_for(session_prod,session_id,buy_price_gold,buy_price_silver):
+def get_price_for(session_prod,session_id,buy_price_gold,buy_price_silver,driver=None):
     """
     Retrieves the 'or - 20 francs coq marianne' coin purchase price from Change de la Bourse using requests and BeautifulSoup.
     """

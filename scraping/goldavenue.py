@@ -1,7 +1,7 @@
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-
+from seleniumbase import Driver
 from scraping.dashboard.database import Item
 from scraping.dashboard.pieces import weights
 from price_parser import Price
@@ -44,8 +44,9 @@ urls = {
 
 
 
-def get_price_for(session_prod,session_id,buy_price_gold,buy_price_silver,driver):
-    # Set up headless Chrome
+def get_price_for(session_prod,session_id,buy_price_gold,buy_price_silver,driver=None):
+    if not driver:
+        driver = Driver(uc=True, headless=True)
     logger.debug("https://www.goldavenue.com/")
     for CMN, url in urls.items():
         try:

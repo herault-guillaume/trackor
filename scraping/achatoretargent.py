@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from seleniumbase import Driver
 from scraping.dashboard.database import Item
 from scraping.dashboard.pieces import weights
 from price_parser import Price
@@ -92,8 +93,9 @@ CMN = {
     "Sachet Scellé 45 pièces d'Ecu 5 Francs" : ('ar - 5 francs fr ecu (1854-1860)',45),
 }
 
-def get_price_for(session_prod, session_id, buy_price_gold,buy_price_silver,driver):
-
+def get_price_for(session_prod, session_id, buy_price_gold,buy_price_silver,driver=None):
+    if not driver:
+        driver = Driver(uc=True, headless=True)
     base_url = "https://www.achat-or-et-argent.fr"
     print(base_url)
     logger.debug(f"Scraping started for {base_url}") # Example debug log

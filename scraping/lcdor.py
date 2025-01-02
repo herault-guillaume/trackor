@@ -33,7 +33,7 @@ CMN = {
 }
 
 #via panier
-def get_price_for(session_prod,session_id,buy_price_gold,buy_price_silver):
+def get_price_for(session_prod,session_id,buy_price_gold,buy_price_silver,driver=None):
     url = 'https://lcdor.fr/achat-or/pieces-dor/'
     logger.debug(url)
     print(url)

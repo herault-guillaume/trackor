@@ -1,3 +1,4 @@
+from seleniumbase import Driver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -57,8 +58,9 @@ CMN = {
         "5 Roubles" : "or - 5 roubles",
 }
 
-def get_price_for(session_prod,session_id,buy_price_gold,buy_price_silver,driver):
-
+def get_price_for(session_prod,session_id,buy_price_gold,buy_price_silver,driver=None):
+    if not driver:
+        driver = Driver(uc=True, headless=True)
     url = "https://www.bdor.fr/achat-or-en-ligne"
     print(url)
     logger.debug(f"Scraping started for {url}")

@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 from scraping.dashboard.database import Item
 from scraping.dashboard.pieces import weights
+from seleniumbase import Driver
 from price_parser import Price
 import traceback
 import logging
@@ -12,10 +13,9 @@ import re
 # Get a logger instance
 logger = logging.getLogger(__name__)
 
-def get_price_for(session_prod,session_id,buy_price_gold,buy_price_silver,driver):
-    """
-    Retrieves the 'or - 20 francs fr coq marianne' coin purchase price from Goldforex using requests and BeautifulSoup.
-    """
+def get_price_for(session_prod,session_id,buy_price_gold,buy_price_silver,driver=None):
+    if not driver:
+        driver = Driver(uc=True, headless=True)
     print("https://stonexbullion.com/")
     logger.debug(f"Scraping started for https://stonexbullion.com/") # Example debug log
 

@@ -1,6 +1,7 @@
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from seleniumbase import Driver
 from scraping.dashboard.database import Item
 from scraping.dashboard.pieces import weights
 from price_parser import Price
@@ -33,17 +34,15 @@ CMN = {
     "50 dollars eagle": 'or - 1 oz american eagle',
     "Demi-souverain": 'or - 1/2 souverain georges V',
     "4 Ducats": 'or - 4 ducats',
-    "20 Dollars Eagle (US)": 'or - 20 dollars liberté',
+    "20 Dollars Eagle (US)": 'or - 20 dollars liberté st gaudens',
     "50 ECU": 'or - 50 écus charles quint',
     #"Chien Lunar 2018 1 once": 'or - lingot 1 once LBMA',
     "10 Francs Français": 'or - 10 francs fr'
 }
 
-def get_price_for(session_prod, session_id,buy_price_gold,buy_price_silver,driver):
-    """
-    Retrieves coin purchase prices from Orobel using Selenium.
-    """
-
+def get_price_for(session_prod, session_id,buy_price_gold,buy_price_silver,driver=None):
+    if not driver:
+        driver = Driver(uc=True, headless=True)
     urls = ["https://www.orobel.biz/catalogue/pieces-or","https://www.orobel.biz/catalogue/pieces-or/page/2","https://www.orobel.biz/catalogue/pieces-en-argent"]
     print(urls)
 
@@ -65,7 +64,10 @@ def get_price_for(session_prod, session_id,buy_price_gold,buy_price_silver,drive
             WebDriverWait(driver, 10).until(
                 EC.presence_of_all_elements_located((By.CLASS_NAME, "fusion-product-wrapper"))
             )
-    
+            # Wait for the products to load (adjust the timeout as needed)
+            out_of_stock_elements = WebDriverWait(driver, 10).until(
+                EC.presence_of_all_elements_located((By.CLASS_NAME, "fusion-out-of-stock"))
+            )
             # Try to find and click the "Load More Produits" button once
     
             # Find the product divs
@@ -73,22 +75,20 @@ def get_price_for(session_prod, session_id,buy_price_gold,buy_price_silver,drive
     
             for product in products_div:
                 try:
-                    if product.find_element(By.CLASS_NAME,'fusion-out-of-stock'):
-                        continue
-                    name_title = product.find_element(By.TAG_NAME,'a').get_attribute('aria-label')
-                    url = product.find_element(By.TAG_NAME,'a').get_attribute('href')
-                    name = name_title.text.strip()
-                    print(name)
+                    product.find_element(By.CLASS_NAME,"fusion-out-of-stock")
+                    continue
+                except Exception:
+                    name_title = product.find_element(By.CLASS_NAME,'product-images').get_attribute('aria-label')
+                    source = product.find_element(By.CLASS_NAME,'product-images').get_attribute('href')
+                    name = name_title.strip()
                     price_text = product.find_element(By.CLASS_NAME, 'woocommerce-Price-amount').text
                     price = Price.fromstring(price_text)
-    
-    
-    
-                    print(price,CMN[name],url)
-    
+
                     minimum = 1
                     quantity = 1
-                    item_data = CMN[name]
+                    item_data = CMN.get(name,None)
+                    if not item_data:
+                        continue
                     if isinstance(item_data, tuple):
                         name = item_data[0]
                         quantity = item_data[1]
@@ -96,14 +96,14 @@ def get_price_for(session_prod, session_id,buy_price_gold,buy_price_silver,drive
                     else:
                         name = item_data
                         bullion_type = item_data[:2]
-    
+
                     if bullion_type == 'or':
                         buy_price = buy_price_gold
                     else:
                         buy_price = buy_price_silver
-    
+
                     price_ranges = [(minimum,9999999999,price)]
-    
+
                     def price_between(value, ranges):
                         """
                         Returns the price per unit for a given quantity.
@@ -114,7 +114,8 @@ def get_price_for(session_prod, session_id,buy_price_gold,buy_price_silver,drive
                                     return price.amount_float
                                 else:
                                     return price
-    
+
+                    print(price, name, url)
                     coin = Item(name=name,
                                 price_ranges=';'.join(['{min_}-{max_}-{price}'.format(min_=r[0],max_=r[1],price=r[2].amount_float) for r in price_ranges]),
                                 buy_premiums=';'.join(
@@ -122,20 +123,20 @@ def get_price_for(session_prod, session_id,buy_price_gold,buy_price_silver,drive
                                     ['{:.2f}'.format(((price_between(i,price_ranges)/quantity + price_between(price_between(i,price_ranges),delivery_ranges)/(quantity*i)) - (buy_price * weights[name][0] * weights[name][1])) * 100.0 / (buy_price * weights[name][0] * weights[name][1])) for i in range(minimum, 751)]
                                 ),
                                 delivery_fees=';'.join(['{min_}-{max_}-{price}'.format(min_=r[0],max_=r[1],price=r[2]) for r in delivery_ranges]),
-                                source=url,
+                                source=source,
                                 session_id=session_id,
                                 bullion_type=bullion_type,
                                 quantity=quantity,
                                 minimum=minimum, timestamp=datetime.now(pytz.timezone('CET'))
     )
-    
+
                     session_prod.add(coin)
                     session_prod.commit()
-    
-    
+
+
                 except KeyError as e:
                     logger.error(f"KeyError: {name}")
-    
+
                 except Exception as e:
                     logger.error(f"An error occurred while processing a product: {e}")
                     traceback.print_exc()

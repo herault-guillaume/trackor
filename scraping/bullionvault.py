@@ -6,10 +6,12 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from scraping.dashboard.database import MetalPrice
+from seleniumbase import Driver
 
 def get(session_prod,session_id,driver):
     """Uses Selenium to click the currency button, then scrapes the 1 kg gold price in Euros."""
-
+    if not driver:
+        driver = Driver(uc=True, headless=True)
     try:
         url = "https://or.bullionvault.fr/"
         driver.get(url)
@@ -59,25 +61,21 @@ def get(session_prod,session_id,driver):
         # # Create GoldPrice object and add to session_prod
         gold_price = MetalPrice(buy_price=g_buy_price_eur, sell_price=g_sell_price_eur, session_id=session_id, bullion_type='or',timestamp=datetime.now(pytz.timezone('CET')))
         session_prod.add(gold_price)
-        print('i',g_buy_price_eur,g_sell_price_eur,session_id,'or')
+
         session_prod.commit()
 
-        print('i')
         # Extract the price from the span
         buy_price_element = driver.find_element(By.CSS_SELECTOR, '#buySILVERPrice span.EUR')
         buy_price_text = buy_price_element.text.strip()
-        print(buy_price_text)
-        print(g_buy_price_eur,g_sell_price_eur)
         # Clean the text and convert to a float
         s_buy_price_eur = float(buy_price_text.split('€')[0].replace('\xa0', '').replace(',', '.').replace(' ',''))/1000.0  # Remove € and nbsp
 
         # Extract the price from the span
         sell_price_element = driver.find_element(By.CSS_SELECTOR, '#sellSILVERPrice span.EUR')
         sell_price_text = sell_price_element.text.strip()
-        print(sell_price_text)
+
         # Clean the text and convert to a float
         s_sell_price_eur = float(sell_price_text.split('€')[0].replace('\xa0', '').replace(',', '.').replace(' ',''))/1000.0  # Remove € and nbsp
-        print(s_buy_price_eur,s_sell_price_eur)
 
         # Create GoldPrice object and add to session_prod
         silver_price = MetalPrice(buy_price=s_buy_price_eur, sell_price=s_sell_price_eur, session_id=session_id, bullion_type='ar',timestamp=datetime.now(pytz.timezone('CET')))
