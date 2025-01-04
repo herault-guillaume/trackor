@@ -2,6 +2,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from scraping.dashboard.pieces import weights
+import json
 
 import os
 import pandas as pd
@@ -14,7 +15,7 @@ from math import floor
 
 from sqlalchemy import func
 import dash
-from dash import dcc, html, Input, Output, State, callback_context
+from dash import dcc, html, Input, Output, State, callback_context, dash_table
 import dash_bootstrap_components as dbc
 from articles import article1, article2, article3, article4, article5, article6, article7, article8, article9
 
@@ -40,7 +41,6 @@ def create_tunnel():
         ssh_password=os.getenv('SSH_PASSWORD'),
         remote_bind_address=(os.getenv('REMOTE_BIND_ADDRESS'), int(os.getenv('REMOTE_PORT_ADDRESS', 3306)))
     )
-
 tunnel = create_tunnel()
 tunnel.start()
 
@@ -291,7 +291,9 @@ def get_country_flag_image(country_code):
 # Define the navigation bar
 navbar = dbc.NavbarSimple(
     children=[
-        dbc.NavItem(dbc.NavLink("Tableau de bord", href="/", id="nav-home")),
+        dbc.NavItem(dbc.NavLink("Tableau de bord offres pro.", href="/", id="nav-home")),
+        dbc.NavItem(dbc.NavLink("Estimation d'un lot", href="/estimation-lot", id="nav-estimation-lot")),
+
         #dbc.NavItem(dbc.NavLink("FAQ", href="/faq", id="nav-faq")),
         dbc.DropdownMenu(
             label="Articles Métaux Précieux",
@@ -366,6 +368,7 @@ app.layout = html.Div([
     header,
     dbc.Container(id="page-content", fluid=False),
     dcc.Store(id='initial-load', data=True),
+    dcc.Store(id='batch-data', storage_type='local'),  # Store for batch data
     html.Div(id='google-analytics-container'),
     dcc.Store(id='cookie-consent', storage_type='local'),  # Changed to local storage
     html.Div(
@@ -415,16 +418,13 @@ app.layout = html.Div([
                Input("nav-article7", "n_clicks"),
                Input("nav-article8", "n_clicks"),
                Input("nav-article9", "n_clicks"),
-               # Input("nav-faq", "n_clicks"),
-               # Input("nav-analyse", "n_clicks"),
-               # Input("nav-whoami", "n_clicks")
+               Input("nav-estimation-lot", "n_clicks")
                ])
 def render_page_content(pathname, n_clicks_home,
                         n_clicks_article1, n_clicks_article2, n_clicks_article3,
                         n_clicks_article4, n_clicks_article5, n_clicks_article6,
                         n_clicks_article7, n_clicks_article8, n_clicks_article9,
-                        #n_clicks_faq, n_clicks_analyse,n_clicks_whoami
-                        ):
+                        n_clicks_estimation_lot):
 
     ctx = callback_context
     triggered_id, _ = ctx.triggered[0]['prop_id'].split('.')
@@ -450,30 +450,8 @@ def render_page_content(pathname, n_clicks_home,
             return article8.layout()
         elif triggered_id == "nav-article9" or pathname == "/articles/9-etude-de-cas":
             return article9.layout()
-    # elif triggered_id == "nav-faq" or pathname == "/faq":
-    #     return html.Div([
-    #         html.H1("FAQ"),
-    #         html.P("Voici les questions fréquemment posées :"),
-    #         html.Ul([
-    #             html.Li("Question 1 ? Réponse 1."),
-    #             html.Li("Question 2 ? Réponse 2."),
-    #             html.Li("Question 3 ? Réponse 3."),
-    #             # ... add more FAQ items
-    #         ])
-    #     ])
-    # elif triggered_id == "nav-analyse" or pathname == "/analyse-prime-napoleon-d-or":
-    #     return serve_analysis()
-    # elif triggered_id == "nav-whoami" or pathname == "/qui-suis-je":
-    #     return html.Div([
-    #         html.H1("Qui suis je ?"),
-    #         html.P("Je suis un passionné de métaux précieux et j'ai créé ce site pour partager mes connaissances et mes analyses."),
-    #         # ... add more information about yourself
-    #     ])
-    else:
-        return html.Div([
-            html.H1("404: Page non trouvée"),
-            html.P("La page que vous recherchez n'existe pas."),
-        ])
+    elif triggered_id == "nav-estimation-lot" or pathname == "/estimation-lot":  # New condition for the detailed lot route
+        return serve_estimation_lot()
 
 @server.route('/sitemap.xml')
 def send_sitemap():
@@ -668,6 +646,226 @@ def serve_dashboard():
             footer,
             ],  color="gold", type="border", spinner_style={"position": "absolute", "top": "3em"}),
             ]))
+
+def serve_estimation_lot():
+    return html.Div([
+        dbc.Row([
+            dbc.Col(
+                dbc.Card([
+                    dbc.CardHeader(
+                        [
+                            html.I(className="fa-solid fa-magnifying-glass", style={'fontSize': '16px'}),
+                            "  Sélectionner une pièce",
+                        ],
+                        style={'textAlign': 'center'}
+                    ),
+                    dbc.CardBody([
+                        dcc.Dropdown(
+                            id='coin-name-dropdown',
+                            options=[{'label': name[4:].upper(), 'value': name} for name in weights if name.startswith('or')],
+                            placeholder="Sélectionnez une pièce",
+                            style={'width': '100%', 'color': 'black', 'textAlign': 'center'}
+                        ),
+                    ]),
+                ]),
+                width=4, className="mb-4"
+            ),
+            dbc.Col(
+                dbc.Card([
+                    dbc.CardHeader(
+                        [
+                            html.I(className="fa-solid fa-hashtag", style={'fontSize': '16px'}),
+                            "  Quantité",
+                        ],
+                        style={'textAlign': 'center'}
+                    ),
+                    dbc.CardBody([
+                        dcc.Dropdown(
+                            id='coin-quantity-dropdown',
+                            options=[{'label': i, 'value': i} for i in range(1, 201)],
+                            value=1,
+                            clearable=False,
+                            style={'width': '100%', 'color': 'black', 'textAlign': 'center'}
+                        ),
+                    ]),
+                ]),
+                width=2, className="mb-4"
+            ),
+            dbc.Col(
+                html.Button('Ajouter une pièce', id='add-coin-button', n_clicks=0, className='btn btn-secondary me-2'),
+                width=3,
+            ),
+            dbc.Col(
+                dbc.Card([
+                    dbc.CardHeader([html.I(className="fa-solid fa-cube", style={'fontSize': '16px'}), "  Bullion",
+                                    dbc.Tooltip("Source cours du métal : BullionVault.", target="cardheader-bullion")],
+                                   style={'textAlign': 'center'}),
+                    dbc.CardBody([
+                        html.Div(
+                            [
+                                html.Span("Argent", className="me-2"),
+                                dbc.Switch(
+                                    id='bullion-type-switch',
+                                    label="",
+                                    value=True,
+                                    className="gold-silver-switch larger-switch",
+                                    persistence=False,
+                                ),
+                                html.Span("Or", className="ms-2"),
+                            ],
+                            className="d-flex align-items-center justify-content-between"
+                            # No need for width: 100% here
+                        )
+                        , html.Div(id='metal-price-output'),
+                    ], id="cardheader-bullion")
+                ],  # The tooltip
+                ),  # Set a fixed width for the Card
+                xs=6, sm=6, md=3, lg=3, xl=2, xxl=2, className="mb-4"
+            ),
+        ]),
+        dbc.Row([
+            dbc.Col(
+                dash_table.DataTable(
+                    id='batch-table',
+                    columns=[
+                        {'name': 'Quantité', 'id': 'quantity', 'type': 'numeric', 'editable': True},
+                        {'name': 'Pièce', 'id': 'name', 'type': 'text'},
+                        {'name': 'Poids total (g)', 'id': 'total_weight', 'type': 'numeric'},
+                        {'name': 'Poids fin (g)', 'id': 'bullion_weight', 'type': 'numeric'},  # New column
+                        {'name': 'Prix spot (€)', 'id': 'spot_price', 'type': 'numeric'}  # New column
+                    ],
+                    data=[{}],
+                    style_cell={'textAlign': 'center'},
+                    editable=True,
+                    row_deletable=True,
+                    # Apply DARKLY theme styles
+                    style_header={
+                        'backgroundColor': '#282828',
+                        'color': 'white',
+                        'fontWeight': 'bold'
+                    },
+                    style_data={
+                        'backgroundColor': '#1A1A1A',
+                        'color': 'white'
+                    },
+                    style_table={'overflowX': 'auto'},
+
+                ),
+                width=12, className="mb-4"
+            )
+        ]),
+        dbc.Row([
+            dbc.Col(
+                html.Div(id='saved-batches-display'),
+                width=12, className="mb-4"
+            )
+        ]),
+        dbc.Row([
+            dbc.Col([
+                html.Button('Enregistrer le lot', id='save-batch-button', n_clicks=0, className='btn btn-secondary me-2'),
+                html.Button('Supprimer le lot', id='delete-batch-button', n_clicks=0, className='btn btn-danger'),
+            ], width=12, className="mb-4")
+        ]),
+        dbc.Row([
+            dbc.Col(
+                html.Div(id='estimation-lot-output'),
+                width=12
+            )
+        ])
+    ])
+
+def get_metal_price(bullion_type):
+    results = MetalPrice.get_previous_price(bullion_type)
+    metal_prices_df = pd.DataFrame(results)
+    return metal_prices_df['buy_price'].iloc[0]
+
+@app.callback(
+    Output('coin-name-dropdown', 'options'),
+    [Input('bullion-type-switch', 'value')]
+)
+def update_coin_dropdown(bullion_type_switch):
+    if bullion_type_switch:
+        return [{'label': name[4:].upper(), 'value': name} for name in weights if name.startswith('or')]
+    else:
+        return [{'label': name[4:].upper(), 'value': name} for name in weights if name.startswith('ar')]
+
+@app.callback(
+    Output('batch-table', 'data'),
+    [Input('add-coin-button', 'n_clicks'),
+     Input('batch-table', 'data_previous')],
+    [State('coin-name-dropdown', 'value'),
+     State('coin-quantity-dropdown', 'value'),
+     State('batch-table', 'data'),
+     State('bullion-type-switch', 'value')]  # Add bullion type state
+)
+def update_batch_table(add_clicks, prev_batch_data, coin_name, coin_quantity, current_batch_data, bullion_type_switch):
+    ctx = callback_context
+    triggered_id, triggered_prop = ctx.triggered[0]['prop_id'].split('.')
+
+    if triggered_id == 'add-coin-button' and add_clicks > 0 and coin_name and coin_quantity:
+        bullion_type = 'or' if bullion_type_switch else 'ar'  # Get bullion type
+        coin_weight = weights[coin_name][0]
+        coin_purity = weights[coin_name][1]
+        metal_price = get_metal_price(bullion_type)  # Get metal price
+
+        new_coin = {
+            'quantity': coin_quantity,
+            'name': coin_name[4:].upper(),
+            'total_weight': coin_weight * coin_quantity,
+            'bullion_weight': coin_weight * coin_purity * coin_quantity,  # Calculate bullion weight
+            'spot_price': coin_weight * coin_purity * metal_price * coin_quantity  # Calculate spot price
+        }
+        if current_batch_data == [{}]:  # Check if the table only has the placeholder row
+            current_batch_data = [new_coin]  # Replace the placeholder with the new coin
+        else:
+            current_batch_data.append(new_coin)
+
+    if prev_batch_data is not None:
+        for row_curr, row_prev in zip(current_batch_data, prev_batch_data):
+            if row_curr['quantity'] != row_prev['quantity']:
+                coin_key = f"{'or' if 'OR' in row_curr['name'] else 'ar'} - {row_curr['name'].lower()}"
+                coin_weight = weights[coin_key][0]
+                coin_purity = weights[coin_key][1]
+                metal_price = get_metal_price('or' if 'OR' in row_curr['name'] else 'ar')
+
+                row_curr['total_weight'] = coin_weight * row_curr['quantity']
+                row_curr['bullion_weight'] = coin_weight * coin_purity * row_curr['quantity']
+                row_curr['spot_price'] = coin_weight * coin_purity * metal_price * row_curr['quantity']
+
+    return current_batch_data
+
+@app.callback(
+    Output('estimation-lot-output', 'children'),
+    [Input('batch-table', 'data'),
+     Input('bullion-type-switch', 'value')]
+)
+def calculate_estimation_lot(batch_data, bullion_type_switch):
+    if batch_data:
+        bullion_type = 'or' if bullion_type_switch else 'ar'
+        total_weight = 0
+        total_bullion_weight = 0
+        spot_price = 0
+
+        for row in batch_data:
+            try:
+                quantity = row['quantity']
+                name = row['name']
+                coin_key = f"{bullion_type} - {name.lower()}"
+                if coin_key in weights:
+                    coin_weight = weights[coin_key][0]
+                    coin_purity = weights[coin_key][1]
+                    total_weight += coin_weight * quantity
+                    total_bullion_weight += coin_weight * coin_purity * quantity
+                    spot_price += coin_weight * coin_purity * get_metal_price(bullion_type) * quantity
+            except:
+                pass
+
+        return html.Div([
+            html.P(f"Poids total: {total_weight:.2f} g"),
+            html.P(f"Poids fin: {total_bullion_weight:.2f} g"),
+            html.P(f"Valeur spot: {spot_price:.2f} €")
+        ])
+    return ""
 
 # #### DASHBOARD CALLBACKS ###############################################################################################
 @app.callback(

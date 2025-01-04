@@ -65,8 +65,8 @@ def get_price_for(session_prod,session_id,buy_price_gold,buy_price_silver,driver
     print(url)
     logger.debug(f"Scraping started for {url}")
     delivery_ranges = [
-        (0.0,1000.0,15.0),
-        (1000.0,999999999999.0,0.01)
+        (0.0,2500.0,15.0),
+        (2500.0,999999999999.0,0.01)
     ]
 
     try :

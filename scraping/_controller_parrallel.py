@@ -98,7 +98,7 @@ def fetch_and_update_data():
                 (comptoirdestuileries.get_price_for, None),
                 (gold.get_price_for, None),
                 (goldavenue.get_price_for, None),
-                (goldforex.get_price_for, None),
+                # (goldforex.get_price_for, None),
                 (goldreserve.get_price_for, None),
                 (lcdor.get_price_for, None),
                 (lmp.get_price_for, None),

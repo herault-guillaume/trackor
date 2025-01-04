@@ -66,8 +66,8 @@ def get_price_for(session_prod,session_id,buy_price_gold,buy_price_silver,driver
     }
 
     delivery_ranges = [
-    (0, 600, 10.0),      # Price 0-600, delivery cost 10.0
-    (600.00, 2500, 20.0),  # Price 600.00-2500, delivery cost 20.0
+    (0.0, 1000.00, 15.0),      # Price 0-600, delivery cost 10.0
+    (1000.00, 2500.0, 20.0),  # Price 600.00-2500, delivery cost 20.0
     (2500.00, 5000, 34.0), # Price 2500.00-5000, delivery cost 34.0
     (5000.00, 7500, 50.0), # Price 5000.00-7500, delivery cost 50.0
     (7500.00, 10000, 56.0),# Price 7500.00-10000, delivery cost 56.0

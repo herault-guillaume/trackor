@@ -65,8 +65,9 @@ def get_price_for(session_prod,session_id,buy_price_gold,buy_price_silver,driver
 
     delivery_ranges = (
         [1,500,14.0],
-        [500,1000,26.0],
-        [1000,100000000,56.0],
+        [500,1000,25.30],
+        [1000,5000,56.1],
+        [5000,999999999999,9999999999999],
     )
 
     for url in urls :

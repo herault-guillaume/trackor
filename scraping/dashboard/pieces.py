@@ -5,7 +5,7 @@ weights  = {
                         'or - 1 oz EpargnOr' : (31.103 , 0.9999),
                         'or - 1 oz buffalo': (31.103 , 0.9999),
                         'or - 1 oz krugerrand': (33.93 , 0.9167),# -> CPor
-                        'or - 1 oz nugget / kangourou': (31.104 , 0.9999),
+                        'or - 1 oz nugget / kangourou': (31.103 , 0.9999),
                         'or - 1 oz philharmonique': (31.103 , 0.9999),
                         'or - 1 oz britannia' : (31.103 , 0.9999),
                         'or - 1 oz panda' : (31.103 , 0.9999),
